@@ -55,6 +55,7 @@ TEST(Controller,insertData_ok){
     EXPECT_CALL(database,insert_data(UrlTest,keyTest,passTest)).Times(1).WillOnce(Return(true));
     bool ans_test = view->PostData(UrlTest);
     EXPECT_TRUE(ans_test);
+    delete view;
 }
 
 
@@ -67,6 +68,7 @@ TEST(Controller,insertData_not_ok){
     EXPECT_CALL(database,insert_data(UrlTest,keyTest,passTest)).Times(1).WillOnce(Return(false));
     bool ans_test = view->PostData(UrlTest);
     EXPECT_FALSE(ans_test);
+    delete view;
 }
 
 TEST(UniqueNameCreator,createKey_ok){

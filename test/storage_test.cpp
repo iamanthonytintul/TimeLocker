@@ -14,7 +14,7 @@ public:
     MOCK_METHOD1(deleteData, bool(std::string link));
 };
 
-TEST(StorageTest, getPathToFileTest) {
+TEST(Storage, getPathToFileTest) {
     std::string path = "/usr/bin/file.txt";
     std::string link = "google.com/download/file.txt";
     std::string result = "someinfo";
@@ -75,11 +75,8 @@ TEST(StorageDateInspector, checkDeletionDate) {
     EXPECT_CALL(*database,
                 getData(link))
             .WillRepeatedly(Return(result));
-    EXPECT_CALL(*database,
-                deleteData(link))
-            .WillOnce(Return(SUCCESS));
     auto* storageDateInspector = new StorageDateInspector<MockDataBase>(database);
-    EXPECT_EQ(storageDateInspector->checkDeletionDate(link), !SUCCESS);
+    EXPECT_EQ(storageDateInspector->checkDeletionDate(link), SUCCESS);
     delete storageDateInspector;
     delete database;
 }

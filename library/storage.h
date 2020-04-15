@@ -76,7 +76,6 @@ private:
 
 template <class Database>
 int StorageDateInspector<Database>::checkDeletionDate(std::string link) {
-    bool result = DBManager->deleteData(link);
     return SUCCESS;
 }
 

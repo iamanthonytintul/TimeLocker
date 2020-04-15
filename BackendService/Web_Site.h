@@ -12,7 +12,7 @@
 class WebSite:public cppcms::application{
     AbstractController* view;
 public:
-    explicit WebSite(cppcms::service &s);
+    explicit WebSite(cppcms::service &s,AbstractController* _view);
     int Response(std::string key);
 };
 

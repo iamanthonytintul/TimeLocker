@@ -15,19 +15,21 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 enable_testing()
 add_subdirectory(backend_server_testing)
 
+add_definitions(-DPATH_TO_UPLOADS="${PROJECT_SOURCE_DIR}/uploads/")
+
 
 include_directories(${PROJECT_SOURCE_DIR}/library/includes)
 include_directories(${PROJECT_SOURCE_DIR}/library/source)
 include_directories(${PROJECT_SOURCE_DIR}/BackendService)
 include_directories(${PROJECT_SOURCE_DIR}/src)
-include_directories(${PROJECT_SOURCE_DIR}/cppcms-1.2.1/cppcms)
 include_directories(${PROJECT_SOURCE_DIR}/cppcms-1.2.1)
+include_directories(${PROJECT_SOURCE_DIR}/cppcms-1.2.1/booster)
 
 find_library(LIB_BOOSTER booster)
 find_library(LIB_CPPCMS cppcms)
 
 add_library(BackendLogicLibrary STATIC library/source/src.cpp)
-add_library(BackendServiceLibrary STATIC BackendService/WebSite.cpp)
+add_library(BackendServiceLibrary STATIC BackendService/src/WebSite.cpp)
 
 add_executable(FileService src/main.cpp)
 

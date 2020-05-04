@@ -1,10 +1,9 @@
-#include <iostream>
-#include "storage.cpp"
+#include "storageMYSQL.h"
 
 int main() {
     //  строки ниже для проверки работы, позже нужно удалить, когда тесты напишу
-    std::map<string, string> result;
-    StorageMySQL< std::map<string,string> > database;
+    map<string, string> result;
+    StorageMySQL<map<string, string>> database;
     database.saveData("FourthFile", "1289", "2020-03-03");
     database.saveData("FirstFile", "1289", "2020-03-03");
     database.saveData("SixthFile", "1289", "2020-03-03");

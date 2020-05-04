@@ -1,4 +1,3 @@
-#include <mysql_connection.h>
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
@@ -58,8 +57,8 @@ StorageMySQL<DBRow>::StorageMySQL(): _statement(nullptr), _resultSet(nullptr), _
     cout << endl;
 }
 
-template <typename DATABASERow>
-StorageMySQL<DATABASERow>::~StorageMySQL() {
+template <typename DBRow>
+StorageMySQL<DBRow>::~StorageMySQL() {
     cout << "Closing connection to database \"" << DATABASE << "\"..." << endl;
     if (_isConnectionStated) {
         _connection->close();

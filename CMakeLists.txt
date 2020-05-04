@@ -13,8 +13,15 @@ execute_process(COMMAND ${CMAKE_COMMAND} --build .
 add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
         ${CMAKE_BINARY_DIR}/googletest-build)
 
-add_executable(TimeLocker src/main.cpp src/storage.cpp)
+set(FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR ~/mysql-connector-cpp)
+include_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include)
+link_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib)
 
 enable_testing()
 add_subdirectory(test)
-include_directories(${PROJECT_SOURCE_DIR}/library)
+include_directories(${PROJECT_SOURCE_DIR}/library ${PROJECT_SOURCE_DIR}/src)
+file (GLOB sources
+        "${PROJECT_SOURCE_DIR}/src/*.cpp")
+add_executable(TimeLocker ${sources})
+target_link_libraries(TimeLocker mysqlcppconn)
+

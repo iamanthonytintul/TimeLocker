@@ -9,13 +9,13 @@
 
 class NameCreator{
 public:
-    virtual char* createKey(std::string name) = 0;
+    virtual std::string createKey(std::string name) = 0;
 };
 
 
 class UniqueNameMaker:public NameCreator{
 public:
-    char* createKey(std::string name) override;
+    std::string createKey(std::string name) override;
 };
 
 

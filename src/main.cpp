@@ -16,5 +16,7 @@ int main(int argc, char* argv[]){
     }catch(std::exception const &e){
         std::cerr<<e.what() << std::endl;
     }
+    delete database;
+    delete view;
     return 0;
 }

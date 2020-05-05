@@ -5,3 +5,4 @@
 /mysql-connector-cpp
 /library/includes/storage.h
 /library/includes/storageMYSQL.hpp
+/library/includes/NameCreator.h

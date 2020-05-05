@@ -55,16 +55,16 @@ void WebSite::PostResponse() {
             std::string pass = form.info.input_pass.value();
             std::string name = view->PostData(pass) + ".zip";
             form.info.input_file.value()->save_to(PATH_TO_UPLOADS + name);
-            return(render(""));
+            return(render("first",form));
         }
     }
-    return(render())
+    return(render("first",form));
 }
 
 void WebSite::GetResponse(std::string key) {
     content::getViaKey_file form;
     if(request().request_method() == "GET"){
-        return(render())
+        return(render("first",form));
     }
     else if(request().request_method() == "POST"){
         form.info.load(context());
@@ -72,7 +72,7 @@ void WebSite::GetResponse(std::string key) {
             std::string pass = form.info.input_pass.value();
             std::string file_name = view->GetData(key,pass);
             if(file_name.empty() || !fileExists(PATH_TO_UPLOADS + file_name)){
-                return(render())
+                return(render("first",form));
             }
             response().add_header("X-Accel-Redirect",DOWNLOAD_PATH+file_name);
             response().content_type(ACCEPTABLE_MIME);
@@ -99,7 +99,7 @@ void WebSite::APIGETResponse() {
             response().add_header("Content-Disposition: attachment; filename=", file_name);
         }
     } else {
-        return response().status(METHOD_NOT_ALLOWED)
+        return response().status(METHOD_NOT_ALLOWED);
     }
 }
 
@@ -115,7 +115,7 @@ void WebSite::APIPOSTResponse() {
             return response().status(BAD_REQUEST);
         }
     } else {
-        return response().status(METHOD_NOT_ALLOWED)
+        return response().status(METHOD_NOT_ALLOWED);
     }
 }
 

@@ -21,7 +21,8 @@ enable_testing()
 add_subdirectory(test)
 include_directories(${PROJECT_SOURCE_DIR}/library ${PROJECT_SOURCE_DIR}/src)
 file (GLOB sources
-        "${PROJECT_SOURCE_DIR}/library/*.cpp"
+        "${PROJECT_SOURCE_DIR}/library/source/*.cpp"
         "${PROJECT_SOURCE_DIR}/src/*.cpp")
 add_executable(TimeLocker ${sources})
 target_link_libraries(TimeLocker mysqlcppconn)
+

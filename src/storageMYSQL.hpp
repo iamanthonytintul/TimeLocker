@@ -10,7 +10,7 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include "storage.h"
+#include "includes/storage.h"
 
 #define HOST "localhost"
 #define USER "dansik"
@@ -23,7 +23,7 @@ using std::map;
 using std::string;
 
 template <typename DBRow>
-class StorageMySQL: public IDBManager<DBRow> {
+class StorageMySQL: public AbstractDBManager<DBRow> {
 public:
     StorageMySQL();
     ~StorageMySQL() override;

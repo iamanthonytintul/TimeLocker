@@ -29,6 +29,7 @@ public:
     ~StorageMySQL() override;
     int saveData(string key, string password, string deletionDate) override;
     DBRow getData(string key) override;
+    bool isConnected() override { return _isConnectionStated; }
 private:
     sql::Driver* _driver;
     sql::Connection* _connection;
@@ -65,7 +66,7 @@ StorageMySQL<DBRow>::StorageMySQL(): _statement(nullptr), _resultSet(nullptr), _
 template <typename DBRow>
 StorageMySQL<DBRow>::~StorageMySQL() {
     cout << "Closing connection to database \"" << DATABASE << "\"..." << endl;
-    if (_isConnectionStated) {
+    if (isConnected()) {
         _connection->close();
         delete _connection;
         cout << "Connection to database \"" << DATABASE << "\" is closed." << endl;
@@ -78,7 +79,7 @@ StorageMySQL<DBRow>::~StorageMySQL() {
 template <typename DBRow>
 int StorageMySQL<DBRow>::saveData(string key, string password, string deletionDate) {
 
-    if (!_isConnectionStated) {
+    if (!isConnected()) {
         cout << "Error: "
                 "connection to database \"" << DATABASE << "\" is not stated." << endl;
         cout << "Insertion failed." << endl;
@@ -116,7 +117,7 @@ template <typename DBRow>
 DBRow StorageMySQL<DBRow>::getData(string key) {
     map<string, string> result;
 
-    if (!_isConnectionStated) {
+    if (!isConnected()) {
         cout << "Error: "
                 "connection to database \"" << DATABASE << "\" is not stated." << endl;
         cout << "Extraction failed." << endl;

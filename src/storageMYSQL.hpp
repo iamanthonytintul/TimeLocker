@@ -1,5 +1,6 @@
 #ifndef TIMELOCKER_STORAGE_H
 #define TIMELOCKER_STORAGEMYSQL_H
+
 #include <mysql_connection.h>
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
@@ -26,8 +27,8 @@ class StorageMySQL: public IDBManager<DBRow> {
 public:
     StorageMySQL();
     ~StorageMySQL() override;
-    int saveData(std::string key, std::string password, std::string deletionDate) override;
-    DBRow getData(std::string key) override;
+    int saveData(string key, string password, string deletionDate) override;
+    DBRow getData(string key) override;
 private:
     sql::Driver* _driver;
     sql::Connection* _connection;
@@ -75,7 +76,15 @@ StorageMySQL<DBRow>::~StorageMySQL() {
 }
 
 template <typename DBRow>
-int StorageMySQL<DBRow>::saveData(std::string key, std::string password, std::string deletionDate) {
+int StorageMySQL<DBRow>::saveData(string key, string password, string deletionDate) {
+
+    if (!_isConnectionStated) {
+        cout << "Error: "
+                "connection to database \"" << DATABASE << "\" is not stated." << endl;
+        cout << "Insertion failed." << endl;
+        return EXIT_FAILURE;
+    }
+
     try {
         cout << endl << "Inserting data..." << endl;
         _preparedStatement = _connection->prepareStatement("INSERT INTO "
@@ -104,8 +113,16 @@ int StorageMySQL<DBRow>::saveData(std::string key, std::string password, std::st
 }
 
 template <typename DBRow>
-DBRow StorageMySQL<DBRow>::getData(std::string key) {
+DBRow StorageMySQL<DBRow>::getData(string key) {
     map<string, string> result;
+
+    if (!_isConnectionStated) {
+        cout << "Error: "
+                "connection to database \"" << DATABASE << "\" is not stated." << endl;
+        cout << "Extraction failed." << endl;
+        return result;
+    }
+
     try {
         cout << endl << "Getting data using key \"" << key << "\"..." << endl;
         _statement = _connection->createStatement();
@@ -121,6 +138,7 @@ DBRow StorageMySQL<DBRow>::getData(std::string key) {
         }
         delete _resultSet;
         delete _statement;
+        cout << "Extraction done." << endl;
 
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
@@ -128,8 +146,8 @@ DBRow StorageMySQL<DBRow>::getData(std::string key) {
         cout << "# ERR: " << e.what();
         cout << " (MySQL error code: " << e.getErrorCode();
         cout << ", SQLState: " << e.getSQLState() << " )" << endl;
+        cout << "Extraction failed." << endl;
     }
-    cout << "Extraction done." << endl;
     return result;
 }
 

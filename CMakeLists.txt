@@ -31,8 +31,13 @@ find_library(LIB_BOOSTER booster)
 find_library(LIB_CPPCMS cppcms)
 find_path(INC_BOOSTER booster/config.h)
 find_path(INC_CPPCMS cppcms/config.h)
-include_directories(INC_BOOSTER)
-include_directories(INC_CPPCMS)
+include_directories(${INC_BOOSTER})
+include_directories(${INC_CPPCMS})
+
+set(FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR ${PROJECT_SOURCE_DIR}/mysql-connector-cpp)
+include_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include)
+link_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib)
+
 
 
 
@@ -41,4 +46,6 @@ add_library(BackendServiceLibrary STATIC BackendService/src/WebSite.cpp)
 
 add_executable(FileService src/main.cpp)
 
-target_link_libraries(FileService LIB_CPPCMS LIB_BOOSTER)
+target_link_libraries(FileService mysqlcppconn)
+target_link_libraries(FileService ${LIB_CPPCMS})
+target_link_libraries(FileService ${LIB_BOOSTER})

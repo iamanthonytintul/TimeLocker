@@ -3,3 +3,4 @@
 /.idea
 /build
 /mysql-connector-cpp
+/library/includes/storage.h

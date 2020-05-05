@@ -2,6 +2,13 @@
 #include "Content.h"
 #include "NameCreator.h"
 
+#define DOWNLOAD_PATH "/download/"
+#define ACCEPTABLE_MIME "application/zip"
+#define BAD_REQUEST 400
+#define NOT_FOUND 404
+#define SUCCESSFUL 200
+#define METHOD_NOT_ALLOWED 405
+
 
 content::info_form::info_form() {
     input_pass.message("Enter password");
@@ -10,7 +17,7 @@ content::info_form::info_form() {
     input_pass.non_empty();
     input_file.limits(MIN_LIMIT, MAX_LIMIT);
     input_file.filename(booster::regex(".*\\.zip"));
-    input_file.mime("application/zip");
+    input_file.mime(ACCEPTABLE_MIME);
     add(input_pass);
     add(input_file);
     add(input_submit);
@@ -20,7 +27,6 @@ content::get_form::get_form() {
     input_key.message("Enter Key");
     input_pass.message("Enter password");
     input_submit.value("Send!");
-    input_key.non_empty();
     input_pass.non_empty();
     add(input_key);
     add(input_pass);
@@ -35,6 +41,11 @@ content::pass_form::pass_form() {
     add(pass_submit);
 }
 
+bool fileExists(const std::string& path){
+    std::ifstream ifile(path.c_str());
+    return (bool)ifile;
+}
+
 
 void WebSite::PostResponse() {
     content::upload form;
@@ -44,7 +55,7 @@ void WebSite::PostResponse() {
             std::string pass = form.info.input_pass.value();
             std::string name = view->PostData(pass) + ".zip";
             form.info.input_file.value()->save_to(PATH_TO_UPLOADS + name);
-            return(render());
+            return(render(""));
         }
     }
     return(render())
@@ -60,18 +71,52 @@ void WebSite::GetResponse(std::string key) {
         if(form.info.validate()){
             std::string pass = form.info.input_pass.value();
             std::string file_name = view->GetData(key,pass);
-            if(file_name.empty()){
+            if(file_name.empty() || !fileExists(PATH_TO_UPLOADS + file_name)){
                 return(render())
             }
-            response().add_header("X-Accel-Redirect","/download/"+file_name);
-            response().content_type("application/zip");
+            response().add_header("X-Accel-Redirect",DOWNLOAD_PATH+file_name);
+            response().content_type(ACCEPTABLE_MIME);
             response().add_header("Content-Disposition: attachment; filename=",file_name);
         }
     }
 }
 
-void WebSite::StaticResponse() {
+void WebSite::APIGETResponse() {
+    if (request().request_method() == "GET") {
+        // getting key + pass from headers
+        std::string auth_header = request().http_authorization();
+        int delimeter_key = auth_header.find(':');
+        std::string key = auth_header.substr(0, delimeter_key);
+        unsigned long size = auth_header.size() - delimeter_key;
+        std::string pass = auth_header.substr(delimeter_key, size);
+        //validating pass from header
+        std::string file_name = view->GetData(key, pass);
+        if (file_name.empty() || !fileExists(PATH_TO_UPLOADS + file_name))
+            response().status(NOT_FOUND);
+        else {
+            response().add_header("X-Accel-Redirect", DOWNLOAD_PATH + file_name);
+            response().content_type(ACCEPTABLE_MIME);
+            response().add_header("Content-Disposition: attachment; filename=", file_name);
+        }
+    } else {
+        return response().status(METHOD_NOT_ALLOWED)
+    }
+}
 
+void WebSite::APIPOSTResponse() {
+    if (request().request_method() == "POST") {
+        if (int(request().files().size()) < MAX_LIMIT && request().content_type() == ACCEPTABLE_MIME &&
+            int(request().files().size()) > MIN_LIMIT) {
+            std::string pass;
+            std::string name = view->PostData(pass) + ".zip";
+            request().files().data()->get()->save_to(PATH_TO_UPLOADS + name);
+            return response().status(SUCCESSFUL);
+        } else {
+            return response().status(BAD_REQUEST);
+        }
+    } else {
+        return response().status(METHOD_NOT_ALLOWED)
+    }
 }
 
 

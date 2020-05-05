@@ -1,6 +1,9 @@
+//
+// Created by felix on 04.05.2020.
+//
 
-#ifndef BACKEND_CONTROLLER_H
-#define BACKEND_CONTROLLER_H
+#ifndef BACKENDSERVICE_CONTROLLER_HPP
+#define BACKENDSERVICE_CONTROLLER_HPP
 
 #include <iostream>
 #include "NameCreator.h"
@@ -28,4 +31,14 @@ public:
 };
 
 
-#endif //BACKEND_CONTROLLER_H
+template<class DataBaseType>
+std::string ViewController<DataBaseType>::GetData(std::string const & key, std::string const & pass) {
+    return "";
+}
+
+template<class DataBaseType>
+std::string ViewController<DataBaseType>::PostData(std::string const & pass) {
+    return "";
+}
+
+#endif //BACKENDSERVICE_CONTROLLER_HPP

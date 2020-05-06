@@ -14,10 +14,10 @@
 class WebSite:public cppcms::application,public AbstractServer{
 public:
         WebSite(cppcms::service &s,AbstractController* _view) : cppcms::application(s),AbstractServer(_view){
-        dispatcher().assign("/get/(\\d+)",&WebSite::GetResponse,this,1);
+        dispatcher().assign("/get/(.*)",&WebSite::GetResponse,this,1);
         dispatcher().assign("/post/",&WebSite::PostResponse, this);
-        dispatcher().assign("/api/post",&WebSite::APIPOSTResponse,this);
-        dispatcher().assign("api/get",&WebSite::APIGETResponse, this);
+        dispatcher().assign("/api/post/",&WebSite::APIPOSTResponse,this);
+        dispatcher().assign("/api/get/",&WebSite::APIGETResponse, this);
     };
     void GetResponse(std::string key) override;
     void PostResponse() override;

@@ -13,6 +13,7 @@ namespace content{
     struct info_form : public cppcms::form{
         cppcms::widgets::password input_pass;
         cppcms::widgets::file input_file;
+        cppcms::widgets::numeric<int> amountOfDays;
         cppcms::widgets::submit input_submit;
         info_form();
     };

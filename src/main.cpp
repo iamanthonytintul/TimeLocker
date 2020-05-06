@@ -6,6 +6,8 @@
 
 int main(int argc, char* argv[]){
     std::map<std::string,std::string>result;
+
+
     auto* database = new StorageMySQL<std::map<std::string,std::string>>;
     auto* view = new ViewController<StorageMySQL<std::map<std::string,std::string>>>(database);
     try{

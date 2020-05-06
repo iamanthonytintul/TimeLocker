@@ -5,7 +5,7 @@ project(BackEndService)
 
 include_directories(${CMAKE_SOURCE_DIR})
 option(STATIC_VIEW "Build Static View instead of dynamically loaded one" OFF)
-set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD 14)
 ##  GTest
 #configure_file(CMakeLists.txt.in
 #        googletest-download/CMakeLists.txt)

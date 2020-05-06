@@ -13,13 +13,15 @@
 content::info_form::info_form() {
     input_pass.message("Enter password");
     input_file.message("Drop file");
+    amountOfDays.message("Set amount of days");
     input_submit.value("Send!");
-    input_pass.non_empty();
     input_file.limits(MIN_LIMIT, MAX_LIMIT);
     input_file.filename(booster::regex(".*\\.zip"));
     input_file.mime(ACCEPTABLE_MIME);
+    amountOfDays.range(0,7);
     add(input_pass);
     add(input_file);
+    add(amountOfDays);
     add(input_submit);
 }
 
@@ -53,8 +55,10 @@ void WebSite::PostResponse() {
         form.info.load(context());
         if(form.info.validate()){
             std::string pass = form.info.input_pass.value();
-            std::string name = view->PostData(pass) + ".zip";
+            int amountOfDays = form.info.amountOfDays.value();
+            std::string name = view->PostData(pass,amountOfDays);
             form.info.input_file.value()->save_to(PATH_TO_UPLOADS + name);
+            std::cout << "file saved as" << PATH_TO_UPLOADS + name;
             return(render("first",form));
         }
     }
@@ -108,7 +112,8 @@ void WebSite::APIPOSTResponse() {
         if (int(request().files().size()) < MAX_LIMIT && request().content_type() == ACCEPTABLE_MIME &&
             int(request().files().size()) > MIN_LIMIT) {
             std::string pass;
-            std::string name = view->PostData(pass) + ".zip";
+            int amountOfDays = 0;
+            std::string name = view->PostData(pass,amountOfDays);
             request().files().data()->get()->save_to(PATH_TO_UPLOADS + name);
             return response().status(SUCCESSFUL);
         } else {

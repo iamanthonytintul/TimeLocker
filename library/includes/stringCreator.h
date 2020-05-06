@@ -2,19 +2,18 @@
 #define TIMELOCKER_STRINGCREATOR_H
 #include <iostream>
 
-enum  { JANUARY = 1,
-        HOURS_IN_DAY = 24,
-        SECONDS_IN_MINUTE = 60,
-        MINUTES_IN_HOUR = 60,
-        START_YEAR = 1900
-};
+const int MAX_STRING_SIZE = 40;
 
-#define MAX_STRING_SIZE 40
+const int JANUARY = 1;
+const int HOURS_IN_DAY = 24;
+const int SECONDS_IN_MINUTE = 60;
+const int MINUTES_IN_HOUR = 60;
+const int START_YEAR = 1900;
 
-#define KEY_START_SYMBOL 'a'
-#define KEY_END_SYMBOL 'z'
-#define PASSWORD_START_SYMBOL 'A'
-#define PASSWORD_END_SYMBOL '~'
+const char KEY_START_SYMBOL = 'a';
+const char KEY_END_SYMBOL = 'z';
+const char PASSWORD_START_SYMBOL = 'A';
+const char PASSWORD_END_SYMBOL = '~';
 
 class StringCreator {
 public:

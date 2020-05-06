@@ -9,7 +9,8 @@ StringCreator::StringCreator() {
 std::string StringCreator::createKey() {
     std::string result;
     for (int i = 0; i < MAX_STRING_SIZE; i++) {
-        result.insert(result.end(), char(KEY_START_SYMBOL + std::rand() % (KEY_END_SYMBOL - KEY_START_SYMBOL)));
+        result.insert(result.end(), char(KEY_START_SYMBOL + std::rand() %
+                                           (KEY_END_SYMBOL - KEY_START_SYMBOL)));
     }
     return result;
 }
@@ -17,7 +18,8 @@ std::string StringCreator::createKey() {
 std::string StringCreator::createPassword() {
     std::string result;
     for (int i = 0; i < MAX_STRING_SIZE; i++) {
-        result.insert(result.end(), char(PASSWORD_START_SYMBOL + std::rand() % (PASSWORD_END_SYMBOL - PASSWORD_START_SYMBOL)));
+        result.insert(result.end(), char(PASSWORD_START_SYMBOL + std::rand() %
+                                           (PASSWORD_END_SYMBOL - PASSWORD_START_SYMBOL)));
     }
     return result;
 }

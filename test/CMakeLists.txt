@@ -2,6 +2,9 @@ file(GLOB tests "${PROJECT_SOURCE_DIR}/test/*.cpp"
                 "${PROJECT_SOURCE_DIR}/test/storageTests/*.cpp")
 list(REMOVE_ITEM tests "${PROJECT_SOURCE_DIR}/test/main.cpp")
 
+file (GLOB sources
+        "${PROJECT_SOURCE_DIR}/library/source/*.cpp")
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -fprofile-arcs -ftest-coverage")
 set(CMAKE_CXX_STANDARD 14)
 include_directories(${PROJECT_SOURCE_DIR}/library ${PROJECT_SOURCE_DIR}/src)

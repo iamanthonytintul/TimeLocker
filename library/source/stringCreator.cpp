@@ -29,21 +29,21 @@ std::string StringCreator::createDeletionDate(int amountOfDays) {
     time_t now = time(NULL) + amountOfDays * SECONDS_IN_MINUTE * MINUTES_IN_HOUR * HOURS_IN_DAY;
     tm* localTime = localtime(&now);
 
-    std::string yearString = std::to_string(START_YEAR + localTime->tm_year);
-    std::string monthString = std::to_string(JANUARY + localTime->tm_mon);
-    std::string dayString = std::to_string(localTime->tm_mday);
+    std::string year = std::to_string(START_YEAR + localTime->tm_year);
+    std::string month = std::to_string(JANUARY + localTime->tm_mon);
+    std::string day = std::to_string(localTime->tm_mday);
 
-    result.append(yearString);
+    result.append(year);
     result.insert(result.end(), '-');
-    if (monthString.length() == 1) {
+    if (month.length() == 1) {
         result.insert(result.end(), '0');
     }
-    result.append(monthString);
+    result.append(month);
     result.insert(result.end(), '-');
-    if (dayString.length() == 1) {
+    if (day.length() == 1) {
         result.insert(result.end(), '0');
     }
-    result.append(dayString);
+    result.append(day);
 
     return result;
 }

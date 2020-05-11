@@ -8,6 +8,7 @@
 TEST(StorageMYSQLTest, saveDataCheckSingleRequest) {
     map<string, string> result;
     StorageMySQL<map<string, string>> database;
+    database.connect();
     StringCreator creator;
     string key;
     string password = creator.createPassword();
@@ -28,6 +29,7 @@ TEST(StorageMYSQLTest, saveDataCheckSingleRequest) {
 TEST(StorageMYSQLTest, saveDataCheckMultipleRequestOneKey) {
     map<string, string> result;
     StorageMySQL<map<string, string>> database;
+    database.connect();
     StringCreator creator;
     string key;
     string password = creator.createPassword();
@@ -50,6 +52,7 @@ TEST(StorageMYSQLTest, saveDataCheckMultipleRequestOneKey) {
 TEST(StorageMYSQLTest, saveDataCheckMultipleRequestMultipleKey) {
     map<string, string> result;
     StorageMySQL<map<string, string>> database;
+    database.connect();
     StringCreator creator;
     string keyOne;
     string keyTwo;

@@ -27,6 +27,7 @@ class StorageMySQL: public AbstractDBManager<DBRow> {
 public:
     StorageMySQL();
     ~StorageMySQL() override;
+    int connect() override;
     int saveData(string key, string password, string deletionDate) override;
     DBRow getData(string key) override;
     bool isConnected() override { return _isConnectionStated; }
@@ -40,7 +41,14 @@ private:
 };
 
 template <typename DBRow>
-StorageMySQL<DBRow>::StorageMySQL(): _statement(nullptr), _resultSet(nullptr), _preparedStatement(nullptr) {
+StorageMySQL<DBRow>::StorageMySQL(): _driver(nullptr), _connection(nullptr),
+                                     _statement(nullptr), _preparedStatement(nullptr),
+                                     _resultSet(nullptr), _isConnectionStated(false) {
+
+}
+
+template <typename DBRow>
+int StorageMySQL<DBRow>::connect() {
     cout << endl;
     cout << "Connecting to database " << DATABASE << "..." << endl;
     try {
@@ -59,14 +67,16 @@ StorageMySQL<DBRow>::StorageMySQL(): _statement(nullptr), _resultSet(nullptr), _
 
         _isConnectionStated = false;
         cout << "Connection to database \""<< DATABASE << "\" is not stated." << endl;
+        return EXIT_FAILURE;
     }
     cout << endl;
+    return EXIT_SUCCESS;
 }
 
 template <typename DBRow>
 StorageMySQL<DBRow>::~StorageMySQL() {
-    cout << "Closing connection to database \"" << DATABASE << "\"..." << endl;
     if (isConnected()) {
+        cout << "Closing connection to database \"" << DATABASE << "\"..." << endl;
         _connection->close();
         delete _connection;
         cout << "Connection to database \"" << DATABASE << "\" is closed." << endl;

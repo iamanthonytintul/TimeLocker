@@ -1,0 +1,14 @@
+<% c++ #include "Content.h" %>
+<% skin view %>
+<% view upload uses content::upload %>
+<% template render() %>
+<html>
+<body>
+    <form method="post" action="/post/" enctype="multipart/form-data" >
+    <% form as_p info %>
+    </form>
+  </body>
+<html>
+<% end template %>
+<% end view %>
+<% end skin %>

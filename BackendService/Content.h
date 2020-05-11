@@ -42,6 +42,9 @@ namespace content{
     struct getViaKey_file : public cppcms::base_content{
         pass_form info;
     };
+    struct message : public cppcms::base_content {
+        std::string text;
+    };
 }
 
 #endif //BACKENDSERVICE_CONTENT_H

@@ -2,8 +2,9 @@
 #include "Content.h"
 #include "NameCreator.h"
 
-#define DOWNLOAD_PATH "/download/"
+#define DOWNLOAD_PATH "/uploads/"
 #define ACCEPTABLE_MIME "application/zip"
+#define FILE_TYPE ".zip"
 #define BAD_REQUEST 400
 #define NOT_FOUND 404
 #define SUCCESSFUL 200
@@ -48,6 +49,15 @@ bool fileExists(const std::string& path){
     return (bool)ifile;
 }
 
+WebSite::WebSite(cppcms::service &s,AbstractController* _view) : cppcms::application(s),AbstractServer(_view) {
+    dispatcher().assign("/get/(.*)", &WebSite::GetResponse, this, 1);
+    dispatcher().assign("/post/", &WebSite::PostResponse, this);
+    dispatcher().assign("/api/post/", &WebSite::APIPOSTResponse, this);
+    dispatcher().assign("/api/get/", &WebSite::APIGETResponse, this);
+    dispatcher().assign("/",&WebSite::StaticResponse, this);
+}
+
+
 
 void WebSite::PostResponse() {
     content::upload form;
@@ -57,31 +67,37 @@ void WebSite::PostResponse() {
             std::string pass = form.info.input_pass.value();
             int amountOfDays = form.info.amountOfDays.value();
             std::string name = view->PostData(pass,amountOfDays);
-            form.info.input_file.value()->save_to(PATH_TO_UPLOADS + name);
+            form.info.input_file.value()->save_to(PATH_TO_UPLOADS + name + FILE_TYPE);
             std::cout << "file saved as" << PATH_TO_UPLOADS + name;
-            return(render("first",form));
+            content::message res;
+            res.link = name;
+            res.pass = pass;
+            return render("message",res);
         }
     }
-    return(render("first",form));
+    return(response().set_redirect_header("/"));
 }
 
 void WebSite::GetResponse(std::string key) {
-    content::getViaKey_file form;
+    content::getViaKeyFile form;
     if(request().request_method() == "GET"){
-        return(render("first",form));
+        return(render("getInfo",form));
     }
     else if(request().request_method() == "POST"){
         form.info.load(context());
         if(form.info.validate()){
             std::string pass = form.info.input_pass.value();
             std::string file_name = view->GetData(key,pass);
-            if(file_name.empty() || !fileExists(PATH_TO_UPLOADS + file_name)){
-                return(render("first",form));
+            std::cout << file_name << " sd";
+            if(file_name.empty() || !fileExists(PATH_TO_UPLOADS + file_name + FILE_TYPE)){
+                return(response().set_redirect_header("/"));
             }
-            response().add_header("X-Accel-Redirect",DOWNLOAD_PATH+file_name);
+            response().add_header("X-Accel-Redirect",DOWNLOAD_PATH+file_name + FILE_TYPE);
             response().content_type(ACCEPTABLE_MIME);
-            response().add_header("Content-Disposition: attachment; filename=",file_name);
+            response().add_header("Content-Disposition: attachment; filename=",file_name + FILE_TYPE);
+            return response().set_redirect_header(DOWNLOAD_PATH);
         }
+        return(response().set_redirect_header("/"));
     }
 }
 
@@ -98,9 +114,10 @@ void WebSite::APIGETResponse() {
         if (file_name.empty() || !fileExists(PATH_TO_UPLOADS + file_name))
             response().status(NOT_FOUND);
         else {
-            response().add_header("X-Accel-Redirect", DOWNLOAD_PATH + file_name);
+            response().add_header("X-Accel-Redirect",DOWNLOAD_PATH+file_name + FILE_TYPE);
             response().content_type(ACCEPTABLE_MIME);
-            response().add_header("Content-Disposition: attachment; filename=", file_name);
+            response().add_header("Content-Disposition: attachment; filename=",file_name + FILE_TYPE);
+            return response().set_redirect_header(DOWNLOAD_PATH);
         }
     } else {
         return response().status(METHOD_NOT_ALLOWED);
@@ -122,6 +139,11 @@ void WebSite::APIPOSTResponse() {
     } else {
         return response().status(METHOD_NOT_ALLOWED);
     }
+}
+
+void WebSite::StaticResponse() {
+    content::upload c;
+    return render("upload",c);
 }
 
 

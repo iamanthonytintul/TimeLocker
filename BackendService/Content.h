@@ -30,6 +30,10 @@ namespace content{
         cppcms::widgets::submit pass_submit;
         pass_form();
     };
+    struct message: public cppcms::base_content{
+        std::string link;
+        std::string pass;
+    };
 
     struct upload : public cppcms::base_content{
         info_form info;
@@ -39,11 +43,8 @@ namespace content{
         get_form info;
     };
 
-    struct getViaKey_file : public cppcms::base_content{
+    struct getViaKeyFile : public cppcms::base_content{
         pass_form info;
-    };
-    struct message : public cppcms::base_content {
-        std::string text;
     };
 }
 

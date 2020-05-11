@@ -47,11 +47,15 @@ std::string ViewController<DataBaseType>::PostData(std::string const & pass,int 
     if(pass.empty()){
         password = nmCreate.createPassword();
     }
-    std::string key = nmCreate.createKey();
     std::string DeletionDate = nmCreate.createDeletionDate(amountOfDays);
-    while(DBManager->saveData(key,password,DeletionDate) == EXIT_FAILURE){
+    std::map<std::string,std::string> result;
+    std::string key;
+    do{
         key = nmCreate.createKey();
-    };
+        result = DBManager->getData(key);
+    }while(result["Key"] == key);
+    DBManager->saveData(key,pass,DeletionDate);
+    std::cout << pass << std::endl;
     return key;
 }
 

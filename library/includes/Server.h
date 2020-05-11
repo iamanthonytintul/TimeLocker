@@ -14,6 +14,7 @@ public:
     virtual void PostResponse() = 0;
     virtual void APIGETResponse() = 0;
     virtual void APIPOSTResponse() = 0;
+    virtual void StaticResponse() = 0;
 
 protected:
     AbstractController * view;

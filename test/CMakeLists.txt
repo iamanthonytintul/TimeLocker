@@ -3,7 +3,9 @@ file(GLOB tests "${PROJECT_SOURCE_DIR}/test/*.cpp"
 list(REMOVE_ITEM tests "${PROJECT_SOURCE_DIR}/test/main.cpp")
 
 file (GLOB sources
+        "${PROJECT_SOURCE_DIR}/src/*.cpp"
         "${PROJECT_SOURCE_DIR}/library/source/*.cpp")
+list(REMOVE_ITEM sources "${PROJECT_SOURCE_DIR}/src/main.cpp")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -fprofile-arcs -ftest-coverage")
 set(CMAKE_CXX_STANDARD 14)

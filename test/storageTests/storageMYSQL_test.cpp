@@ -3,12 +3,20 @@
 #include "includes/stringCreator.h"
 #include "storageMYSQL.hpp"
 
-#define amountOfDays 7
+const int amountOfDays = 7;
 
-TEST(StorageMYSQLTest, saveDataCheckSingleRequest) {
+TEST(StorageMySQLTest, connection) {
+    StorageMySQL<map<string, string>> database;
+    EXPECT_EQ(database.connect("", "", "", ""), EXIT_FAILURE);
+    EXPECT_EQ(database.connect("localhost", "dansik",
+            "1234", "TimelockerStorage"), EXIT_SUCCESS);
+}
+
+TEST(StorageMYSQLTest, saveDataIsConnected) {
     map<string, string> result;
     StorageMySQL<map<string, string>> database;
-    database.connect();
+    EXPECT_EQ(database.connect("localhost", "dansik",
+                               "1234", "TimelockerStorage"), EXIT_SUCCESS);
     StringCreator creator;
     string key;
     string password = creator.createPassword();
@@ -18,18 +26,15 @@ TEST(StorageMYSQLTest, saveDataCheckSingleRequest) {
         key = creator.createKey();
         result = database.getData(key);
     } while (result["Key"] == key);
-
-    if (!database.isConnected()) {
-        EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_FAILURE);
-    } else {
-        EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_SUCCESS);
-    }
+    EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_SUCCESS);
+    EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_FAILURE);
 }
 
-TEST(StorageMYSQLTest, saveDataCheckMultipleRequestOneKey) {
+TEST(StorageMYSQLTest, saveDataIsNotConnected) {
     map<string, string> result;
     StorageMySQL<map<string, string>> database;
-    database.connect();
+    EXPECT_EQ(database.connect("", "",
+                               "", ""), EXIT_FAILURE);
     StringCreator creator;
     string key;
     string password = creator.createPassword();
@@ -39,52 +44,39 @@ TEST(StorageMYSQLTest, saveDataCheckMultipleRequestOneKey) {
         key = creator.createKey();
         result = database.getData(key);
     } while (result["Key"] == key);
-
-    if (!database.isConnected()) {
-        EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_FAILURE);
-    } else {
-        EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_SUCCESS);
-        EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_FAILURE);
-    }
+    EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_FAILURE);
 }
 
-
-TEST(StorageMYSQLTest, saveDataCheckMultipleRequestMultipleKey) {
+TEST(StorageMYSQLTest, getDataIsConnected) {
     map<string, string> result;
     StorageMySQL<map<string, string>> database;
-    database.connect();
+    EXPECT_EQ(database.connect("localhost", "dansik",
+                               "1234", "TimelockerStorage"), EXIT_SUCCESS);
     StringCreator creator;
-    string keyOne;
-    string keyTwo;
-    string keyThree;
+    string key;
     string password = creator.createPassword();
     string deletionDate = creator.createDeletionDate(amountOfDays);
 
     do {
-        keyOne = creator.createKey();
-        result = database.getData(keyOne);
-    } while (result["Key"] == keyOne);
+        key = creator.createKey();
+        result = database.getData(key);
+    } while (result["Key"] == key);
+    EXPECT_EQ(result.empty(), NULL);
+}
+
+TEST(StorageMYSQLTest, getDataIsNotConnected) {
+    map<string, string> result;
+    StorageMySQL<map<string, string>> database;
+    EXPECT_EQ(database.connect("", "",
+                               "", ""), EXIT_FAILURE);
+    StringCreator creator;
+    string key;
+    string password = creator.createPassword();
+    string deletionDate = creator.createDeletionDate(amountOfDays);
 
     do {
-        keyTwo = creator.createKey();
-        result = database.getData(keyTwo);
-    } while (result["Key"] == keyTwo);
-
-    do {
-        keyThree = creator.createKey();
-        result = database.getData(keyThree);
-    } while (result["Key"] == keyThree);
-
-    if (!database.isConnected()) {
-        EXPECT_EQ(database.saveData(keyOne, password, deletionDate), EXIT_FAILURE);
-        EXPECT_EQ(database.saveData(keyTwo, password, deletionDate), EXIT_FAILURE);
-        EXPECT_EQ(database.saveData(keyThree, password, deletionDate), EXIT_FAILURE);
-    } else {
-        EXPECT_EQ(database.saveData(keyOne, password, deletionDate), EXIT_SUCCESS);
-        EXPECT_EQ(database.saveData(keyOne, password, deletionDate), EXIT_FAILURE);
-        EXPECT_EQ(database.saveData(keyTwo, password, deletionDate), EXIT_SUCCESS);
-        EXPECT_EQ(database.saveData(keyThree, password, deletionDate), EXIT_SUCCESS);
-        EXPECT_EQ(database.saveData(keyTwo, password, deletionDate), EXIT_FAILURE);
-        EXPECT_EQ(database.saveData(keyThree, password, deletionDate), EXIT_FAILURE);
-    }
+        key = creator.createKey();
+        result = database.getData(key);
+    } while (result["Key"] == key);
+    EXPECT_EQ(result.empty(), NULL);
 }

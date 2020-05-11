@@ -12,11 +12,6 @@
 #include <map>
 #include "includes/storage.h"
 
-#define HOST "localhost"
-#define USER "dansik"
-#define PASS "1234"
-#define DATABASE "TimelockerStorage"
-
 using std::cout;
 using std::endl;
 using std::map;
@@ -27,7 +22,7 @@ class StorageMySQL: public AbstractDBManager<DBRow> {
 public:
     StorageMySQL();
     ~StorageMySQL() override;
-    int connect() override;
+    int connect(string host, string user, string password, string database) override;
     int saveData(string key, string password, string deletionDate) override;
     DBRow getData(string key) override;
     bool isConnected() override { return _isConnectionStated; }
@@ -48,16 +43,16 @@ StorageMySQL<DBRow>::StorageMySQL(): _driver(nullptr), _connection(nullptr),
 }
 
 template <typename DBRow>
-int StorageMySQL<DBRow>::connect() {
+int StorageMySQL<DBRow>::connect(string host, string user, string password, string database) {
     cout << endl;
-    cout << "Connecting to database " << DATABASE << "..." << endl;
+    cout << "Connecting to database " << database << "..." << endl;
     try {
         _driver = get_driver_instance();
-        _connection = _driver->connect(HOST, USER, PASS);
-        _connection->setSchema(DATABASE);
+        _connection = _driver->connect(host, user, password);
+        _connection->setSchema(database);
 
         _isConnectionStated = true;
-        cout << "Connection to database \"" << DATABASE <<"\" is stated." << endl;
+        cout << "Connection to database \"" << database <<"\" is stated." << endl;
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
         cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
@@ -66,7 +61,7 @@ int StorageMySQL<DBRow>::connect() {
         cout << ", SQLState: " << e.getSQLState() << " )" << endl;
 
         _isConnectionStated = false;
-        cout << "Connection to database \""<< DATABASE << "\" is not stated." << endl;
+        cout << "Connection to database \""<< database << "\" is not stated." << endl;
         return EXIT_FAILURE;
     }
     cout << endl;
@@ -76,10 +71,10 @@ int StorageMySQL<DBRow>::connect() {
 template <typename DBRow>
 StorageMySQL<DBRow>::~StorageMySQL() {
     if (isConnected()) {
-        cout << "Closing connection to database \"" << DATABASE << "\"..." << endl;
+        cout << "Closing connection to database..." << endl;
         _connection->close();
         delete _connection;
-        cout << "Connection to database \"" << DATABASE << "\" is closed." << endl;
+        cout << "Connection to database is closed." << endl;
     } else {
         cout << "No connection to close." << endl;
     }
@@ -89,9 +84,8 @@ StorageMySQL<DBRow>::~StorageMySQL() {
 template <typename DBRow>
 int StorageMySQL<DBRow>::saveData(string key, string password, string deletionDate) {
 
-    if (!isConnected()) {
-        cout << "Error: "
-                "connection to database \"" << DATABASE << "\" is not stated." << endl;
+     if (!isConnected()) {
+        cout << "Error: connection to database is not stated." << endl;
         cout << "Insertion failed." << endl;
         return EXIT_FAILURE;
     }
@@ -129,7 +123,7 @@ DBRow StorageMySQL<DBRow>::getData(string key) {
 
     if (!isConnected()) {
         cout << "Error: "
-                "connection to database \"" << DATABASE << "\" is not stated." << endl;
+                "connection to database is not stated." << endl;
         cout << "Extraction failed." << endl;
         return result;
     }
@@ -149,8 +143,11 @@ DBRow StorageMySQL<DBRow>::getData(string key) {
         }
         delete _resultSet;
         delete _statement;
-        cout << "Extraction done." << endl;
 
+        if (result.empty()) {
+            throw sql::SQLException("No data found.");
+        }
+        cout << "Extraction done." << endl;
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
         cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;

@@ -1,6 +1,6 @@
 #include "Web_Site.h"
 #include "Content.h"
-#include "NameCreator.h"
+#include "stringCreator.h"
 
 #define DOWNLOAD_PATH "/uploads/"
 #define ACCEPTABLE_MIME "application/zip"
@@ -88,7 +88,6 @@ void WebSite::GetResponse(std::string key) {
         if(form.info.validate()){
             std::string pass = form.info.input_pass.value();
             std::string file_name = view->GetData(key,pass);
-            std::cout << file_name << " sd";
             if(file_name.empty() || !fileExists(PATH_TO_UPLOADS + file_name + FILE_TYPE)){
                 return(response().set_redirect_header("/"));
             }

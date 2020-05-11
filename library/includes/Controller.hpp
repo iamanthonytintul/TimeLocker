@@ -3,7 +3,7 @@
 #define BACKENDSERVICE_CONTROLLER_HPP
 
 #include <iostream>
-#include "NameCreator.h"
+#include "stringCreator.h"
 #include "storage.h"
 #include <map>
 enum {NO_SUCH_FILE, NO_DB_CONNECTION};
@@ -12,10 +12,10 @@ enum {NO_SUCH_FILE, NO_DB_CONNECTION};
 class AbstractController{
 public:
     virtual std::string GetData(std::string const&, std::string const&) = 0;
-    virtual std::string PostData(std::string const &, int amountOfDays) = 0;
+    virtual std::string PostData(std::string  &, int amountOfDays) = 0;
     virtual ~AbstractController() = default;
 protected:
-    UniqueNameMaker nmCreate;
+    StringCreator nmCreate;
 };
 
 
@@ -25,7 +25,7 @@ class ViewController : public AbstractController{
 public:
     explicit ViewController(DataBaseType* _DBManager):DBManager(_DBManager),AbstractController(){};
     std::string GetData(std::string const& key, std::string const& pass) override;
-    std::string PostData(std::string const & pass,int amountOfDays) override;
+    std::string PostData(std::string & pass,int amountOfDays) override;
 };
 
 
@@ -42,10 +42,9 @@ std::string ViewController<DataBaseType>::GetData(std::string const & key, std::
 }
 
 template<class DataBaseType>
-std::string ViewController<DataBaseType>::PostData(std::string const & pass,int amountOfDays) {
-    std::string password;
+std::string ViewController<DataBaseType>::PostData(std::string & pass,int amountOfDays) {
     if(pass.empty()){
-        password = nmCreate.createPassword();
+        pass = nmCreate.createPassword();
     }
     std::string DeletionDate = nmCreate.createDeletionDate(amountOfDays);
     std::map<std::string,std::string> result;

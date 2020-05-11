@@ -6,19 +6,19 @@ project(BackEndService)
 include_directories(${CMAKE_SOURCE_DIR})
 option(STATIC_VIEW "Build Static View instead of dynamically loaded one" OFF)
 set (CMAKE_CXX_STANDARD 14)
-##  GTest
-#configure_file(CMakeLists.txt.in
-#        googletest-download/CMakeLists.txt)
-#execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-#        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-#execute_process(COMMAND ${CMAKE_COMMAND} --build .
-#        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-#
-#add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
-#        ${CMAKE_BINARY_DIR}/googletest-build)
-#
-#enable_testing()
-#add_subdirectory(test)
+#  GTest
+configure_file(CMakeLists.txt.in
+        googletest-download/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+
+add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
+        ${CMAKE_BINARY_DIR}/googletest-build)
+
+enable_testing()
+add_subdirectory(test)
 
 add_definitions(-DPATH_TO_UPLOADS="${PROJECT_SOURCE_DIR}/uploads/")
 

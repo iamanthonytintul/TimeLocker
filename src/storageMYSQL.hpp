@@ -21,7 +21,10 @@ template <typename DBRow>
 class StorageMySQL: public AbstractDBManager<DBRow> {
 public:
     StorageMySQL();
+    StorageMySQL(const StorageMySQL&) = delete;
+    void operator=(StorageMySQL&) = delete;
     ~StorageMySQL() override;
+
     int connect(string host, string user, string password, string database) override;
     int saveData(string key, string password, string deletionDate) override;
     DBRow getData(string key) override;

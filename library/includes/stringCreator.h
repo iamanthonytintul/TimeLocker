@@ -18,6 +18,8 @@ const char PASSWORD_END_SYMBOL = '~';
 class StringCreator {
 public:
     StringCreator();
+    StringCreator(const StringCreator&) = delete;
+    void operator=(const StringCreator&) = delete;
     ~StringCreator() = default;
     std::string createKey();
     std::string createPassword();

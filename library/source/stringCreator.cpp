@@ -2,24 +2,33 @@
 #include <ctime>
 #include "stringCreator.h"
 
-StringCreator::StringCreator(int keySize, int passwordSize): _keySize(keySize), _passwordSize(passwordSize) {
+StringCreator::StringCreator(int keySize, int passwordSize,
+                             char keyStartSymbol, char keyEndSymbol,
+                             char passwordStartSymbol, char passwordEndSymbol):
+                             _keySize(keySize), _passwordSize(passwordSize),
+                             _keyStartSymbol(keyStartSymbol), _keyEndSymbol(keyEndSymbol),
+                             _passwordStartSymbol(passwordStartSymbol), _passwordEndSymbol(passwordEndSymbol) {
     srand(time(NULL));
 }
 
 std::string StringCreator::createKey() const {
     std::string result;
-    for (int i = 0; i < _keySize; i++) {
-        result.insert(result.end(), char(KEY_START_SYMBOL + std::rand() %
-                                           (KEY_END_SYMBOL - KEY_START_SYMBOL)));
+    const char start = (_keyStartSymbol) ? _keyStartSymbol : DEFAULT_KEY_START_SYMBOL;
+    const char end = (_keyEndSymbol) ? _keyEndSymbol : DEFAULT_KEY_END_SYMBOL;
+    const int size = (_keySize > EMPTY) ? _keySize : DEFAULT_KEY_SIZE;
+    for (int i = 0; i < size; i++) {
+        result.insert(result.end(), char(start + std::rand() % (end - start)));
     }
     return result;
 }
 
 std::string StringCreator::createPassword() const {
     std::string result;
-    for (int i = 0; i < _passwordSize; i++) {
-        result.insert(result.end(), char(PASSWORD_START_SYMBOL + std::rand() %
-                                           (PASSWORD_END_SYMBOL - PASSWORD_START_SYMBOL)));
+    const char start = (_passwordStartSymbol) ? _passwordStartSymbol : DEFAULT_PASSWORD_START_SYMBOL;
+    const char end = (_passwordEndSymbol) ? _passwordEndSymbol : DEFAULT_PASSWORD_END_SYMBOL;
+    const int size = (_passwordSize > EMPTY) ? _passwordSize : DEFAULT_PASSWORD_SIZE;
+    for (int i = 0; i < size; i++) {
+        result.insert(result.end(), char(start + std::rand() % (end - start)));
     }
     return result;
 }

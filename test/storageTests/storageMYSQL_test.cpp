@@ -38,7 +38,11 @@ TEST(StorageMYSQLTest, saveDataIsConnected) {
     ResourceManagerStringCreator resourceManagerStringCreator(PATH_TO_TEST_STRING_CREATOR);
     resourceManagerStringCreator.parseFile();
     StringCreator creator(resourceManagerStringCreator.getKeySize(),
-                          resourceManagerStringCreator.getPasswordSize());
+                          resourceManagerStringCreator.getPasswordSize(),
+                          resourceManagerStringCreator.getKeyStartSymbol(),
+                          resourceManagerStringCreator.getKeyEndSymbol(),
+                          resourceManagerStringCreator.getPasswordStartSymbol(),
+                          resourceManagerStringCreator.getPasswordEndSymbol());
     string key;
     string password = creator.createPassword();
     string deletionDate = creator.createDeletionDate(amountOfDays);
@@ -64,7 +68,11 @@ TEST(StorageMYSQLTest, saveDataIsNotConnected) {
     ResourceManagerStringCreator resourceManagerStringCreator(PATH_TO_TEST_STRING_CREATOR);
     resourceManagerStringCreator.parseFile();
     StringCreator creator(resourceManagerStringCreator.getKeySize(),
-                          resourceManagerStringCreator.getPasswordSize());
+                          resourceManagerStringCreator.getPasswordSize(),
+                          resourceManagerStringCreator.getKeyStartSymbol(),
+                          resourceManagerStringCreator.getKeyEndSymbol(),
+                          resourceManagerStringCreator.getPasswordStartSymbol(),
+                          resourceManagerStringCreator.getPasswordEndSymbol());
     string key;
     string password = creator.createPassword();
     string deletionDate = creator.createDeletionDate(amountOfDays);
@@ -89,7 +97,11 @@ TEST(StorageMYSQLTest, getData) {
     ResourceManagerStringCreator resourceManagerStringCreator(PATH_TO_TEST_STRING_CREATOR);
     resourceManagerStringCreator.parseFile();
     StringCreator creator(resourceManagerStringCreator.getKeySize(),
-                          resourceManagerStringCreator.getPasswordSize());
+                          resourceManagerStringCreator.getPasswordSize(),
+                          resourceManagerStringCreator.getKeyStartSymbol(),
+                          resourceManagerStringCreator.getKeyEndSymbol(),
+                          resourceManagerStringCreator.getPasswordStartSymbol(),
+                          resourceManagerStringCreator.getPasswordEndSymbol());
     string key;
     string password = creator.createPassword();
     string deletionDate = creator.createDeletionDate(amountOfDays);

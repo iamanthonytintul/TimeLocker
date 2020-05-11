@@ -15,10 +15,18 @@ public:
     void parseFile() override;
     int getKeySize() const;
     int getPasswordSize() const;
+    char getKeyStartSymbol() const;
+    char getKeyEndSymbol() const;
+    char getPasswordStartSymbol() const;
+    char getPasswordEndSymbol() const;
 private:
     const string _pathToFile;
     int _keySize{};
     int _passwordSize{};
+    char _keyStartSymbol{};
+    char _keyEndSymbol{};
+    char _passwordStartSymbol{};
+    char _passwordEndSymbol{};
 };
 
 #endif //TIMELOCKER_RESOURCEMANAGERSTRINGCREATOR_H

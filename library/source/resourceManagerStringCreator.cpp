@@ -21,6 +21,18 @@ void ResourceManagerStringCreator::parseFile() {
             if (key == "PASSWORDSIZE") {
                 _passwordSize = std::stoi(value);
             }
+            if (key == "KEYSTARTSYMBOL") {
+                _keyStartSymbol = value[0];
+            }
+            if (key == "KEYENDSYMBOL") {
+                _keyEndSymbol = value[0];
+            }
+            if (key == "PASSWORDSTARTSYMBOL") {
+                _passwordStartSymbol = value[0];
+            }
+            if (key == "PASSWORDENDSYMBOL") {
+                _passwordEndSymbol = value[0];
+            }
         }
     }
 }
@@ -31,4 +43,20 @@ int ResourceManagerStringCreator::getKeySize() const {
 
 int ResourceManagerStringCreator::getPasswordSize() const {
     return _passwordSize;
+}
+
+char ResourceManagerStringCreator::getKeyStartSymbol() const {
+    return _keyStartSymbol;
+}
+
+char ResourceManagerStringCreator::getKeyEndSymbol() const {
+    return _keyEndSymbol;
+}
+
+char ResourceManagerStringCreator::getPasswordStartSymbol() const {
+    return _passwordStartSymbol;
+}
+
+char ResourceManagerStringCreator::getPasswordEndSymbol() const {
+    return _passwordEndSymbol;
 }

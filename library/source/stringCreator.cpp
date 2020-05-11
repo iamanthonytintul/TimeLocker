@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <ctime>
-#include "includes/stringCreator.h"
+#include "stringCreator.h"
 
 StringCreator::StringCreator() {
     srand(time(NULL));

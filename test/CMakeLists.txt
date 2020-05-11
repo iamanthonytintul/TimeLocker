@@ -9,7 +9,7 @@ list(REMOVE_ITEM sources "${PROJECT_SOURCE_DIR}/src/main.cpp")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -fprofile-arcs -ftest-coverage")
 set(CMAKE_CXX_STANDARD 14)
-include_directories(${PROJECT_SOURCE_DIR}/library ${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/library/includes ${PROJECT_SOURCE_DIR}/src)
 
 set(FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR ~/mysql-connector-cpp)
 include_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include)

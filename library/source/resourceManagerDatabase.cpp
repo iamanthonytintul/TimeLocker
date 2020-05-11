@@ -1,6 +1,6 @@
 #include <fstream>
 #include <sstream>
-#include "includes/resourseManagerDatabase.h"
+#include "resourseManagerDatabase.h"
 
 ResourceManagerDatabase::ResourceManagerDatabase(const string& path): _pathToFile(path) {
 }

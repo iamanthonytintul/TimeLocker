@@ -1,7 +1,7 @@
 #include <iostream>
 #include <gtest/gtest.h>
-#include "includes/stringCreator.h"
-#include "includes/resourseManagerDatabase.h"
+#include "stringCreator.h"
+#include "resourseManagerDatabase.h"
 #include "storageMYSQL.hpp"
 
 const int amountOfDays = 7;

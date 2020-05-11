@@ -20,7 +20,7 @@ add_definitions(-DPATH_TO_DB_CONFIG="${PROJECT_SOURCE_DIR}/src/configs/database.
 
 enable_testing()
 add_subdirectory(test)
-include_directories(${PROJECT_SOURCE_DIR}/library ${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/library/includes ${PROJECT_SOURCE_DIR}/src)
 file (GLOB sources
         "${PROJECT_SOURCE_DIR}/library/source/*.cpp"
         "${PROJECT_SOURCE_DIR}/src/*.cpp")

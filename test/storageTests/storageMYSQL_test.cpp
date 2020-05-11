@@ -1,7 +1,8 @@
 #include <iostream>
 #include <gtest/gtest.h>
+#include "resourceManagerDatabase.h"
+#include "resourceManagerStringCreator.h"
 #include "stringCreator.h"
-#include "resourseManagerDatabase.h"
 #include "storageMYSQL.hpp"
 
 const int amountOfDays = 7;
@@ -34,7 +35,10 @@ TEST(StorageMYSQLTest, saveDataIsConnected) {
                                     resourceManagerMySqlSUCCESS.getPassword(),
                                     resourceManagerMySqlSUCCESS.getDatabase()
                                    ), EXIT_SUCCESS);
-    StringCreator creator;
+    ResourceManagerStringCreator resourceManagerStringCreator(PATH_TO_TEST_STRING_CREATOR);
+    resourceManagerStringCreator.parseFile();
+    StringCreator creator(resourceManagerStringCreator.getKeySize(),
+                          resourceManagerStringCreator.getPasswordSize());
     string key;
     string password = creator.createPassword();
     string deletionDate = creator.createDeletionDate(amountOfDays);
@@ -42,7 +46,7 @@ TEST(StorageMYSQLTest, saveDataIsConnected) {
     do {
         key = creator.createKey();
         result = database.getData(key);
-    } while (result["Key"] == key);
+    } while (!result["Key"].empty());
     EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_SUCCESS);
     EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_FAILURE);
 }
@@ -57,7 +61,10 @@ TEST(StorageMYSQLTest, saveDataIsNotConnected) {
                                     resourceManagerMySqlERROR.getPassword(),
                                     resourceManagerMySqlERROR.getDatabase()
                                    ), EXIT_FAILURE);
-    StringCreator creator;
+    ResourceManagerStringCreator resourceManagerStringCreator(PATH_TO_TEST_STRING_CREATOR);
+    resourceManagerStringCreator.parseFile();
+    StringCreator creator(resourceManagerStringCreator.getKeySize(),
+                          resourceManagerStringCreator.getPasswordSize());
     string key;
     string password = creator.createPassword();
     string deletionDate = creator.createDeletionDate(amountOfDays);
@@ -79,7 +86,10 @@ TEST(StorageMYSQLTest, getData) {
                                     resourceManagerMySqlSUCCESS.getPassword(),
                                     resourceManagerMySqlSUCCESS.getDatabase()
                                    ), EXIT_SUCCESS);
-    StringCreator creator;
+    ResourceManagerStringCreator resourceManagerStringCreator(PATH_TO_TEST_STRING_CREATOR);
+    resourceManagerStringCreator.parseFile();
+    StringCreator creator(resourceManagerStringCreator.getKeySize(),
+                          resourceManagerStringCreator.getPasswordSize());
     string key;
     string password = creator.createPassword();
     string deletionDate = creator.createDeletionDate(amountOfDays);

@@ -2,8 +2,7 @@
 #define TIMELOCKER_STRINGCREATOR_H
 #include <iostream>
 
-const int MAX_STRING_SIZE = 40;
-
+const int SINGLE_NUMERAL = 1;
 const int JANUARY = 1;
 const int HOURS_IN_DAY = 24;
 const int SECONDS_IN_MINUTE = 60;
@@ -17,13 +16,16 @@ const char PASSWORD_END_SYMBOL = '~';
 
 class StringCreator {
 public:
-    StringCreator();
+    StringCreator(int keySize, int passwordSize);
     StringCreator(const StringCreator&) = delete;
     void operator=(const StringCreator&) = delete;
     ~StringCreator() = default;
-    std::string createKey();
-    std::string createPassword();
-    std::string createDeletionDate(int amountOfDays);
+    std::string createKey() const;
+    std::string createPassword() const;
+    std::string createDeletionDate(int amountOfDays) const;
+private:
+    int _keySize;
+    int _passwordSize;
 };
 
 #endif //TIMELOCKER_STRINGCREATOR_H

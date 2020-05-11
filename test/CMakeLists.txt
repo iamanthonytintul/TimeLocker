@@ -16,7 +16,8 @@ include_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include)
 link_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib)
 
 add_definitions(-DPATH_TO_TEST_DB_CONFIG_OK="${PROJECT_SOURCE_DIR}/test/configs/databaseSUCCESS.config"
-                -DPATH_TO_TEST_DB_CONFIG_NOT_OK="${PROJECT_SOURCE_DIR}/test/configs/databaseERROR.config")
+                -DPATH_TO_TEST_DB_CONFIG_NOT_OK="${PROJECT_SOURCE_DIR}/test/configs/databaseERROR.config"
+                -DPATH_TO_TEST_STRING_CREATOR="${PROJECT_SOURCE_DIR}/test/configs/stringCreator.config")
 
 foreach(file ${tests})
     set(name)

@@ -16,7 +16,8 @@ add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
 set(FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR ~/mysql-connector-cpp)
 include_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include)
 link_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib)
-add_definitions(-DPATH_TO_DB_CONFIG="${PROJECT_SOURCE_DIR}/src/configs/database.config")
+add_definitions(-DPATH_TO_DB_CONFIG="${PROJECT_SOURCE_DIR}/src/configs/database.config"
+                -DPATH_TO_STRING_CREATOR="${PROJECT_SOURCE_DIR}/src/configs/stringCreator.config")
 
 enable_testing()
 add_subdirectory(test)
@@ -26,4 +27,3 @@ file (GLOB sources
         "${PROJECT_SOURCE_DIR}/src/*.cpp")
 add_executable(TimeLocker ${sources})
 target_link_libraries(TimeLocker mysqlcppconn)
-

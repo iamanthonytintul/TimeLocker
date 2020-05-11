@@ -1,8 +1,9 @@
 #include <fstream>
 #include <sstream>
-#include "resourseManagerDatabase.h"
+#include <utility>
+#include "resourceManagerDatabase.h"
 
-ResourceManagerDatabase::ResourceManagerDatabase(const string& path): _pathToFile(path) {
+ResourceManagerDatabase::ResourceManagerDatabase(string path): _pathToFile(std::move(path)) {
 }
 
 void ResourceManagerDatabase::parseFile() {

@@ -111,5 +111,9 @@ TEST(StorageMYSQLTest, tryToGetData) {
         result = database.getData(key);
     } while (result["Key"] == key);
     EXPECT_EQ(result.empty(), NULL);
+
+    EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_SUCCESS);
+    result = database.getData(key);
+    EXPECT_EQ(result["Key"], key);
 }
 

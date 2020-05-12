@@ -53,7 +53,6 @@ int StorageMySQL<DBRow>::connect(string host, string user, string password, stri
         _driver = get_driver_instance();
         _connection = _driver->connect(host, user, password);
         _connection->setSchema(database);
-
         _isConnectionStated = true;
         cout << "Connection to database \"" << database <<"\" is stated." << endl;
     } catch (sql::SQLException &e) {
@@ -62,7 +61,6 @@ int StorageMySQL<DBRow>::connect(string host, string user, string password, stri
         cout << "# ERR: " << e.what();
         cout << " (MySQL error code: " << e.getErrorCode();
         cout << ", SQLState: " << e.getSQLState() << " )" << endl;
-
         _isConnectionStated = false;
         cout << "Connection to database \""<< database << "\" is not stated." << endl;
         return EXIT_FAILURE;
@@ -103,7 +101,6 @@ int StorageMySQL<DBRow>::saveData(string key, string password, string deletionDa
         _preparedStatement->setString(2, password);
         _preparedStatement->setString(3, deletionDate);
         _preparedStatement->execute();
-
         delete _preparedStatement;
     } catch (sql::SQLException &e) {
         cout << "# ERR: SQLException in " << __FILE__;
@@ -111,7 +108,6 @@ int StorageMySQL<DBRow>::saveData(string key, string password, string deletionDa
         cout << "# ERR: " << e.what();
         cout << " (MySQL error code: " << e.getErrorCode();
         cout << ", SQLState: " << e.getSQLState() << " )" << endl;
-
         cout << "Insertion failed." << endl;
         delete _preparedStatement;
         return EXIT_FAILURE;
@@ -146,7 +142,6 @@ DBRow StorageMySQL<DBRow>::getData(string key) {
         }
         delete _resultSet;
         delete _statement;
-
         if (result.empty()) {
             throw sql::SQLException("No data found.");
         }

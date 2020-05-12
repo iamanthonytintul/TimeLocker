@@ -3,14 +3,14 @@
 #include <iostream>
 #include "resourceManager.h"
 
-using std::string;
+const int FIRST_SYMBOL = 0;
 
 class ResourceManagerStringCreator: public AbstractResourceManager {
 public:
-    explicit ResourceManagerStringCreator(string path);
+    explicit ResourceManagerStringCreator(std::string path);
     ResourceManagerStringCreator(const ResourceManagerStringCreator&) = delete;
     void operator=(const ResourceManagerStringCreator&) = delete;
-    ~ResourceManagerStringCreator() = default;
+    ~ResourceManagerStringCreator() override = default;
 
     void parseFile() override;
     int getKeySize() const;
@@ -20,7 +20,7 @@ public:
     char getPasswordStartSymbol() const;
     char getPasswordEndSymbol() const;
 private:
-    const string _pathToFile;
+    const std::string _pathToFile;
     int _keySize{};
     int _passwordSize{};
     char _keyStartSymbol{};

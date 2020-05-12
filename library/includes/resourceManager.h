@@ -4,7 +4,7 @@
 
 class AbstractResourceManager {
 public:
-    ~AbstractResourceManager() = default;
+    virtual ~AbstractResourceManager() = default;
     virtual void parseFile() = 0;
 private:
     const std::string _pathToFile;

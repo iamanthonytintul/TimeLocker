@@ -7,33 +7,33 @@
 
 const int amountOfDays = 7;
 
-TEST(StorageMySQLTest, connection) {
+TEST(StorageMySQLTest, tryToConnect) {
     StorageMySQL<map<string, string>> database;
-    ResourceManagerDatabase resourceManagerMySqlSUCCESS(PATH_TO_TEST_DB_CONFIG_OK);
-    resourceManagerMySqlSUCCESS.parseFile();
-    ResourceManagerDatabase resourceManagerMySqlERROR(PATH_TO_TEST_DB_CONFIG_NOT_OK);
-    resourceManagerMySqlERROR.parseFile();
-    EXPECT_EQ(database.connect(resourceManagerMySqlERROR.getHost(),
-                                    resourceManagerMySqlERROR.getUser(),
-                                    resourceManagerMySqlERROR.getPassword(),
-                                    resourceManagerMySqlERROR.getDatabase()
+    ResourceManagerDatabase resourceManagerMySQLSuccess(PATH_TO_TEST_DB_CONFIG_OK);
+    resourceManagerMySQLSuccess.parseFile();
+    ResourceManagerDatabase resourceManagerMySQLError(PATH_TO_TEST_DB_CONFIG_NOT_OK);
+    resourceManagerMySQLError.parseFile();
+    EXPECT_EQ(database.connect(resourceManagerMySQLError.getHost(),
+                                    resourceManagerMySQLError.getUser(),
+                                    resourceManagerMySQLError.getPassword(),
+                                    resourceManagerMySQLError.getDatabase()
                                    ), EXIT_FAILURE);
-    EXPECT_EQ(database.connect(resourceManagerMySqlSUCCESS.getHost(),
-                                    resourceManagerMySqlSUCCESS.getUser(),
-                                    resourceManagerMySqlSUCCESS.getPassword(),
-                                    resourceManagerMySqlSUCCESS.getDatabase()
+    EXPECT_EQ(database.connect(resourceManagerMySQLSuccess.getHost(),
+                                    resourceManagerMySQLSuccess.getUser(),
+                                    resourceManagerMySQLSuccess.getPassword(),
+                                    resourceManagerMySQLSuccess.getDatabase()
                                    ), EXIT_SUCCESS);
 }
 
-TEST(StorageMYSQLTest, saveDataIsConnected) {
+TEST(StorageMYSQLTest, tryToSaveDataWhenConnected) {
     map<string, string> result;
     StorageMySQL<map<string, string>> database;
-    ResourceManagerDatabase resourceManagerMySqlSUCCESS(PATH_TO_TEST_DB_CONFIG_OK);
-    resourceManagerMySqlSUCCESS.parseFile();
-    EXPECT_EQ(database.connect(resourceManagerMySqlSUCCESS.getHost(),
-                                    resourceManagerMySqlSUCCESS.getUser(),
-                                    resourceManagerMySqlSUCCESS.getPassword(),
-                                    resourceManagerMySqlSUCCESS.getDatabase()
+    ResourceManagerDatabase resourceManagerMySQL(PATH_TO_TEST_DB_CONFIG_OK);
+    resourceManagerMySQL.parseFile();
+    EXPECT_EQ(database.connect(resourceManagerMySQL.getHost(),
+                                    resourceManagerMySQL.getUser(),
+                                    resourceManagerMySQL.getPassword(),
+                                    resourceManagerMySQL.getDatabase()
                                    ), EXIT_SUCCESS);
     ResourceManagerStringCreator resourceManagerStringCreator(PATH_TO_TEST_STRING_CREATOR);
     resourceManagerStringCreator.parseFile();
@@ -45,7 +45,7 @@ TEST(StorageMYSQLTest, saveDataIsConnected) {
                           resourceManagerStringCreator.getPasswordEndSymbol());
     string key;
     string password = creator.createPassword();
-    string deletionDate = creator.createDeletionDate(amountOfDays);
+    string deletionDate = StringCreator::createDeletionDate(amountOfDays);
 
     do {
         key = creator.createKey();
@@ -55,15 +55,15 @@ TEST(StorageMYSQLTest, saveDataIsConnected) {
     EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_FAILURE);
 }
 
-TEST(StorageMYSQLTest, saveDataIsNotConnected) {
+TEST(StorageMYSQLTest, tryToSaveDataWhenNotConnected) {
     map<string, string> result;
     StorageMySQL<map<string, string>> database;
-    ResourceManagerDatabase resourceManagerMySqlERROR(PATH_TO_TEST_DB_CONFIG_NOT_OK);
-    resourceManagerMySqlERROR.parseFile();
-    EXPECT_EQ(database.connect(resourceManagerMySqlERROR.getHost(),
-                                    resourceManagerMySqlERROR.getUser(),
-                                    resourceManagerMySqlERROR.getPassword(),
-                                    resourceManagerMySqlERROR.getDatabase()
+    ResourceManagerDatabase resourceManagerMySQL(PATH_TO_TEST_DB_CONFIG_NOT_OK);
+    resourceManagerMySQL.parseFile();
+    EXPECT_EQ(database.connect(resourceManagerMySQL.getHost(),
+                                    resourceManagerMySQL.getUser(),
+                                    resourceManagerMySQL.getPassword(),
+                                    resourceManagerMySQL.getDatabase()
                                    ), EXIT_FAILURE);
     ResourceManagerStringCreator resourceManagerStringCreator(PATH_TO_TEST_STRING_CREATOR);
     resourceManagerStringCreator.parseFile();
@@ -75,7 +75,7 @@ TEST(StorageMYSQLTest, saveDataIsNotConnected) {
                           resourceManagerStringCreator.getPasswordEndSymbol());
     string key;
     string password = creator.createPassword();
-    string deletionDate = creator.createDeletionDate(amountOfDays);
+    string deletionDate = StringCreator::createDeletionDate(amountOfDays);
 
     do {
         key = creator.createKey();
@@ -84,15 +84,15 @@ TEST(StorageMYSQLTest, saveDataIsNotConnected) {
     EXPECT_EQ(database.saveData(key, password, deletionDate), EXIT_FAILURE);
 }
 
-TEST(StorageMYSQLTest, getData) {
+TEST(StorageMYSQLTest, tryToGetData) {
     map<string, string> result;
     StorageMySQL<map<string, string>> database;
-    ResourceManagerDatabase resourceManagerMySqlSUCCESS(PATH_TO_TEST_DB_CONFIG_OK);
-    resourceManagerMySqlSUCCESS.parseFile();
-    EXPECT_EQ(database.connect(resourceManagerMySqlSUCCESS.getHost(),
-                                    resourceManagerMySqlSUCCESS.getUser(),
-                                    resourceManagerMySqlSUCCESS.getPassword(),
-                                    resourceManagerMySqlSUCCESS.getDatabase()
+    ResourceManagerDatabase resourceManagerMySQL(PATH_TO_TEST_DB_CONFIG_OK);
+    resourceManagerMySQL.parseFile();
+    EXPECT_EQ(database.connect(resourceManagerMySQL.getHost(),
+                                    resourceManagerMySQL.getUser(),
+                                    resourceManagerMySQL.getPassword(),
+                                    resourceManagerMySQL.getDatabase()
                                    ), EXIT_SUCCESS);
     ResourceManagerStringCreator resourceManagerStringCreator(PATH_TO_TEST_STRING_CREATOR);
     resourceManagerStringCreator.parseFile();
@@ -104,7 +104,7 @@ TEST(StorageMYSQLTest, getData) {
                           resourceManagerStringCreator.getPasswordEndSymbol());
     string key;
     string password = creator.createPassword();
-    string deletionDate = creator.createDeletionDate(amountOfDays);
+    string deletionDate = StringCreator::createDeletionDate(amountOfDays);
 
     do {
         key = creator.createKey();

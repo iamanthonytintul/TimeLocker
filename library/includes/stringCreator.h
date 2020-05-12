@@ -8,7 +8,7 @@ const int JANUARY = 1;
 const int HOURS_IN_DAY = 24;
 const int SECONDS_IN_MINUTE = 60;
 const int MINUTES_IN_HOUR = 60;
-const int START_YEAR = 1900;
+const int START_YEAR_TM_STRUCT = 1900;
 
 const int DEFAULT_KEY_SIZE = 32;
 const int DEFAULT_PASSWORD_SIZE = 8;
@@ -29,7 +29,7 @@ public:
 
     std::string createKey() const;
     std::string createPassword() const;
-    std::string createDeletionDate(int amountOfDays) const;
+    static std::string createDeletionDate(int amountOfDays);
 private:
     const int _keySize;
     const int _passwordSize;

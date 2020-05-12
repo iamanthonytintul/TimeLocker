@@ -1,20 +1,19 @@
 #include <fstream>
 #include <sstream>
-#include <utility>
 #include "resourceManagerDatabase.h"
 
 ResourceManagerDatabase::ResourceManagerDatabase(string path): _pathToFile(std::move(path)) {
 }
 
 void ResourceManagerDatabase::parseFile() {
-    std::ifstream infile(_pathToFile);
+    std::ifstream resourceFile(_pathToFile);
     string line;
-    while (std::getline(infile, line)) {
-        std::istringstream is_line(line);
+    while (std::getline(resourceFile, line)) {
+        std::istringstream lineStream(line);
         std::string key;
-        if (std::getline(is_line, key, '=')) {
+        if (std::getline(lineStream, key, '=')) {
             std::string value;
-            std::getline(is_line, value);
+            std::getline(lineStream, value);
             if (key == "HOST") {
                 _host.append(value);
             }

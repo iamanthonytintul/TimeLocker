@@ -9,7 +9,7 @@ public:
     explicit ResourceManagerDatabase(string path);
     ResourceManagerDatabase(const ResourceManagerDatabase&) = delete;
     void operator=(const ResourceManagerDatabase&) = delete;
-    ~ResourceManagerDatabase() = default;
+    ~ResourceManagerDatabase() override = default;
 
     void parseFile() override;
     string getHost() const;

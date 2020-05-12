@@ -1,37 +1,36 @@
 #include <fstream>
 #include <sstream>
-#include <utility>
 #include "resourceManagerStringCreator.h"
 
-ResourceManagerStringCreator::ResourceManagerStringCreator(string path): _pathToFile(std::move(path)) {
+ResourceManagerStringCreator::ResourceManagerStringCreator(std::string path): _pathToFile(std::move(path)) {
 }
 
 void ResourceManagerStringCreator::parseFile() {
-    std::ifstream infile(_pathToFile);
-    string line;
-    while (std::getline(infile, line)) {
-        std::istringstream is_line(line);
+    std::ifstream resourceFile(_pathToFile);
+    std::string line;
+    while (std::getline(resourceFile, line)) {
+        std::istringstream lineStream(line);
         std::string key;
-        if (std::getline(is_line, key, '=')) {
+        if (std::getline(lineStream, key, '=')) {
             std::string value;
-            std::getline(is_line, value);
-            if (key == "KEYSIZE") {
+            std::getline(lineStream, value);
+            if (key == "KEY_SIZE") {
                 _keySize = std::stoi(value);
             }
-            if (key == "PASSWORDSIZE") {
+            if (key == "PASSWORD_SIZE") {
                 _passwordSize = std::stoi(value);
             }
-            if (key == "KEYSTARTSYMBOL") {
-                _keyStartSymbol = value[0];
+            if (key == "KEY_START_SYMBOL") {
+                _keyStartSymbol = value[FIRST_SYMBOL];
             }
-            if (key == "KEYENDSYMBOL") {
-                _keyEndSymbol = value[0];
+            if (key == "KEY_END_SYMBOL") {
+                _keyEndSymbol = value[FIRST_SYMBOL];
             }
-            if (key == "PASSWORDSTARTSYMBOL") {
-                _passwordStartSymbol = value[0];
+            if (key == "PASSWORD_START_SYMBOL") {
+                _passwordStartSymbol = value[FIRST_SYMBOL];
             }
-            if (key == "PASSWORDENDSYMBOL") {
-                _passwordEndSymbol = value[0];
+            if (key == "PASSWORD_END_SYMBOL") {
+                _passwordEndSymbol = value[FIRST_SYMBOL];
             }
         }
     }

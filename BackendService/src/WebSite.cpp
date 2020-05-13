@@ -2,13 +2,7 @@
 #include "Content.h"
 #include "stringCreator.h"
 
-#define DOWNLOAD_PATH "/uploads/"
-#define ACCEPTABLE_MIME "application/zip"
-#define FILE_TYPE ".zip"
-#define BAD_REQUEST 400
-#define NOT_FOUND 404
-#define SUCCESSFUL 200
-#define METHOD_NOT_ALLOWED 405
+using namespace constants;
 
 
 content::info_form::info_form() {
@@ -17,7 +11,7 @@ content::info_form::info_form() {
     amountOfDays.message("Set amount of days");
     input_submit.value("Send!");
     input_file.limits(MIN_LIMIT, MAX_LIMIT);
-    input_file.filename(booster::regex(".*\\.zip"));
+    input_file.filename(booster::regex(MIME_REGEX));
     input_file.mime(ACCEPTABLE_MIME);
     amountOfDays.range(0,7);
     add(input_pass);
@@ -48,6 +42,26 @@ bool fileExists(const std::string& path){
     std::ifstream ifile(path.c_str());
     return (bool)ifile;
 }
+
+int toInt(const std::string& toi){
+    int res;
+    try{
+        res = std::stoi(toi);
+    }catch(std::invalid_argument &e){
+        res = DEFAULT_TIME;
+    }return res;
+}
+
+int delimeterFunc(const std::string& req,std::string &key,std::string &val){
+    if(req.empty())
+        return FAIL;
+    int delimeter_key = req.find(DELIMETER_KEY);
+    key = req.substr(0, delimeter_key);
+    unsigned long size = req.size() - delimeter_key;
+    val = req.substr(delimeter_key, size);
+    return SUCCESS;
+}
+
 
 WebSite::WebSite(cppcms::service &s,AbstractController* _view) : cppcms::application(s),AbstractServer(_view) {
     dispatcher().assign("/get/(.*)", &WebSite::GetResponse, this, 1);
@@ -87,13 +101,15 @@ void WebSite::GetResponse(std::string key) {
         form.info.load(context());
         if(form.info.validate()){
             std::string pass = form.info.input_pass.value();
-            std::string file_name = view->GetData(key,pass);
-            if(file_name.empty() || !fileExists(PATH_TO_UPLOADS + file_name + FILE_TYPE)){
+
+            int status = view->GetData(key,pass);
+            if(status == 0 || !fileExists(PATH_TO_UPLOADS + key + FILE_TYPE)){
                 return(response().set_redirect_header("/"));
             }
-            response().add_header("X-Accel-Redirect",DOWNLOAD_PATH+file_name + FILE_TYPE);
+
+            response().add_header("X-Accel-Redirect",DOWNLOAD_PATH+key + FILE_TYPE);
             response().content_type(ACCEPTABLE_MIME);
-            response().add_header("Content-Disposition: attachment; filename=",file_name + FILE_TYPE);
+            response().add_header("Content-Disposition: attachment; filename=",key + FILE_TYPE);
             return response().set_redirect_header(DOWNLOAD_PATH);
         }
         return(response().set_redirect_header("/"));
@@ -102,20 +118,22 @@ void WebSite::GetResponse(std::string key) {
 
 void WebSite::APIGETResponse() {
     if (request().request_method() == "GET") {
-        // getting key + pass from headers
-        std::string auth_header = request().http_authorization();
-        int delimeter_key = auth_header.find(':');
-        std::string key = auth_header.substr(0, delimeter_key);
-        unsigned long size = auth_header.size() - delimeter_key;
-        std::string pass = auth_header.substr(delimeter_key, size);
-        //validating pass from header
-        std::string file_name = view->GetData(key, pass);
-        if (file_name.empty() || !fileExists(PATH_TO_UPLOADS + file_name))
+
+        // получение ключа и пароля
+        std::string auth_header = request().get(PASSHEADER);
+        std::string key,pass;
+        if(delimeterFunc(auth_header,key,pass) == 0)
+            return response().status(BAD_REQUEST);
+
+        //проверка пароля
+        int status = view->GetData(key, pass);
+
+        if (status == 0 || !fileExists(PATH_TO_UPLOADS + key + FILE_TYPE))
             response().status(NOT_FOUND);
         else {
-            response().add_header("X-Accel-Redirect",DOWNLOAD_PATH+file_name + FILE_TYPE);
+            response().add_header("X-Accel-Redirect",DOWNLOAD_PATH+key + FILE_TYPE);
             response().content_type(ACCEPTABLE_MIME);
-            response().add_header("Content-Disposition: attachment; filename=",file_name + FILE_TYPE);
+            response().add_header("Content-Disposition: attachment; filename=",key + FILE_TYPE);
             return response().set_redirect_header(DOWNLOAD_PATH);
         }
     } else {
@@ -127,11 +145,18 @@ void WebSite::APIPOSTResponse() {
     if (request().request_method() == "POST") {
         if (int(request().files().size()) < MAX_LIMIT && request().content_type() == ACCEPTABLE_MIME &&
             int(request().files().size()) > MIN_LIMIT) {
-            std::string pass;
-            int amountOfDays = 0;
+
+            //получение данных для корректного сохранения
+            std::string pass = request().get(PASSHEADER);
+            std::string lifeTime = request().get(TIMEHEADER);
+            int amountOfDays = toInt(lifeTime);
             std::string name = view->PostData(pass,amountOfDays);
+
+            //сохранение файла
             request().files().data()->get()->save_to(PATH_TO_UPLOADS + name);
-            return response().status(SUCCESSFUL);
+            response().status(SUCCESSFUL);
+            std::string resp = "File name: " + name + "\nPassword: " + pass;
+            response().out() << resp;
         } else {
             return response().status(BAD_REQUEST);
         }

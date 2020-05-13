@@ -5,55 +5,67 @@
 #include <iostream>
 #include "stringCreator.h"
 #include "storage.h"
+#include "Constant.h"
 #include <map>
-enum {NO_SUCH_FILE, NO_DB_CONNECTION};
 
+using namespace constants;
 
 class AbstractController{
 public:
-    virtual std::string GetData(std::string const&, std::string const&) = 0;
+    virtual int GetData(std::string const&, std::string const&) = 0;
     virtual std::string PostData(std::string  &, int amountOfDays) = 0;
+    virtual int ValidateData(std::string & key,std::string &pass) = 0;
     virtual ~AbstractController() = default;
-protected:
-    StringCreator nmCreate;
 };
 
 
 template <class DataBaseType>
 class ViewController : public AbstractController{
     DataBaseType* DBManager;
+    StringCreator nmCreate;
 public:
-    explicit ViewController(DataBaseType* _DBManager):DBManager(_DBManager),AbstractController(){};
-    std::string GetData(std::string const& key, std::string const& pass) override;
+    explicit ViewController(DataBaseType* _DBManager):DBManager(_DBManager) {};
+    int GetData(std::string const& key, std::string const& pass) override;
+    int ValidateData(std::string & key,std::string & pass) override;
     std::string PostData(std::string & pass,int amountOfDays) override;
 };
 
 
 template<class DataBaseType>
-std::string ViewController<DataBaseType>::GetData(std::string const & key, std::string const & pass) {
+int ViewController<DataBaseType>::GetData(std::string const & key, std::string const & pass) {
     if(key.empty() || pass.empty()){
-        return "";
+        return FAIL;
     }
     std::map<std::string,std::string> res = DBManager->getData(key);
-    if(res.empty() || pass != res["Password"]){
-        return "";
+
+    if(res.empty() || pass != res[PASSMAP]){
+        return FAIL;
     }
-    return res["Key"];
+    return SUCCESS;
+}
+
+template<class DataBaseType>
+int ViewController<DataBaseType>::ValidateData(std::string &key, std::string &pass){
+    if(pass.empty()){
+        pass = nmCreate.createPassword();
+    }
+    std::map<std::string,std::string> result;
+    do{
+        key = nmCreate.createKey();
+        result = DBManager->getData(key);
+    }while(result[KEYMAP] == key);
+    return SUCCESS;
 }
 
 template<class DataBaseType>
 std::string ViewController<DataBaseType>::PostData(std::string & pass,int amountOfDays) {
-    if(pass.empty()){
-        pass = nmCreate.createPassword();
-    }
+
     std::string DeletionDate = nmCreate.createDeletionDate(amountOfDays);
-    std::map<std::string,std::string> result;
     std::string key;
-    do{
-        key = nmCreate.createKey();
-        result = DBManager->getData(key);
-    }while(result["Key"] == key);
-    DBManager->saveData(key,pass,DeletionDate);
+    ValidateData(key,pass);
+
+    if(DBManager->saveData(key,pass,DeletionDate) == EXIT_FAILURE)
+        return "";
     std::cout << pass << std::endl;
     return key;
 }

@@ -24,14 +24,16 @@ include_directories(${PROJECT_SOURCE_DIR}/BackendService)
 include_directories(${PROJECT_SOURCE_DIR}/BackendService/template)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
+
 foreach(file ${tests})
     set(name)
     get_filename_component(name ${file} NAME_WE)
     add_executable("${name}_tests"
             ${sources}
             ${file}
-            "${PROJECT_SOURCE_DIR}/test/main.cpp" "src/main.cpp" source/src.cpp BackendService/src/WebSite.cpp)
-    target_link_libraries("${name}_tests" gtest_main gmock BackendLogicLibrary BackendServiceLibrary ${LIB_CPPCMS} ${LIB_BOOSTER})
+            "${PROJECT_SOURCE_DIR}/test/main.cpp" "${PROJECT_SOURCE_DIR}/library/source/src.cpp" "${PROJECT_SOURCE_DIR}/BackendService/src/WebSite.cpp")
+    target_link_libraries("${name}_tests" gtest_main gmock ${LIB_CPPCMS} ${LIB_BOOSTER})
+    add_dependencies("${name}_tests" view)
     set (CMAKE_CXX_STANDARD 11)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -fprofile-arcs -ftest-coverage -Wall -Werror -Wpedantic")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -fprofile-arcs -ftest-coverage")

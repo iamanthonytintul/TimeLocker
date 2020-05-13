@@ -1,13 +1,8 @@
-//
-// Created by felix on 22.04.2020.
-//
 
 #ifndef BACKENDSERVICE_CONTENT_H
 #define BACKENDSERVICE_CONTENT_H
 #include <cppcms/form.h>
 #include <cppcms/view.h>
-#define MIN_LIMIT 0
-#define MAX_LIMIT 50*1024*1024
 
 namespace content{
     struct info_form : public cppcms::form{

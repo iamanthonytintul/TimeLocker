@@ -1,6 +1,3 @@
-//
-// Created by felix on 22.04.2020.
-//
 
 #ifndef BACKENDSERVICE_SERVER_H
 #define BACKENDSERVICE_SERVER_H

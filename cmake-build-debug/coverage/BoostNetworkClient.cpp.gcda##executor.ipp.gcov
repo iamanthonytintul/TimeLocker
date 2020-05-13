@@ -1,0 +1,46 @@
+        -:    0:Source:/usr/include/boost/asio/impl/executor.ipp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// impl/executor.ipp
+        -:    3:// ~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_IMPL_EXECUTOR_IPP
+        -:   12:#define BOOST_ASIO_IMPL_EXECUTOR_IPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <boost/asio/executor.hpp>
+        -:   20:
+        -:   21:#include <boost/asio/detail/push_options.hpp>
+        -:   22:
+        -:   23:namespace boost {
+        -:   24:namespace asio {
+        -:   25:
+    #####:   26:bad_executor::bad_executor() BOOST_ASIO_NOEXCEPT
+    %%%%%:   26-block  0
+        -:   27:{
+    #####:   28:}
+        -:   29:
+    #####:   30:const char* bad_executor::what() const BOOST_ASIO_NOEXCEPT_OR_NOTHROW
+        -:   31:{
+    #####:   32:  return "bad executor";
+    %%%%%:   32-block  0
+        -:   33:}
+        -:   34:
+        -:   35:} // namespace asio
+        -:   36:} // namespace boost
+        -:   37:
+        -:   38:#include <boost/asio/detail/pop_options.hpp>
+        -:   39:
+        -:   40:#endif // BOOST_ASIO_IMPL_EXECUTOR_IPP

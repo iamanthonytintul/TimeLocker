@@ -1,0 +1,247 @@
+        -:    0:Source:/usr/include/boost/system/detail/std_interoperability.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/SendFileClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/SendFileClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1:// Support for interoperability between Boost.System and <system_error>
+        -:    2://
+        -:    3:// Copyright 2018 Peter Dimov
+        -:    4://
+        -:    5:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    6:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    7://
+        -:    8:// See library home page at http://www.boost.org/libs/system
+        -:    9:
+        -:   10:#include <system_error>
+        -:   11:#include <map>
+        -:   12:#include <memory>
+        -:   13:#include <mutex>
+        -:   14:
+        -:   15://
+        -:   16:
+        -:   17:namespace boost
+        -:   18:{
+        -:   19:
+        -:   20:namespace system
+        -:   21:{
+        -:   22:
+        -:   23:namespace detail
+        -:   24:{
+        -:   25:
+        -:   26:class BOOST_SYMBOL_VISIBLE std_category: public std::error_category
+        -:   27:{
+        -:   28:private:
+        -:   29:
+        -:   30:    boost::system::error_category const * pc_;
+        -:   31:
+        -:   32:public:
+        -:   33:
+    #####:   34:    explicit std_category( boost::system::error_category const * pc, unsigned id ): pc_( pc )
+    %%%%%:   34-block  0
+        -:   35:    {
+        -:   36:        if( id != 0 )
+        -:   37:        {
+        -:   38:#if defined(_MSC_VER) && defined(_CPPLIB_VER) && _MSC_VER >= 1900 && _MSC_VER < 2000
+        -:   39:
+        -:   40:            // Poking into the protected _Addr member of std::error_category
+        -:   41:            // is not a particularly good programming practice, but what can
+        -:   42:            // you do
+        -:   43:
+        -:   44:            _Addr = id;
+        -:   45:
+        -:   46:#endif
+        -:   47:        }
+    #####:   48:    }
+        -:   49:
+    #####:   50:    virtual const char * name() const BOOST_NOEXCEPT
+        -:   51:    {
+    #####:   52:        return pc_->name();
+    %%%%%:   52-block  0
+        -:   53:    }
+        -:   54:
+    #####:   55:    virtual std::string message( int ev ) const
+        -:   56:    {
+    #####:   57:        return pc_->message( ev );
+    %%%%%:   57-block  0
+        -:   58:    }
+        -:   59:
+    #####:   60:    virtual std::error_condition default_error_condition( int ev ) const BOOST_NOEXCEPT
+        -:   61:    {
+    #####:   62:        return pc_->default_error_condition( ev );
+    %%%%%:   62-block  0
+        -:   63:    }
+        -:   64:
+        -:   65:    virtual bool equivalent( int code, const std::error_condition & condition ) const BOOST_NOEXCEPT;
+        -:   66:    virtual bool equivalent( const std::error_code & code, int condition ) const BOOST_NOEXCEPT;
+        -:   67:};
+        -:   68:
+        -:   69:#if !defined(__SUNPRO_CC) // trailing __global is not supported
+        -:   70:inline std::error_category const & to_std_category( boost::system::error_category const & cat ) BOOST_SYMBOL_VISIBLE;
+        -:   71:#endif
+        -:   72:
+        -:   73:struct cat_ptr_less
+        -:   74:{
+    #####:   75:    bool operator()( boost::system::error_category const * p1, boost::system::error_category const * p2 ) const BOOST_NOEXCEPT
+        -:   76:    {
+    #####:   77:        return *p1 < *p2;
+    %%%%%:   77-block  0
+        -:   78:    }
+        -:   79:};
+        -:   80:
+    #####:   81:inline std::error_category const & to_std_category( boost::system::error_category const & cat )
+        -:   82:{
+    #####:   83:    if( cat == boost::system::system_category() )
+    %%%%%:   83-block  0
+        -:   84:    {
+    #####:   85:        static const std_category system_instance( &cat, 0x1F4D7 );
+    %%%%%:   85-block  0
+    %%%%%:   85-block  1
+    %%%%%:   85-block  2
+    #####:   86:        return system_instance;
+    %%%%%:   86-block  0
+        -:   87:    }
+    #####:   88:    else if( cat == boost::system::generic_category() )
+    %%%%%:   88-block  0
+        -:   89:    {
+    #####:   90:        static const std_category generic_instance( &cat, 0x1F4D3 );
+    %%%%%:   90-block  0
+    %%%%%:   90-block  1
+    %%%%%:   90-block  2
+    #####:   91:        return generic_instance;
+    %%%%%:   91-block  0
+        -:   92:    }
+        -:   93:    else
+        -:   94:    {
+        -:   95:        typedef std::map< boost::system::error_category const *, std::unique_ptr<std_category>, cat_ptr_less > map_type;
+        -:   96:
+    #####:   97:        static map_type map_;
+    %%%%%:   97-block  0
+    %%%%%:   97-block  1
+    %%%%%:   97-block  2
+        -:   98:        static std::mutex map_mx_;
+        -:   99:
+    #####:  100:        std::lock_guard<std::mutex> guard( map_mx_ );
+    %%%%%:  100-block  0
+    $$$$$:  100-block  1
+        -:  101:
+    #####:  102:        map_type::iterator i = map_.find( &cat );
+    %%%%%:  102-block  0
+    $$$$$:  102-block  1
+        -:  103:
+    #####:  104:        if( i == map_.end() )
+    %%%%%:  104-block  0
+        -:  105:        {
+    #####:  106:            std::unique_ptr<std_category> p( new std_category( &cat, 0 ) );
+    %%%%%:  106-block  0
+    %%%%%:  106-block  1
+    $$$$$:  106-block  2
+        -:  107:
+    #####:  108:            std::pair<map_type::iterator, bool> r = map_.insert( map_type::value_type( &cat, std::move( p ) ) );
+    %%%%%:  108-block  0
+    $$$$$:  108-block  1
+    $$$$$:  108-block  2
+    $$$$$:  108-block  3
+        -:  109:
+    #####:  110:            i = r.first;
+        -:  111:        }
+        -:  112:
+    #####:  113:        return *i->second;
+    %%%%%:  113-block  0
+        -:  114:    }
+        -:  115:}
+        -:  116:
+    #####:  117:inline bool std_category::equivalent( int code, const std::error_condition & condition ) const BOOST_NOEXCEPT
+        -:  118:{
+    #####:  119:    if( condition.category() == *this )
+    %%%%%:  119-block  0
+        -:  120:    {
+    #####:  121:        boost::system::error_condition bn( condition.value(), *pc_ );
+    %%%%%:  121-block  0
+    #####:  122:        return pc_->equivalent( code, bn );
+        -:  123:    }
+    #####:  124:    else if( condition.category() == std::generic_category() || condition.category() == boost::system::generic_category() )
+    %%%%%:  124-block  0
+    %%%%%:  124-block  1
+    %%%%%:  124-block  2
+    %%%%%:  124-block  3
+    %%%%%:  124-block  4
+        -:  125:    {
+    #####:  126:        boost::system::error_condition bn( condition.value(), boost::system::generic_category() );
+    %%%%%:  126-block  0
+    #####:  127:        return pc_->equivalent( code, bn );
+        -:  128:    }
+        -:  129:
+        -:  130:#ifndef BOOST_NO_RTTI
+        -:  131:
+    #####:  132:    else if( std_category const* pc2 = dynamic_cast< std_category const* >( &condition.category() ) )
+    %%%%%:  132-block  0
+    %%%%%:  132-block  1
+    %%%%%:  132-block  2
+    %%%%%:  132-block  3
+        -:  133:    {
+    #####:  134:        boost::system::error_condition bn( condition.value(), *pc2->pc_ );
+    %%%%%:  134-block  0
+    #####:  135:        return pc_->equivalent( code, bn );
+        -:  136:    }
+        -:  137:
+        -:  138:#endif
+        -:  139:
+        -:  140:    else
+        -:  141:    {
+    #####:  142:        return default_error_condition( code ) == condition;
+    %%%%%:  142-block  0
+        -:  143:    }
+        -:  144:}
+        -:  145:
+    #####:  146:inline bool std_category::equivalent( const std::error_code & code, int condition ) const BOOST_NOEXCEPT
+        -:  147:{
+    #####:  148:    if( code.category() == *this )
+    %%%%%:  148-block  0
+        -:  149:    {
+    #####:  150:        boost::system::error_code bc( code.value(), *pc_ );
+    %%%%%:  150-block  0
+    #####:  151:        return pc_->equivalent( bc, condition );
+        -:  152:    }
+    #####:  153:    else if( code.category() == std::generic_category() || code.category() == boost::system::generic_category() )
+    %%%%%:  153-block  0
+    %%%%%:  153-block  1
+    %%%%%:  153-block  2
+    %%%%%:  153-block  3
+    %%%%%:  153-block  4
+        -:  154:    {
+    #####:  155:        boost::system::error_code bc( code.value(), boost::system::generic_category() );
+    %%%%%:  155-block  0
+    #####:  156:        return pc_->equivalent( bc, condition );
+        -:  157:    }
+        -:  158:
+        -:  159:#ifndef BOOST_NO_RTTI
+        -:  160:
+    #####:  161:    else if( std_category const* pc2 = dynamic_cast< std_category const* >( &code.category() ) )
+    %%%%%:  161-block  0
+    %%%%%:  161-block  1
+    %%%%%:  161-block  2
+    %%%%%:  161-block  3
+        -:  162:    {
+    #####:  163:        boost::system::error_code bc( code.value(), *pc2->pc_ );
+    %%%%%:  163-block  0
+    #####:  164:        return pc_->equivalent( bc, condition );
+        -:  165:    }
+        -:  166:#endif
+        -:  167:
+    #####:  168:    else if( *pc_ == boost::system::generic_category() )
+    %%%%%:  168-block  0
+        -:  169:    {
+    #####:  170:        return std::generic_category().equivalent( code, condition );
+    %%%%%:  170-block  0
+        -:  171:    }
+        -:  172:    else
+        -:  173:    {
+    #####:  174:        return false;
+    %%%%%:  174-block  0
+        -:  175:    }
+        -:  176:}
+        -:  177:
+        -:  178:} // namespace detail
+        -:  179:
+        -:  180:} // namespace system
+        -:  181:
+        -:  182:} // namespace boost

@@ -1,0 +1,27 @@
+        -:    0:Source:/home/anthonytintul/CLionProjects/TLConsoleApplication/lib/Views/pages/ConsoleViewUploadFileMessagePage.cpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/Views/pages/ConsoleViewUploadFileMessagePage.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/Views/pages/ConsoleViewUploadFileMessagePage.cpp.gcda
+        -:    0:Runs:1
+        -:    1:#include "PresenterHeaders/presenter.h"
+        -:    2:
+    #####:    3:void ConsoleViewUploadFileMessagePage::attach(AbstractPresenter *observerPresenter) {
+    #####:    4:    vectorOfPresenters.push_back(observerPresenter);
+    %%%%%:    4-block  0
+    #####:    5:}
+        -:    6:
+    #####:    7:int ConsoleViewUploadFileMessagePage::printPage() {
+    #####:    8:    output << std::endl << "For the security of storing your data, you must create a password. Follow the instructions below."
+    %%%%%:    8-block  0
+    #####:    9:           << std::endl << std::endl;
+    #####:   10:    output << "There are two options for the password:" << std::endl << std::endl;
+    #####:   11:    output << "Your own password. " << MIN_PASSWORD_LENGTH << " <= Length <= " << MAX_PASSWORD_LENGTH << std::endl;
+    #####:   12:    output << "Automatically generated, easy to remember password. " << MIN_PASSWORD_LENGTH << " <= Length <= "
+    #####:   13:           << MAX_PASSWORD_LENGTH << " with letters only" << std::endl << std::endl;
+        -:   14:
+    #####:   15:    return SUCCESS;
+        -:   16:}
+        -:   17:
+    #####:   18:void ConsoleViewUploadFileMessagePage::accept(AbstractVisitor *visitor) {
+    #####:   19:    visitor->visitUploadFilePage(this);
+    %%%%%:   19-block  0
+    #####:   20:}

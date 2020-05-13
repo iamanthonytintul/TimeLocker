@@ -1,0 +1,115 @@
+        -:    0:Source:/usr/include/boost/asio/detail/recycling_allocator.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/src/main.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/src/main.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// detail/recycling_allocator.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_DETAIL_RECYCLING_ALLOCATOR_HPP
+        -:   12:#define BOOST_ASIO_DETAIL_RECYCLING_ALLOCATOR_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <boost/asio/detail/memory.hpp>
+        -:   20:#include <boost/asio/detail/thread_context.hpp>
+        -:   21:#include <boost/asio/detail/thread_info_base.hpp>
+        -:   22:
+        -:   23:#include <boost/asio/detail/push_options.hpp>
+        -:   24:
+        -:   25:namespace boost {
+        -:   26:namespace asio {
+        -:   27:namespace detail {
+        -:   28:
+        -:   29:template <typename T, typename Purpose = thread_info_base::default_tag>
+        -:   30:class recycling_allocator
+        -:   31:{
+        -:   32:public:
+        -:   33:  typedef T value_type;
+        -:   34:
+        -:   35:  template <typename U>
+        -:   36:  struct rebind
+        -:   37:  {
+        -:   38:    typedef recycling_allocator<U, Purpose> other;
+        -:   39:  };
+        -:   40:
+        -:   41:  recycling_allocator()
+        -:   42:  {
+        -:   43:  }
+        -:   44:
+        -:   45:  template <typename U>
+    #####:   46:  recycling_allocator(const recycling_allocator<U, Purpose>&)
+        -:   47:  {
+    #####:   48:  }
+        -:   49:
+    #####:   50:  T* allocate(std::size_t n)
+        -:   51:  {
+        -:   52:    typedef thread_context::thread_call_stack call_stack;
+    #####:   53:    void* p = thread_info_base::allocate(Purpose(),
+    %%%%%:   53-block  0
+        -:   54:        call_stack::top(), sizeof(T) * n);
+    #####:   55:    return static_cast<T*>(p);
+        -:   56:  }
+        -:   57:
+    #####:   58:  void deallocate(T* p, std::size_t n)
+        -:   59:  {
+        -:   60:    typedef thread_context::thread_call_stack call_stack;
+    #####:   61:    thread_info_base::deallocate(Purpose(),
+    %%%%%:   61-block  0
+        -:   62:        call_stack::top(), p, sizeof(T) * n);
+    #####:   63:  }
+        -:   64:};
+        -:   65:
+        -:   66:template <typename Purpose>
+        -:   67:class recycling_allocator<void, Purpose>
+        -:   68:{
+        -:   69:public:
+        -:   70:  typedef void value_type;
+        -:   71:
+        -:   72:  template <typename U>
+        -:   73:  struct rebind
+        -:   74:  {
+        -:   75:    typedef recycling_allocator<U, Purpose> other;
+        -:   76:  };
+        -:   77:
+    #####:   78:  recycling_allocator()
+        -:   79:  {
+    #####:   80:  }
+        -:   81:
+        -:   82:  template <typename U>
+        -:   83:  recycling_allocator(const recycling_allocator<U, Purpose>&)
+        -:   84:  {
+        -:   85:  }
+        -:   86:};
+        -:   87:
+        -:   88:template <typename Allocator, typename Purpose>
+        -:   89:struct get_recycling_allocator
+        -:   90:{
+        -:   91:  typedef Allocator type;
+        -:   92:  static type get(const Allocator& a) { return a; }
+        -:   93:};
+        -:   94:
+        -:   95:template <typename T, typename Purpose>
+        -:   96:struct get_recycling_allocator<std::allocator<T>, Purpose>
+        -:   97:{
+        -:   98:  typedef recycling_allocator<T, Purpose> type;
+    #####:   99:  static type get(const std::allocator<T>&) { return type(); }
+    %%%%%:   99-block  0
+        -:  100:};
+        -:  101:
+        -:  102:} // namespace detail
+        -:  103:} // namespace asio
+        -:  104:} // namespace boost
+        -:  105:
+        -:  106:#include <boost/asio/detail/pop_options.hpp>
+        -:  107:
+        -:  108:#endif // BOOST_ASIO_DETAIL_RECYCLING_ALLOCATOR_HPP

@@ -1,0 +1,179 @@
+        -:    0:Source:/usr/include/boost/asio/detail/io_object_executor.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// io_object_executor.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_DETAIL_IO_OBJECT_EXECUTOR_HPP
+        -:   12:#define BOOST_ASIO_DETAIL_IO_OBJECT_EXECUTOR_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <boost/asio/detail/handler_invoke_helpers.hpp>
+        -:   20:#include <boost/asio/detail/type_traits.hpp>
+        -:   21:#include <boost/asio/io_context.hpp>
+        -:   22:
+        -:   23:#include <boost/asio/detail/push_options.hpp>
+        -:   24:
+        -:   25:namespace boost {
+        -:   26:namespace asio {
+        -:   27:namespace detail {
+        -:   28:
+        -:   29:// Wrap the (potentially polymorphic) executor so that we can bypass it when
+        -:   30:// dispatching on a target executor that has a native I/O implementation.
+        -:   31:template <typename Executor>
+        -:   32:class io_object_executor
+        -:   33:{
+        -:   34:public:
+        -:   35:  io_object_executor(const Executor& ex,
+        -:   36:      bool native_implementation) BOOST_ASIO_NOEXCEPT
+        -:   37:    : executor_(ex),
+        -:   38:      has_native_impl_(native_implementation)
+        -:   39:  {
+        -:   40:  }
+        -:   41:
+       16:   42:  io_object_executor(const io_object_executor& other) BOOST_ASIO_NOEXCEPT
+       16:   43:    : executor_(other.executor_),
+       16:   44:      has_native_impl_(other.has_native_impl_)
+       16:   44-block  0
+        -:   45:  {
+       16:   46:  }
+        -:   47:
+        -:   48:  template <typename Executor1>
+        -:   49:  io_object_executor(
+        -:   50:      const io_object_executor<Executor1>& other) BOOST_ASIO_NOEXCEPT
+        -:   51:    : executor_(other.inner_executor()),
+        -:   52:      has_native_impl_(other.has_native_implementation())
+        -:   53:  {
+        -:   54:  }
+        -:   55:
+        -:   56:#if defined(BOOST_ASIO_HAS_MOVE)
+        -:   57:  io_object_executor(io_object_executor&& other) BOOST_ASIO_NOEXCEPT
+        -:   58:    : executor_(BOOST_ASIO_MOVE_CAST(Executor)(other.executor_)),
+        -:   59:      has_native_impl_(other.has_native_impl_)
+        -:   60:  {
+        -:   61:  }
+        -:   62:#endif // defined(BOOST_ASIO_HAS_MOVE)
+        -:   63:
+    #####:   64:  const Executor& inner_executor() const BOOST_ASIO_NOEXCEPT
+        -:   65:  {
+    #####:   66:    return executor_;
+    %%%%%:   66-block  0
+        -:   67:  }
+        -:   68:
+        -:   69:  bool has_native_implementation() const BOOST_ASIO_NOEXCEPT
+        -:   70:  {
+        -:   71:    return has_native_impl_;
+        -:   72:  }
+        -:   73:
+        -:   74:  execution_context& context() const BOOST_ASIO_NOEXCEPT
+        -:   75:  {
+        -:   76:    return executor_.context();
+        -:   77:  }
+        -:   78:
+        8:   79:  void on_work_started() const BOOST_ASIO_NOEXCEPT
+        -:   80:  {
+        8:   81:    if (is_same<Executor, io_context::executor_type>::value
+        8:   82:        || has_native_impl_)
+        8:   82-block  0
+        -:   83:    {
+        -:   84:      // When using a native implementation, work is already counted by the
+        -:   85:      // execution context.
+        -:   86:    }
+        -:   87:    else
+        -:   88:    {
+    #####:   89:      executor_.on_work_started();
+    %%%%%:   89-block  0
+        -:   90:    }
+        8:   91:  }
+        -:   92:
+        8:   93:  void on_work_finished() const BOOST_ASIO_NOEXCEPT
+        -:   94:  {
+        8:   95:    if (is_same<Executor, io_context::executor_type>::value
+        8:   96:        || has_native_impl_)
+        8:   96-block  0
+        -:   97:    {
+        -:   98:      // When using a native implementation, work is already counted by the
+        -:   99:      // execution context.
+        -:  100:    }
+        -:  101:    else
+        -:  102:    {
+    #####:  103:      executor_.on_work_finished();
+    %%%%%:  103-block  0
+        -:  104:    }
+        8:  105:  }
+        -:  106:
+        -:  107:  template <typename F, typename A>
+       4*:  108:  void dispatch(BOOST_ASIO_MOVE_ARG(F) f, const A& a) const
+        -:  109:  {
+       4*:  110:    if (is_same<Executor, io_context::executor_type>::value
+       4*:  111:        || has_native_impl_)
+        -:  112:    {
+        -:  113:      // When using a native implementation, I/O completion handlers are
+        -:  114:      // already dispatched according to the execution context's executor's
+        -:  115:      // rules. We can call the function directly.
+        -:  116:#if defined(BOOST_ASIO_HAS_MOVE)
+        -:  117:      if (is_same<F, typename decay<F>::type>::value)
+        -:  118:      {
+       4*:  119:        boost_asio_handler_invoke_helpers::invoke(f, f);
+       4*:  120:        return;
+        -:  121:      }
+        -:  122:#endif // defined(BOOST_ASIO_HAS_MOVE)
+        -:  123:      typename decay<F>::type function(BOOST_ASIO_MOVE_CAST(F)(f));
+        -:  124:      boost_asio_handler_invoke_helpers::invoke(function, function);
+        -:  125:    }
+        -:  126:    else
+        -:  127:    {
+    #####:  128:      executor_.dispatch(BOOST_ASIO_MOVE_CAST(F)(f), a);
+        -:  129:    }
+        -:  130:  }
+        -:  131:
+        -:  132:  template <typename F, typename A>
+        -:  133:  void post(BOOST_ASIO_MOVE_ARG(F) f, const A& a) const
+        -:  134:  {
+        -:  135:    executor_.post(BOOST_ASIO_MOVE_CAST(F)(f), a);
+        -:  136:  }
+        -:  137:
+        -:  138:  template <typename F, typename A>
+        -:  139:  void defer(BOOST_ASIO_MOVE_ARG(F) f, const A& a) const
+        -:  140:  {
+        -:  141:    executor_.defer(BOOST_ASIO_MOVE_CAST(F)(f), a);
+        -:  142:  }
+        -:  143:
+        -:  144:  friend bool operator==(const io_object_executor& a,
+        -:  145:      const io_object_executor& b) BOOST_ASIO_NOEXCEPT
+        -:  146:  {
+        -:  147:    return a.executor_ == b.executor_
+        -:  148:      && a.has_native_impl_ == b.has_native_impl_;
+        -:  149:  }
+        -:  150:
+        -:  151:  friend bool operator!=(const io_object_executor& a,
+        -:  152:      const io_object_executor& b) BOOST_ASIO_NOEXCEPT
+        -:  153:  {
+        -:  154:    return a.executor_ != b.executor_
+        -:  155:      || a.has_native_impl_ != b.has_native_impl_;
+        -:  156:  }
+        -:  157:
+        -:  158:private:
+        -:  159:  Executor executor_;
+        -:  160:  const bool has_native_impl_;
+        -:  161:};
+        -:  162:
+        -:  163:} // namespace detail
+        -:  164:} // namespace asio
+        -:  165:} // namespace boost
+        -:  166:
+        -:  167:#include <boost/asio/detail/pop_options.hpp>
+        -:  168:
+        -:  169:#endif // BOOST_ASIO_DETAIL_IO_OBJECT_EXECUTOR_HPP

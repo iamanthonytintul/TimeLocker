@@ -1,0 +1,425 @@
+        -:    0:Source:/usr/include/boost/asio/impl/executor.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/src/main.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/src/main.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// impl/executor.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_IMPL_EXECUTOR_HPP
+        -:   12:#define BOOST_ASIO_IMPL_EXECUTOR_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <boost/asio/detail/atomic_count.hpp>
+        -:   20:#include <boost/asio/detail/executor_function.hpp>
+        -:   21:#include <boost/asio/detail/global.hpp>
+        -:   22:#include <boost/asio/detail/memory.hpp>
+        -:   23:#include <boost/asio/detail/recycling_allocator.hpp>
+        -:   24:#include <boost/asio/executor.hpp>
+        -:   25:#include <boost/asio/system_executor.hpp>
+        -:   26:
+        -:   27:#include <boost/asio/detail/push_options.hpp>
+        -:   28:
+        -:   29:namespace boost {
+        -:   30:namespace asio {
+        -:   31:
+        -:   32:#if !defined(GENERATING_DOCUMENTATION)
+        -:   33:
+        -:   34:#if defined(BOOST_ASIO_HAS_MOVE)
+        -:   35:
+        -:   36:// Lightweight, move-only function object wrapper.
+        -:   37:class executor::function
+        -:   38:{
+        -:   39:public:
+        -:   40:  template <typename F, typename Alloc>
+        -:   41:  explicit function(F f, const Alloc& a)
+        -:   42:  {
+        -:   43:    // Allocate and construct an operation to wrap the function.
+        -:   44:    typedef detail::executor_function<F, Alloc> func_type;
+        -:   45:    typename func_type::ptr p = {
+        -:   46:      detail::addressof(a), func_type::ptr::allocate(a), 0 };
+        -:   47:    func_ = new (p.v) func_type(BOOST_ASIO_MOVE_CAST(F)(f), a);
+        -:   48:    p.v = 0;
+        -:   49:  }
+        -:   50:
+    #####:   51:  function(function&& other) BOOST_ASIO_NOEXCEPT
+    #####:   52:    : func_(other.func_)
+        -:   53:  {
+    #####:   54:    other.func_ = 0;
+    #####:   55:  }
+        -:   56:
+    #####:   57:  ~function()
+    #####:   58:  {
+    #####:   59:    if (func_)
+    %%%%%:   59-block  0
+    #####:   60:      func_->destroy();
+    %%%%%:   60-block  0
+    #####:   61:  }
+        -:   62:
+    #####:   63:  void operator()()
+        -:   64:  {
+    #####:   65:    if (func_)
+    %%%%%:   65-block  0
+        -:   66:    {
+    #####:   67:      detail::executor_function_base* func = func_;
+    #####:   68:      func_ = 0;
+    #####:   69:      func->complete();
+    %%%%%:   69-block  0
+        -:   70:    }
+    #####:   71:  }
+        -:   72:
+        -:   73:private:
+        -:   74:  detail::executor_function_base* func_;
+        -:   75:};
+        -:   76:
+        -:   77:#else // defined(BOOST_ASIO_HAS_MOVE)
+        -:   78:
+        -:   79:// Not so lightweight, copyable function object wrapper.
+        -:   80:class executor::function
+        -:   81:{
+        -:   82:public:
+        -:   83:  template <typename F, typename Alloc>
+        -:   84:  explicit function(const F& f, const Alloc&)
+        -:   85:    : impl_(new impl<F>(f))
+        -:   86:  {
+        -:   87:  }
+        -:   88:
+        -:   89:  void operator()()
+        -:   90:  {
+        -:   91:    impl_->invoke_(impl_.get());
+        -:   92:  }
+        -:   93:
+        -:   94:private:
+        -:   95:  // Base class for polymorphic function implementations.
+        -:   96:  struct impl_base
+        -:   97:  {
+        -:   98:    void (*invoke_)(impl_base*);
+        -:   99:  };
+        -:  100:
+        -:  101:  // Polymorphic function implementation.
+        -:  102:  template <typename F>
+        -:  103:  struct impl : impl_base
+        -:  104:  {
+        -:  105:    impl(const F& f)
+        -:  106:      : function_(f)
+        -:  107:    {
+        -:  108:      invoke_ = &function::invoke<F>;
+        -:  109:    }
+        -:  110:
+        -:  111:    F function_;
+        -:  112:  };
+        -:  113:
+        -:  114:  // Helper to invoke a function.
+        -:  115:  template <typename F>
+        -:  116:  static void invoke(impl_base* i)
+        -:  117:  {
+        -:  118:    static_cast<impl<F>*>(i)->function_();
+        -:  119:  }
+        -:  120:
+        -:  121:  detail::shared_ptr<impl_base> impl_;
+        -:  122:};
+        -:  123:
+        -:  124:#endif // defined(BOOST_ASIO_HAS_MOVE)
+        -:  125:
+        -:  126:// Default polymorphic allocator implementation.
+        -:  127:template <typename Executor, typename Allocator>
+        -:  128:class executor::impl
+        -:  129:  : public executor::impl_base
+        -:  130:{
+        -:  131:public:
+        -:  132:  typedef BOOST_ASIO_REBIND_ALLOC(Allocator, impl) allocator_type;
+        -:  133:
+        1:  134:  static impl_base* create(const Executor& e, Allocator a = Allocator())
+        -:  135:  {
+        1:  136:    raw_mem mem(a);
+        1:  136-block  0
+        1:  137:    impl* p = new (mem.ptr_) impl(e, a);
+        1:  137-block  0
+        1:  138:    mem.ptr_ = 0;
+        2:  139:    return p;
+        1:  139-block  0
+        -:  140:  }
+        -:  141:
+        1:  142:  impl(const Executor& e, const Allocator& a) BOOST_ASIO_NOEXCEPT
+        -:  143:    : impl_base(false),
+        -:  144:      ref_count_(1),
+        -:  145:      executor_(e),
+        1:  146:      allocator_(a)
+        1:  146-block  0
+        -:  147:  {
+        1:  148:  }
+        -:  149:
+       17:  150:  impl_base* clone() const BOOST_ASIO_NOEXCEPT
+        -:  151:  {
+       17:  152:    ++ref_count_;
+       17:  152-block  0
+       17:  153:    return const_cast<impl_base*>(static_cast<const impl_base*>(this));
+        -:  154:  }
+        -:  155:
+       17:  156:  void destroy() BOOST_ASIO_NOEXCEPT
+        -:  157:  {
+       17:  158:    if (--ref_count_ == 0)
+       17:  158-block  0
+        -:  159:    {
+    #####:  160:      allocator_type alloc(allocator_);
+    %%%%%:  160-block  0
+    #####:  161:      impl* p = this;
+    #####:  162:      p->~impl();
+    #####:  163:      alloc.deallocate(p, 1);
+        -:  164:    }
+       17:  165:  }
+        -:  166:
+    #####:  167:  void on_work_started() BOOST_ASIO_NOEXCEPT
+        -:  168:  {
+    #####:  169:    executor_.on_work_started();
+    %%%%%:  169-block  0
+    #####:  170:  }
+        -:  171:
+    #####:  172:  void on_work_finished() BOOST_ASIO_NOEXCEPT
+        -:  173:  {
+    #####:  174:    executor_.on_work_finished();
+    %%%%%:  174-block  0
+    #####:  175:  }
+        -:  176:
+    #####:  177:  execution_context& context() BOOST_ASIO_NOEXCEPT
+        -:  178:  {
+    #####:  179:    return executor_.context();
+    %%%%%:  179-block  0
+        -:  180:  }
+        -:  181:
+    #####:  182:  void dispatch(BOOST_ASIO_MOVE_ARG(function) f)
+        -:  183:  {
+    #####:  184:    executor_.dispatch(BOOST_ASIO_MOVE_CAST(function)(f), allocator_);
+    %%%%%:  184-block  0
+    #####:  185:  }
+        -:  186:
+    #####:  187:  void post(BOOST_ASIO_MOVE_ARG(function) f)
+        -:  188:  {
+    #####:  189:    executor_.post(BOOST_ASIO_MOVE_CAST(function)(f), allocator_);
+    %%%%%:  189-block  0
+    #####:  190:  }
+        -:  191:
+    #####:  192:  void defer(BOOST_ASIO_MOVE_ARG(function) f)
+        -:  193:  {
+    #####:  194:    executor_.defer(BOOST_ASIO_MOVE_CAST(function)(f), allocator_);
+    %%%%%:  194-block  0
+    #####:  195:  }
+        -:  196:
+    #####:  197:  type_id_result_type target_type() const BOOST_ASIO_NOEXCEPT
+        -:  198:  {
+    #####:  199:    return type_id<Executor>();
+    %%%%%:  199-block  0
+        -:  200:  }
+        -:  201:
+    #####:  202:  void* target() BOOST_ASIO_NOEXCEPT
+        -:  203:  {
+    #####:  204:    return &executor_;
+    %%%%%:  204-block  0
+        -:  205:  }
+        -:  206:
+    #####:  207:  const void* target() const BOOST_ASIO_NOEXCEPT
+        -:  208:  {
+    #####:  209:    return &executor_;
+    %%%%%:  209-block  0
+        -:  210:  }
+        -:  211:
+    #####:  212:  bool equals(const impl_base* e) const BOOST_ASIO_NOEXCEPT
+        -:  213:  {
+    #####:  214:    if (this == e)
+    %%%%%:  214-block  0
+    #####:  215:      return true;
+    %%%%%:  215-block  0
+    #####:  216:    if (target_type() != e->target_type())
+    %%%%%:  216-block  0
+    #####:  217:      return false;
+    %%%%%:  217-block  0
+    #####:  218:    return executor_ == *static_cast<const Executor*>(e->target());
+    %%%%%:  218-block  0
+        -:  219:  }
+        -:  220:
+        -:  221:private:
+        -:  222:  mutable detail::atomic_count ref_count_;
+        -:  223:  Executor executor_;
+        -:  224:  Allocator allocator_;
+        -:  225:
+        -:  226:  struct raw_mem
+        -:  227:  {
+        -:  228:    allocator_type allocator_;
+        -:  229:    impl* ptr_;
+        -:  230:
+        1:  231:    explicit raw_mem(const Allocator& a)
+        -:  232:      : allocator_(a),
+        1:  233:        ptr_(allocator_.allocate(1))
+        1:  233-block  0
+    $$$$$:  233-block  1
+        -:  234:    {
+        1:  235:    }
+        1:  235-block  0
+        -:  236:
+        1:  237:    ~raw_mem()
+        -:  238:    {
+        1:  239:      if (ptr_)
+        1:  239-block  0
+    #####:  240:        allocator_.deallocate(ptr_, 1);
+    %%%%%:  240-block  0
+        1:  241:    }
+        1:  241-block  0
+        -:  242:
+        -:  243:  private:
+        -:  244:    // Disallow copying and assignment.
+        -:  245:    raw_mem(const raw_mem&);
+        -:  246:    raw_mem operator=(const raw_mem&);
+        -:  247:  };
+        -:  248:};
+        -:  249:
+        -:  250:// Polymorphic allocator specialisation for system_executor.
+        -:  251:template <typename Allocator>
+        -:  252:class executor::impl<system_executor, Allocator>
+        -:  253:  : public executor::impl_base
+        -:  254:{
+        -:  255:public:
+        -:  256:  static impl_base* create(const system_executor&,
+        -:  257:      const Allocator& = Allocator())
+        -:  258:  {
+        -:  259:    return &detail::global<impl<system_executor, std::allocator<void> > >();
+        -:  260:  }
+        -:  261:
+        -:  262:  impl()
+        -:  263:    : impl_base(true)
+        -:  264:  {
+        -:  265:  }
+        -:  266:
+        -:  267:  impl_base* clone() const BOOST_ASIO_NOEXCEPT
+        -:  268:  {
+        -:  269:    return const_cast<impl_base*>(static_cast<const impl_base*>(this));
+        -:  270:  }
+        -:  271:
+        -:  272:  void destroy() BOOST_ASIO_NOEXCEPT
+        -:  273:  {
+        -:  274:  }
+        -:  275:
+        -:  276:  void on_work_started() BOOST_ASIO_NOEXCEPT
+        -:  277:  {
+        -:  278:    executor_.on_work_started();
+        -:  279:  }
+        -:  280:
+        -:  281:  void on_work_finished() BOOST_ASIO_NOEXCEPT
+        -:  282:  {
+        -:  283:    executor_.on_work_finished();
+        -:  284:  }
+        -:  285:
+        -:  286:  execution_context& context() BOOST_ASIO_NOEXCEPT
+        -:  287:  {
+        -:  288:    return executor_.context();
+        -:  289:  }
+        -:  290:
+        -:  291:  void dispatch(BOOST_ASIO_MOVE_ARG(function) f)
+        -:  292:  {
+        -:  293:    executor_.dispatch(BOOST_ASIO_MOVE_CAST(function)(f), allocator_);
+        -:  294:  }
+        -:  295:
+        -:  296:  void post(BOOST_ASIO_MOVE_ARG(function) f)
+        -:  297:  {
+        -:  298:    executor_.post(BOOST_ASIO_MOVE_CAST(function)(f), allocator_);
+        -:  299:  }
+        -:  300:
+        -:  301:  void defer(BOOST_ASIO_MOVE_ARG(function) f)
+        -:  302:  {
+        -:  303:    executor_.defer(BOOST_ASIO_MOVE_CAST(function)(f), allocator_);
+        -:  304:  }
+        -:  305:
+        -:  306:  type_id_result_type target_type() const BOOST_ASIO_NOEXCEPT
+        -:  307:  {
+        -:  308:    return type_id<system_executor>();
+        -:  309:  }
+        -:  310:
+        -:  311:  void* target() BOOST_ASIO_NOEXCEPT
+        -:  312:  {
+        -:  313:    return &executor_;
+        -:  314:  }
+        -:  315:
+        -:  316:  const void* target() const BOOST_ASIO_NOEXCEPT
+        -:  317:  {
+        -:  318:    return &executor_;
+        -:  319:  }
+        -:  320:
+        -:  321:  bool equals(const impl_base* e) const BOOST_ASIO_NOEXCEPT
+        -:  322:  {
+        -:  323:    return this == e;
+        -:  324:  }
+        -:  325:
+        -:  326:private:
+        -:  327:  system_executor executor_;
+        -:  328:  Allocator allocator_;
+        -:  329:};
+        -:  330:
+        -:  331:template <typename Executor>
+        1:  332:executor::executor(Executor e)
+        1:  333:  : impl_(impl<Executor, std::allocator<void> >::create(e))
+        1:  333-block  0
+        -:  334:{
+        1:  335:}
+        -:  336:
+        -:  337:template <typename Executor, typename Allocator>
+        -:  338:executor::executor(allocator_arg_t, const Allocator& a, Executor e)
+        -:  339:  : impl_(impl<Executor, Allocator>::create(e, a))
+        -:  340:{
+        -:  341:}
+        -:  342:
+        -:  343:template <typename Function, typename Allocator>
+        -:  344:void executor::dispatch(BOOST_ASIO_MOVE_ARG(Function) f,
+        -:  345:    const Allocator& a) const
+        -:  346:{
+        -:  347:  impl_base* i = get_impl();
+        -:  348:  if (i->fast_dispatch_)
+        -:  349:    system_executor().dispatch(BOOST_ASIO_MOVE_CAST(Function)(f), a);
+        -:  350:  else
+        -:  351:    i->dispatch(function(BOOST_ASIO_MOVE_CAST(Function)(f), a));
+        -:  352:}
+        -:  353:
+        -:  354:template <typename Function, typename Allocator>
+        -:  355:void executor::post(BOOST_ASIO_MOVE_ARG(Function) f,
+        -:  356:    const Allocator& a) const
+        -:  357:{
+        -:  358:  get_impl()->post(function(BOOST_ASIO_MOVE_CAST(Function)(f), a));
+        -:  359:}
+        -:  360:
+        -:  361:template <typename Function, typename Allocator>
+        -:  362:void executor::defer(BOOST_ASIO_MOVE_ARG(Function) f,
+        -:  363:    const Allocator& a) const
+        -:  364:{
+        -:  365:  get_impl()->defer(function(BOOST_ASIO_MOVE_CAST(Function)(f), a));
+        -:  366:}
+        -:  367:
+        -:  368:template <typename Executor>
+        -:  369:Executor* executor::target() BOOST_ASIO_NOEXCEPT
+        -:  370:{
+        -:  371:  return impl_ && impl_->target_type() == type_id<Executor>()
+        -:  372:    ? static_cast<Executor*>(impl_->target()) : 0;
+        -:  373:}
+        -:  374:
+        -:  375:template <typename Executor>
+        -:  376:const Executor* executor::target() const BOOST_ASIO_NOEXCEPT
+        -:  377:{
+        -:  378:  return impl_ && impl_->target_type() == type_id<Executor>()
+        -:  379:    ? static_cast<Executor*>(impl_->target()) : 0;
+        -:  380:}
+        -:  381:
+        -:  382:#endif // !defined(GENERATING_DOCUMENTATION)
+        -:  383:
+        -:  384:} // namespace asio
+        -:  385:} // namespace boost
+        -:  386:
+        -:  387:#include <boost/asio/detail/pop_options.hpp>
+        -:  388:
+        -:  389:#endif // BOOST_ASIO_IMPL_EXECUTOR_HPP

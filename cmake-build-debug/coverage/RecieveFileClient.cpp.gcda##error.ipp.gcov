@@ -1,0 +1,199 @@
+        -:    0:Source:/usr/include/boost/asio/impl/error.ipp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/RecieveFileClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/RecieveFileClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// impl/error.ipp
+        -:    3:// ~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_IMPL_ERROR_IPP
+        -:   12:#define BOOST_ASIO_IMPL_ERROR_IPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <string>
+        -:   20:#include <boost/asio/error.hpp>
+        -:   21:
+        -:   22:#include <boost/asio/detail/push_options.hpp>
+        -:   23:
+        -:   24:namespace boost {
+        -:   25:namespace asio {
+        -:   26:namespace error {
+        -:   27:
+        -:   28:#if !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
+        -:   29:
+        -:   30:namespace detail {
+        -:   31:
+        -:   32:class netdb_category : public boost::system::error_category
+        -:   33:{
+        -:   34:public:
+    #####:   35:  const char* name() const BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT
+        -:   36:  {
+    #####:   37:    return "asio.netdb";
+    %%%%%:   37-block  0
+        -:   38:  }
+        -:   39:
+    #####:   40:  std::string message(int value) const
+        -:   41:  {
+    #####:   42:    if (value == error::host_not_found)
+    %%%%%:   42-block  0
+    #####:   43:      return "Host not found (authoritative)";
+    %%%%%:   43-block  0
+    %%%%%:   43-block  1
+    $$$$$:   43-block  2
+    $$$$$:   43-block  3
+    #####:   44:    if (value == error::host_not_found_try_again)
+    %%%%%:   44-block  0
+    #####:   45:      return "Host not found (non-authoritative), try again later";
+    %%%%%:   45-block  0
+    %%%%%:   45-block  1
+    $$$$$:   45-block  2
+    $$$$$:   45-block  3
+    #####:   46:    if (value == error::no_data)
+    %%%%%:   46-block  0
+    #####:   47:      return "The query is valid, but it does not have associated data";
+    %%%%%:   47-block  0
+    %%%%%:   47-block  1
+    $$$$$:   47-block  2
+    $$$$$:   47-block  3
+    #####:   48:    if (value == error::no_recovery)
+    %%%%%:   48-block  0
+    #####:   49:      return "A non-recoverable error occurred during database lookup";
+    %%%%%:   49-block  0
+    %%%%%:   49-block  1
+    $$$$$:   49-block  2
+    $$$$$:   49-block  3
+    #####:   50:    return "asio.netdb error";
+    %%%%%:   50-block  0
+    %%%%%:   50-block  1
+    $$$$$:   50-block  2
+        -:   51:  }
+        -:   52:};
+        -:   53:
+        -:   54:} // namespace detail
+        -:   55:
+    #####:   56:const boost::system::error_category& get_netdb_category()
+        -:   57:{
+        -:   58:  static detail::netdb_category instance;
+    #####:   59:  return instance;
+    %%%%%:   59-block  0
+        -:   60:}
+        -:   61:
+        -:   62:namespace detail {
+        -:   63:
+        -:   64:class addrinfo_category : public boost::system::error_category
+        -:   65:{
+        -:   66:public:
+    #####:   67:  const char* name() const BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT
+        -:   68:  {
+    #####:   69:    return "asio.addrinfo";
+    %%%%%:   69-block  0
+        -:   70:  }
+        -:   71:
+    #####:   72:  std::string message(int value) const
+        -:   73:  {
+    #####:   74:    if (value == error::service_not_found)
+    %%%%%:   74-block  0
+    #####:   75:      return "Service not found";
+    %%%%%:   75-block  0
+    %%%%%:   75-block  1
+    $$$$$:   75-block  2
+    $$$$$:   75-block  3
+    #####:   76:    if (value == error::socket_type_not_supported)
+    %%%%%:   76-block  0
+    #####:   77:      return "Socket type not supported";
+    %%%%%:   77-block  0
+    %%%%%:   77-block  1
+    $$$$$:   77-block  2
+    $$$$$:   77-block  3
+    #####:   78:    return "asio.addrinfo error";
+    %%%%%:   78-block  0
+    %%%%%:   78-block  1
+    $$$$$:   78-block  2
+        -:   79:  }
+        -:   80:};
+        -:   81:
+        -:   82:} // namespace detail
+        -:   83:
+    #####:   84:const boost::system::error_category& get_addrinfo_category()
+        -:   85:{
+        -:   86:  static detail::addrinfo_category instance;
+    #####:   87:  return instance;
+    %%%%%:   87-block  0
+        -:   88:}
+        -:   89:
+        -:   90:#endif // !defined(BOOST_ASIO_WINDOWS) && !defined(__CYGWIN__)
+        -:   91:
+        -:   92:namespace detail {
+        -:   93:
+        -:   94:class misc_category : public boost::system::error_category
+        -:   95:{
+        -:   96:public:
+    #####:   97:  const char* name() const BOOST_ASIO_ERROR_CATEGORY_NOEXCEPT
+        -:   98:  {
+    #####:   99:    return "asio.misc";
+    %%%%%:   99-block  0
+        -:  100:  }
+        -:  101:
+    #####:  102:  std::string message(int value) const
+        -:  103:  {
+    #####:  104:    if (value == error::already_open)
+    %%%%%:  104-block  0
+    #####:  105:      return "Already open";
+    %%%%%:  105-block  0
+    %%%%%:  105-block  1
+    $$$$$:  105-block  2
+    $$$$$:  105-block  3
+    #####:  106:    if (value == error::eof)
+    %%%%%:  106-block  0
+    #####:  107:      return "End of file";
+    %%%%%:  107-block  0
+    %%%%%:  107-block  1
+    $$$$$:  107-block  2
+    $$$$$:  107-block  3
+    #####:  108:    if (value == error::not_found)
+    %%%%%:  108-block  0
+    #####:  109:      return "Element not found";
+    %%%%%:  109-block  0
+    %%%%%:  109-block  1
+    $$$$$:  109-block  2
+    $$$$$:  109-block  3
+    #####:  110:    if (value == error::fd_set_failure)
+    %%%%%:  110-block  0
+    #####:  111:      return "The descriptor does not fit into the select call's fd_set";
+    %%%%%:  111-block  0
+    %%%%%:  111-block  1
+    $$$$$:  111-block  2
+    $$$$$:  111-block  3
+    #####:  112:    return "asio.misc error";
+    %%%%%:  112-block  0
+    %%%%%:  112-block  1
+    $$$$$:  112-block  2
+        -:  113:  }
+        -:  114:};
+        -:  115:
+        -:  116:} // namespace detail
+        -:  117:
+    #####:  118:const boost::system::error_category& get_misc_category()
+        -:  119:{
+        -:  120:  static detail::misc_category instance;
+    #####:  121:  return instance;
+    %%%%%:  121-block  0
+        -:  122:}
+        -:  123:
+        -:  124:} // namespace error
+        -:  125:} // namespace asio
+        -:  126:} // namespace boost
+        -:  127:
+        -:  128:#include <boost/asio/detail/pop_options.hpp>
+        -:  129:
+        -:  130:#endif // BOOST_ASIO_IMPL_ERROR_IPP

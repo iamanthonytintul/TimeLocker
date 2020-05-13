@@ -1,0 +1,770 @@
+        -:    0:Source:/usr/include/boost/asio/detail/reactive_socket_service_base.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// detail/reactive_socket_service_base.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_DETAIL_REACTIVE_SOCKET_SERVICE_BASE_HPP
+        -:   12:#define BOOST_ASIO_DETAIL_REACTIVE_SOCKET_SERVICE_BASE_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:
+        -:   20:#if !defined(BOOST_ASIO_HAS_IOCP) \
+        -:   21:  && !defined(BOOST_ASIO_WINDOWS_RUNTIME)
+        -:   22:
+        -:   23:#include <boost/asio/buffer.hpp>
+        -:   24:#include <boost/asio/error.hpp>
+        -:   25:#include <boost/asio/execution_context.hpp>
+        -:   26:#include <boost/asio/socket_base.hpp>
+        -:   27:#include <boost/asio/detail/buffer_sequence_adapter.hpp>
+        -:   28:#include <boost/asio/detail/memory.hpp>
+        -:   29:#include <boost/asio/detail/reactive_null_buffers_op.hpp>
+        -:   30:#include <boost/asio/detail/reactive_socket_recv_op.hpp>
+        -:   31:#include <boost/asio/detail/reactive_socket_recvmsg_op.hpp>
+        -:   32:#include <boost/asio/detail/reactive_socket_send_op.hpp>
+        -:   33:#include <boost/asio/detail/reactive_wait_op.hpp>
+        -:   34:#include <boost/asio/detail/reactor.hpp>
+        -:   35:#include <boost/asio/detail/reactor_op.hpp>
+        -:   36:#include <boost/asio/detail/socket_holder.hpp>
+        -:   37:#include <boost/asio/detail/socket_ops.hpp>
+        -:   38:#include <boost/asio/detail/socket_types.hpp>
+        -:   39:
+        -:   40:#include <boost/asio/detail/push_options.hpp>
+        -:   41:
+        -:   42:namespace boost {
+        -:   43:namespace asio {
+        -:   44:namespace detail {
+        -:   45:
+        -:   46:class reactive_socket_service_base
+        -:   47:{
+        -:   48:public:
+        -:   49:  // The native type of a socket.
+        -:   50:  typedef socket_type native_handle_type;
+        -:   51:
+        -:   52:  // The implementation type of the socket.
+        -:   53:  struct base_implementation_type
+        -:   54:  {
+        -:   55:    // The native socket representation.
+        -:   56:    socket_type socket_;
+        -:   57:
+        -:   58:    // The current state of the socket.
+        -:   59:    socket_ops::state_type state_;
+        -:   60:
+        -:   61:    // Per-descriptor data used by the reactor.
+        -:   62:    reactor::per_descriptor_data reactor_data_;
+        -:   63:  };
+        -:   64:
+        -:   65:  // Constructor.
+        -:   66:  BOOST_ASIO_DECL reactive_socket_service_base(execution_context& context);
+        -:   67:
+        -:   68:  // Destroy all user-defined handler objects owned by the service.
+        -:   69:  BOOST_ASIO_DECL void base_shutdown();
+        -:   70:
+        -:   71:  // Construct a new socket implementation.
+        -:   72:  BOOST_ASIO_DECL void construct(base_implementation_type& impl);
+        -:   73:
+        -:   74:  // Move-construct a new socket implementation.
+        -:   75:  BOOST_ASIO_DECL void base_move_construct(base_implementation_type& impl,
+        -:   76:      base_implementation_type& other_impl) BOOST_ASIO_NOEXCEPT;
+        -:   77:
+        -:   78:  // Move-assign from another socket implementation.
+        -:   79:  BOOST_ASIO_DECL void base_move_assign(base_implementation_type& impl,
+        -:   80:      reactive_socket_service_base& other_service,
+        -:   81:      base_implementation_type& other_impl);
+        -:   82:
+        -:   83:  // Destroy a socket implementation.
+        -:   84:  BOOST_ASIO_DECL void destroy(base_implementation_type& impl);
+        -:   85:
+        -:   86:  // Determine whether the socket is open.
+        3:   87:  bool is_open(const base_implementation_type& impl) const
+        -:   88:  {
+        3:   89:    return impl.socket_ != invalid_socket;
+        3:   89-block  0
+        -:   90:  }
+        -:   91:
+        -:   92:  // Destroy a socket implementation.
+        -:   93:  BOOST_ASIO_DECL boost::system::error_code close(
+        -:   94:      base_implementation_type& impl, boost::system::error_code& ec);
+        -:   95:
+        -:   96:  // Release ownership of the socket.
+        -:   97:  BOOST_ASIO_DECL socket_type release(
+        -:   98:      base_implementation_type& impl, boost::system::error_code& ec);
+        -:   99:
+        -:  100:  // Get the native socket representation.
+        -:  101:  native_handle_type native_handle(base_implementation_type& impl)
+        -:  102:  {
+        -:  103:    return impl.socket_;
+        -:  104:  }
+        -:  105:
+        -:  106:  // Cancel all operations associated with the socket.
+        -:  107:  BOOST_ASIO_DECL boost::system::error_code cancel(
+        -:  108:      base_implementation_type& impl, boost::system::error_code& ec);
+        -:  109:
+        -:  110:  // Determine whether the socket is at the out-of-band data mark.
+        -:  111:  bool at_mark(const base_implementation_type& impl,
+        -:  112:      boost::system::error_code& ec) const
+        -:  113:  {
+        -:  114:    return socket_ops::sockatmark(impl.socket_, ec);
+        -:  115:  }
+        -:  116:
+        -:  117:  // Determine the number of bytes available for reading.
+        -:  118:  std::size_t available(const base_implementation_type& impl,
+        -:  119:      boost::system::error_code& ec) const
+        -:  120:  {
+        -:  121:    return socket_ops::available(impl.socket_, ec);
+        -:  122:  }
+        -:  123:
+        -:  124:  // Place the socket into the state where it will listen for new connections.
+        -:  125:  boost::system::error_code listen(base_implementation_type& impl,
+        -:  126:      int backlog, boost::system::error_code& ec)
+        -:  127:  {
+        -:  128:    socket_ops::listen(impl.socket_, backlog, ec);
+        -:  129:    return ec;
+        -:  130:  }
+        -:  131:
+        -:  132:  // Perform an IO control command on the socket.
+        -:  133:  template <typename IO_Control_Command>
+        -:  134:  boost::system::error_code io_control(base_implementation_type& impl,
+        -:  135:      IO_Control_Command& command, boost::system::error_code& ec)
+        -:  136:  {
+        -:  137:    socket_ops::ioctl(impl.socket_, impl.state_, command.name(),
+        -:  138:        static_cast<ioctl_arg_type*>(command.data()), ec);
+        -:  139:    return ec;
+        -:  140:  }
+        -:  141:
+        -:  142:  // Gets the non-blocking mode of the socket.
+        -:  143:  bool non_blocking(const base_implementation_type& impl) const
+        -:  144:  {
+        -:  145:    return (impl.state_ & socket_ops::user_set_non_blocking) != 0;
+        -:  146:  }
+        -:  147:
+        -:  148:  // Sets the non-blocking mode of the socket.
+        -:  149:  boost::system::error_code non_blocking(base_implementation_type& impl,
+        -:  150:      bool mode, boost::system::error_code& ec)
+        -:  151:  {
+        -:  152:    socket_ops::set_user_non_blocking(impl.socket_, impl.state_, mode, ec);
+        -:  153:    return ec;
+        -:  154:  }
+        -:  155:
+        -:  156:  // Gets the non-blocking mode of the native socket implementation.
+        -:  157:  bool native_non_blocking(const base_implementation_type& impl) const
+        -:  158:  {
+        -:  159:    return (impl.state_ & socket_ops::internal_non_blocking) != 0;
+        -:  160:  }
+        -:  161:
+        -:  162:  // Sets the non-blocking mode of the native socket implementation.
+        -:  163:  boost::system::error_code native_non_blocking(base_implementation_type& impl,
+        -:  164:      bool mode, boost::system::error_code& ec)
+        -:  165:  {
+        -:  166:    socket_ops::set_internal_non_blocking(impl.socket_, impl.state_, mode, ec);
+        -:  167:    return ec;
+        -:  168:  }
+        -:  169:
+        -:  170:  // Wait for the socket to become ready to read, ready to write, or to have
+        -:  171:  // pending error conditions.
+        -:  172:  boost::system::error_code wait(base_implementation_type& impl,
+        -:  173:      socket_base::wait_type w, boost::system::error_code& ec)
+        -:  174:  {
+        -:  175:    switch (w)
+        -:  176:    {
+        -:  177:    case socket_base::wait_read:
+        -:  178:      socket_ops::poll_read(impl.socket_, impl.state_, -1, ec);
+        -:  179:      break;
+        -:  180:    case socket_base::wait_write:
+        -:  181:      socket_ops::poll_write(impl.socket_, impl.state_, -1, ec);
+        -:  182:      break;
+        -:  183:    case socket_base::wait_error:
+        -:  184:      socket_ops::poll_error(impl.socket_, impl.state_, -1, ec);
+        -:  185:      break;
+        -:  186:    default:
+        -:  187:      ec = boost::asio::error::invalid_argument;
+        -:  188:      break;
+        -:  189:    }
+        -:  190:
+        -:  191:    return ec;
+        -:  192:  }
+        -:  193:
+        -:  194:  // Asynchronously wait for the socket to become ready to read, ready to
+        -:  195:  // write, or to have pending error conditions.
+        -:  196:  template <typename Handler, typename IoExecutor>
+        -:  197:  void async_wait(base_implementation_type& impl,
+        -:  198:      socket_base::wait_type w, Handler& handler, const IoExecutor& io_ex)
+        -:  199:  {
+        -:  200:    bool is_continuation =
+        -:  201:      boost_asio_handler_cont_helpers::is_continuation(handler);
+        -:  202:
+        -:  203:    // Allocate and construct an operation to wrap the handler.
+        -:  204:    typedef reactive_wait_op<Handler, IoExecutor> op;
+        -:  205:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+        -:  206:      op::ptr::allocate(handler), 0 };
+        -:  207:    p.p = new (p.v) op(handler, io_ex);
+        -:  208:
+        -:  209:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  210:          &impl, impl.socket_, "async_wait"));
+        -:  211:
+        -:  212:    int op_type;
+        -:  213:    switch (w)
+        -:  214:    {
+        -:  215:      case socket_base::wait_read:
+        -:  216:        op_type = reactor::read_op;
+        -:  217:        break;
+        -:  218:      case socket_base::wait_write:
+        -:  219:        op_type = reactor::write_op;
+        -:  220:        break;
+        -:  221:      case socket_base::wait_error:
+        -:  222:        op_type = reactor::except_op;
+        -:  223:        break;
+        -:  224:      default:
+        -:  225:        p.p->ec_ = boost::asio::error::invalid_argument;
+        -:  226:        reactor_.post_immediate_completion(p.p, is_continuation);
+        -:  227:        p.v = p.p = 0;
+        -:  228:        return;
+        -:  229:    }
+        -:  230:
+        -:  231:    start_op(impl, op_type, p.p, is_continuation, false, false);
+        -:  232:    p.v = p.p = 0;
+        -:  233:  }
+        -:  234:
+        -:  235:  // Send the given data to the peer.
+        -:  236:  template <typename ConstBufferSequence>
+        -:  237:  size_t send(base_implementation_type& impl,
+        -:  238:      const ConstBufferSequence& buffers,
+        -:  239:      socket_base::message_flags flags, boost::system::error_code& ec)
+        -:  240:  {
+        -:  241:    buffer_sequence_adapter<boost::asio::const_buffer,
+        -:  242:        ConstBufferSequence> bufs(buffers);
+        -:  243:
+        -:  244:    return socket_ops::sync_send(impl.socket_, impl.state_,
+        -:  245:        bufs.buffers(), bufs.count(), flags, bufs.all_empty(), ec);
+        -:  246:  }
+        -:  247:
+        -:  248:  // Wait until data can be sent without blocking.
+        -:  249:  size_t send(base_implementation_type& impl, const null_buffers&,
+        -:  250:      socket_base::message_flags, boost::system::error_code& ec)
+        -:  251:  {
+        -:  252:    // Wait for socket to become ready.
+        -:  253:    socket_ops::poll_write(impl.socket_, impl.state_, -1, ec);
+        -:  254:
+        -:  255:    return 0;
+        -:  256:  }
+        -:  257:
+        -:  258:  // Start an asynchronous send. The data being sent must be valid for the
+        -:  259:  // lifetime of the asynchronous operation.
+        -:  260:  template <typename ConstBufferSequence, typename Handler, typename IoExecutor>
+       1*:  261:  void async_send(base_implementation_type& impl,
+        -:  262:      const ConstBufferSequence& buffers, socket_base::message_flags flags,
+        -:  263:      Handler& handler, const IoExecutor& io_ex)
+        -:  264:  {
+        -:  265:    bool is_continuation =
+       1*:  266:      boost_asio_handler_cont_helpers::is_continuation(handler);
+        -:  267:
+        -:  268:    // Allocate and construct an operation to wrap the handler.
+        -:  269:    typedef reactive_socket_send_op<
+        -:  270:        ConstBufferSequence, Handler, IoExecutor> op;
+       1*:  271:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+       1*:  272:      op::ptr::allocate(handler), 0 };
+       1*:  273:    p.p = new (p.v) op(impl.socket_, impl.state_,
+        -:  274:        buffers, flags, handler, io_ex);
+        -:  275:
+        -:  276:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  277:          &impl, impl.socket_, "async_send"));
+        -:  278:
+       1*:  279:    start_op(impl, reactor::write_op, p.p, is_continuation, true,
+       1*:  280:        ((impl.state_ & socket_ops::stream_oriented)
+       2*:  281:          && buffer_sequence_adapter<boost::asio::const_buffer,
+       1*:  282:            ConstBufferSequence>::all_empty(buffers)));
+       1*:  283:    p.v = p.p = 0;
+       1*:  284:  }
+------------------
+_ZN5boost4asio6detail28reactive_socket_service_base10async_sendINS0_15const_buffers_1ENS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlSK_mE_EENS1_18io_object_executorIS9_EEEEvRNS2_24base_implementation_typeERKT_iRT0_RKT1_:
+        1:  261:  void async_send(base_implementation_type& impl,
+        -:  262:      const ConstBufferSequence& buffers, socket_base::message_flags flags,
+        -:  263:      Handler& handler, const IoExecutor& io_ex)
+        -:  264:  {
+        -:  265:    bool is_continuation =
+        1:  266:      boost_asio_handler_cont_helpers::is_continuation(handler);
+        1:  266-block  0
+        -:  267:
+        -:  268:    // Allocate and construct an operation to wrap the handler.
+        -:  269:    typedef reactive_socket_send_op<
+        -:  270:        ConstBufferSequence, Handler, IoExecutor> op;
+        1:  271:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+        1:  271-block  0
+    $$$$$:  271-block  1
+        1:  272:      op::ptr::allocate(handler), 0 };
+        1:  273:    p.p = new (p.v) op(impl.socket_, impl.state_,
+        1:  273-block  0
+    $$$$$:  273-block  1
+        -:  274:        buffers, flags, handler, io_ex);
+        -:  275:
+        -:  276:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  277:          &impl, impl.socket_, "async_send"));
+        -:  278:
+        1:  279:    start_op(impl, reactor::write_op, p.p, is_continuation, true,
+        1:  279-block  0
+        1:  280:        ((impl.state_ & socket_ops::stream_oriented)
+       2*:  281:          && buffer_sequence_adapter<boost::asio::const_buffer,
+        1:  281-block  0
+    %%%%%:  281-block  1
+        1:  281-block  2
+        1:  282:            ConstBufferSequence>::all_empty(buffers)));
+        1:  282-block  0
+        1:  283:    p.v = p.p = 0;
+        1:  283-block  0
+        1:  284:  }
+------------------
+_ZN5boost4asio6detail28reactive_socket_service_base10async_sendINS0_15const_buffers_1ENS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSK_mE0_EENS1_18io_object_executorIS9_EEEEvRNS2_24base_implementation_typeERKT_iRT0_RKT1_:
+    #####:  261:  void async_send(base_implementation_type& impl,
+        -:  262:      const ConstBufferSequence& buffers, socket_base::message_flags flags,
+        -:  263:      Handler& handler, const IoExecutor& io_ex)
+        -:  264:  {
+        -:  265:    bool is_continuation =
+    #####:  266:      boost_asio_handler_cont_helpers::is_continuation(handler);
+    %%%%%:  266-block  0
+        -:  267:
+        -:  268:    // Allocate and construct an operation to wrap the handler.
+        -:  269:    typedef reactive_socket_send_op<
+        -:  270:        ConstBufferSequence, Handler, IoExecutor> op;
+    #####:  271:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    %%%%%:  271-block  0
+    $$$$$:  271-block  1
+    #####:  272:      op::ptr::allocate(handler), 0 };
+    #####:  273:    p.p = new (p.v) op(impl.socket_, impl.state_,
+    %%%%%:  273-block  0
+    $$$$$:  273-block  1
+        -:  274:        buffers, flags, handler, io_ex);
+        -:  275:
+        -:  276:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  277:          &impl, impl.socket_, "async_send"));
+        -:  278:
+    #####:  279:    start_op(impl, reactor::write_op, p.p, is_continuation, true,
+    %%%%%:  279-block  0
+    #####:  280:        ((impl.state_ & socket_ops::stream_oriented)
+    #####:  281:          && buffer_sequence_adapter<boost::asio::const_buffer,
+    %%%%%:  281-block  0
+    %%%%%:  281-block  1
+    %%%%%:  281-block  2
+    #####:  282:            ConstBufferSequence>::all_empty(buffers)));
+    %%%%%:  282-block  0
+    #####:  283:    p.v = p.p = 0;
+    %%%%%:  283-block  0
+    #####:  284:  }
+------------------
+_ZN5boost4asio6detail28reactive_socket_service_base10async_sendINS0_15const_buffers_1ENS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlSK_mE_EENS1_18io_object_executorIS9_EEEEvRNS2_24base_implementation_typeERKT_iRT0_RKT1_:
+    #####:  261:  void async_send(base_implementation_type& impl,
+        -:  262:      const ConstBufferSequence& buffers, socket_base::message_flags flags,
+        -:  263:      Handler& handler, const IoExecutor& io_ex)
+        -:  264:  {
+        -:  265:    bool is_continuation =
+    #####:  266:      boost_asio_handler_cont_helpers::is_continuation(handler);
+    %%%%%:  266-block  0
+        -:  267:
+        -:  268:    // Allocate and construct an operation to wrap the handler.
+        -:  269:    typedef reactive_socket_send_op<
+        -:  270:        ConstBufferSequence, Handler, IoExecutor> op;
+    #####:  271:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    %%%%%:  271-block  0
+    $$$$$:  271-block  1
+    #####:  272:      op::ptr::allocate(handler), 0 };
+    #####:  273:    p.p = new (p.v) op(impl.socket_, impl.state_,
+    %%%%%:  273-block  0
+    $$$$$:  273-block  1
+        -:  274:        buffers, flags, handler, io_ex);
+        -:  275:
+        -:  276:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  277:          &impl, impl.socket_, "async_send"));
+        -:  278:
+    #####:  279:    start_op(impl, reactor::write_op, p.p, is_continuation, true,
+    %%%%%:  279-block  0
+    #####:  280:        ((impl.state_ & socket_ops::stream_oriented)
+    #####:  281:          && buffer_sequence_adapter<boost::asio::const_buffer,
+    %%%%%:  281-block  0
+    %%%%%:  281-block  1
+    %%%%%:  281-block  2
+    #####:  282:            ConstBufferSequence>::all_empty(buffers)));
+    %%%%%:  282-block  0
+    #####:  283:    p.v = p.p = 0;
+    %%%%%:  283-block  0
+    #####:  284:  }
+------------------
+        -:  285:
+        -:  286:  // Start an asynchronous wait until data can be sent without blocking.
+        -:  287:  template <typename Handler, typename IoExecutor>
+        -:  288:  void async_send(base_implementation_type& impl, const null_buffers&,
+        -:  289:      socket_base::message_flags, Handler& handler, const IoExecutor& io_ex)
+        -:  290:  {
+        -:  291:    bool is_continuation =
+        -:  292:      boost_asio_handler_cont_helpers::is_continuation(handler);
+        -:  293:
+        -:  294:    // Allocate and construct an operation to wrap the handler.
+        -:  295:    typedef reactive_null_buffers_op<Handler, IoExecutor> op;
+        -:  296:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+        -:  297:      op::ptr::allocate(handler), 0 };
+        -:  298:    p.p = new (p.v) op(handler, io_ex);
+        -:  299:
+        -:  300:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  301:          &impl, impl.socket_, "async_send(null_buffers)"));
+        -:  302:
+        -:  303:    start_op(impl, reactor::write_op, p.p, is_continuation, false, false);
+        -:  304:    p.v = p.p = 0;
+        -:  305:  }
+        -:  306:
+        -:  307:  // Receive some data from the peer. Returns the number of bytes received.
+        -:  308:  template <typename MutableBufferSequence>
+        -:  309:  size_t receive(base_implementation_type& impl,
+        -:  310:      const MutableBufferSequence& buffers,
+        -:  311:      socket_base::message_flags flags, boost::system::error_code& ec)
+        -:  312:  {
+        -:  313:    buffer_sequence_adapter<boost::asio::mutable_buffer,
+        -:  314:        MutableBufferSequence> bufs(buffers);
+        -:  315:
+        -:  316:    return socket_ops::sync_recv(impl.socket_, impl.state_,
+        -:  317:        bufs.buffers(), bufs.count(), flags, bufs.all_empty(), ec);
+        -:  318:  }
+        -:  319:
+        -:  320:  // Wait until data can be received without blocking.
+        -:  321:  size_t receive(base_implementation_type& impl, const null_buffers&,
+        -:  322:      socket_base::message_flags, boost::system::error_code& ec)
+        -:  323:  {
+        -:  324:    // Wait for socket to become ready.
+        -:  325:    socket_ops::poll_read(impl.socket_, impl.state_, -1, ec);
+        -:  326:
+        -:  327:    return 0;
+        -:  328:  }
+        -:  329:
+        -:  330:  // Start an asynchronous receive. The buffer for the data being received
+        -:  331:  // must be valid for the lifetime of the asynchronous operation.
+        -:  332:  template <typename MutableBufferSequence,
+        -:  333:      typename Handler, typename IoExecutor>
+       2*:  334:  void async_receive(base_implementation_type& impl,
+        -:  335:      const MutableBufferSequence& buffers, socket_base::message_flags flags,
+        -:  336:      Handler& handler, const IoExecutor& io_ex)
+        -:  337:  {
+        -:  338:    bool is_continuation =
+       2*:  339:      boost_asio_handler_cont_helpers::is_continuation(handler);
+        -:  340:
+        -:  341:    // Allocate and construct an operation to wrap the handler.
+        -:  342:    typedef reactive_socket_recv_op<
+        -:  343:        MutableBufferSequence, Handler, IoExecutor> op;
+       2*:  344:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+       2*:  345:      op::ptr::allocate(handler), 0 };
+       2*:  346:    p.p = new (p.v) op(impl.socket_, impl.state_,
+        -:  347:        buffers, flags, handler, io_ex);
+        -:  348:
+        -:  349:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  350:          &impl, impl.socket_, "async_receive"));
+        -:  351:
+       2*:  352:    start_op(impl,
+       2*:  353:        (flags & socket_base::message_out_of_band)
+        -:  354:          ? reactor::except_op : reactor::read_op,
+       2*:  355:        p.p, is_continuation,
+       2*:  356:        (flags & socket_base::message_out_of_band) == 0,
+       2*:  357:        ((impl.state_ & socket_ops::stream_oriented)
+       4*:  358:          && buffer_sequence_adapter<boost::asio::mutable_buffer,
+       2*:  359:            MutableBufferSequence>::all_empty(buffers)));
+       2*:  360:    p.v = p.p = 0;
+       2*:  361:  }
+------------------
+_ZN5boost4asio6detail28reactive_socket_service_base13async_receiveINS0_17mutable_buffers_1ENS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS9_EEEEvRNS2_24base_implementation_typeERKT_iRT0_RKT1_:
+        1:  334:  void async_receive(base_implementation_type& impl,
+        -:  335:      const MutableBufferSequence& buffers, socket_base::message_flags flags,
+        -:  336:      Handler& handler, const IoExecutor& io_ex)
+        -:  337:  {
+        -:  338:    bool is_continuation =
+        1:  339:      boost_asio_handler_cont_helpers::is_continuation(handler);
+        1:  339-block  0
+        -:  340:
+        -:  341:    // Allocate and construct an operation to wrap the handler.
+        -:  342:    typedef reactive_socket_recv_op<
+        -:  343:        MutableBufferSequence, Handler, IoExecutor> op;
+        1:  344:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+        1:  344-block  0
+    $$$$$:  344-block  1
+        1:  345:      op::ptr::allocate(handler), 0 };
+        1:  346:    p.p = new (p.v) op(impl.socket_, impl.state_,
+        1:  346-block  0
+    $$$$$:  346-block  1
+        -:  347:        buffers, flags, handler, io_ex);
+        -:  348:
+        -:  349:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  350:          &impl, impl.socket_, "async_receive"));
+        -:  351:
+       1*:  352:    start_op(impl,
+    %%%%%:  352-block  0
+        1:  352-block  1
+        1:  352-block  2
+        1:  353:        (flags & socket_base::message_out_of_band)
+        -:  354:          ? reactor::except_op : reactor::read_op,
+        1:  355:        p.p, is_continuation,
+        1:  356:        (flags & socket_base::message_out_of_band) == 0,
+        1:  356-block  0
+        1:  357:        ((impl.state_ & socket_ops::stream_oriented)
+       2*:  358:          && buffer_sequence_adapter<boost::asio::mutable_buffer,
+        1:  358-block  0
+    %%%%%:  358-block  1
+        1:  358-block  2
+        1:  359:            MutableBufferSequence>::all_empty(buffers)));
+        1:  359-block  0
+        1:  360:    p.v = p.p = 0;
+        1:  360-block  0
+        1:  361:  }
+------------------
+_ZN5boost4asio6detail28reactive_socket_service_base13async_receiveINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSJ_mE_EENS1_18io_object_executorIS9_EEEEvRNS2_24base_implementation_typeERKT_iRT0_RKT1_:
+        1:  334:  void async_receive(base_implementation_type& impl,
+        -:  335:      const MutableBufferSequence& buffers, socket_base::message_flags flags,
+        -:  336:      Handler& handler, const IoExecutor& io_ex)
+        -:  337:  {
+        -:  338:    bool is_continuation =
+        1:  339:      boost_asio_handler_cont_helpers::is_continuation(handler);
+        1:  339-block  0
+        -:  340:
+        -:  341:    // Allocate and construct an operation to wrap the handler.
+        -:  342:    typedef reactive_socket_recv_op<
+        -:  343:        MutableBufferSequence, Handler, IoExecutor> op;
+        1:  344:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+        1:  344-block  0
+    $$$$$:  344-block  1
+        1:  345:      op::ptr::allocate(handler), 0 };
+        1:  346:    p.p = new (p.v) op(impl.socket_, impl.state_,
+        1:  346-block  0
+    $$$$$:  346-block  1
+        -:  347:        buffers, flags, handler, io_ex);
+        -:  348:
+        -:  349:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  350:          &impl, impl.socket_, "async_receive"));
+        -:  351:
+       1*:  352:    start_op(impl,
+    %%%%%:  352-block  0
+        1:  352-block  1
+        1:  352-block  2
+        1:  353:        (flags & socket_base::message_out_of_band)
+        -:  354:          ? reactor::except_op : reactor::read_op,
+        1:  355:        p.p, is_continuation,
+        1:  356:        (flags & socket_base::message_out_of_band) == 0,
+        1:  356-block  0
+        1:  357:        ((impl.state_ & socket_ops::stream_oriented)
+       2*:  358:          && buffer_sequence_adapter<boost::asio::mutable_buffer,
+        1:  358-block  0
+    %%%%%:  358-block  1
+        1:  358-block  2
+        1:  359:            MutableBufferSequence>::all_empty(buffers)));
+        1:  359-block  0
+        1:  360:    p.v = p.p = 0;
+        1:  360-block  0
+        1:  361:  }
+------------------
+_ZN5boost4asio6detail28reactive_socket_service_base13async_receiveINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSJ_mE_EENS1_18io_object_executorIS9_EEEEvRNS2_24base_implementation_typeERKT_iRT0_RKT1_:
+    #####:  334:  void async_receive(base_implementation_type& impl,
+        -:  335:      const MutableBufferSequence& buffers, socket_base::message_flags flags,
+        -:  336:      Handler& handler, const IoExecutor& io_ex)
+        -:  337:  {
+        -:  338:    bool is_continuation =
+    #####:  339:      boost_asio_handler_cont_helpers::is_continuation(handler);
+    %%%%%:  339-block  0
+        -:  340:
+        -:  341:    // Allocate and construct an operation to wrap the handler.
+        -:  342:    typedef reactive_socket_recv_op<
+        -:  343:        MutableBufferSequence, Handler, IoExecutor> op;
+    #####:  344:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+    %%%%%:  344-block  0
+    $$$$$:  344-block  1
+    #####:  345:      op::ptr::allocate(handler), 0 };
+    #####:  346:    p.p = new (p.v) op(impl.socket_, impl.state_,
+    %%%%%:  346-block  0
+    $$$$$:  346-block  1
+        -:  347:        buffers, flags, handler, io_ex);
+        -:  348:
+        -:  349:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  350:          &impl, impl.socket_, "async_receive"));
+        -:  351:
+    #####:  352:    start_op(impl,
+    %%%%%:  352-block  0
+    %%%%%:  352-block  1
+    %%%%%:  352-block  2
+    #####:  353:        (flags & socket_base::message_out_of_band)
+        -:  354:          ? reactor::except_op : reactor::read_op,
+    #####:  355:        p.p, is_continuation,
+    #####:  356:        (flags & socket_base::message_out_of_band) == 0,
+    %%%%%:  356-block  0
+    #####:  357:        ((impl.state_ & socket_ops::stream_oriented)
+    #####:  358:          && buffer_sequence_adapter<boost::asio::mutable_buffer,
+    %%%%%:  358-block  0
+    %%%%%:  358-block  1
+    %%%%%:  358-block  2
+    #####:  359:            MutableBufferSequence>::all_empty(buffers)));
+    %%%%%:  359-block  0
+    #####:  360:    p.v = p.p = 0;
+    %%%%%:  360-block  0
+    #####:  361:  }
+------------------
+        -:  362:
+        -:  363:  // Wait until data can be received without blocking.
+        -:  364:  template <typename Handler, typename IoExecutor>
+        -:  365:  void async_receive(base_implementation_type& impl,
+        -:  366:      const null_buffers&, socket_base::message_flags flags,
+        -:  367:      Handler& handler, const IoExecutor& io_ex)
+        -:  368:  {
+        -:  369:    bool is_continuation =
+        -:  370:      boost_asio_handler_cont_helpers::is_continuation(handler);
+        -:  371:
+        -:  372:    // Allocate and construct an operation to wrap the handler.
+        -:  373:    typedef reactive_null_buffers_op<Handler, IoExecutor> op;
+        -:  374:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+        -:  375:      op::ptr::allocate(handler), 0 };
+        -:  376:    p.p = new (p.v) op(handler, io_ex);
+        -:  377:
+        -:  378:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  379:          &impl, impl.socket_, "async_receive(null_buffers)"));
+        -:  380:
+        -:  381:    start_op(impl,
+        -:  382:        (flags & socket_base::message_out_of_band)
+        -:  383:          ? reactor::except_op : reactor::read_op,
+        -:  384:        p.p, is_continuation, false, false);
+        -:  385:    p.v = p.p = 0;
+        -:  386:  }
+        -:  387:
+        -:  388:  // Receive some data with associated flags. Returns the number of bytes
+        -:  389:  // received.
+        -:  390:  template <typename MutableBufferSequence>
+        -:  391:  size_t receive_with_flags(base_implementation_type& impl,
+        -:  392:      const MutableBufferSequence& buffers,
+        -:  393:      socket_base::message_flags in_flags,
+        -:  394:      socket_base::message_flags& out_flags, boost::system::error_code& ec)
+        -:  395:  {
+        -:  396:    buffer_sequence_adapter<boost::asio::mutable_buffer,
+        -:  397:        MutableBufferSequence> bufs(buffers);
+        -:  398:
+        -:  399:    return socket_ops::sync_recvmsg(impl.socket_, impl.state_,
+        -:  400:        bufs.buffers(), bufs.count(), in_flags, out_flags, ec);
+        -:  401:  }
+        -:  402:
+        -:  403:  // Wait until data can be received without blocking.
+        -:  404:  size_t receive_with_flags(base_implementation_type& impl,
+        -:  405:      const null_buffers&, socket_base::message_flags,
+        -:  406:      socket_base::message_flags& out_flags, boost::system::error_code& ec)
+        -:  407:  {
+        -:  408:    // Wait for socket to become ready.
+        -:  409:    socket_ops::poll_read(impl.socket_, impl.state_, -1, ec);
+        -:  410:
+        -:  411:    // Clear out_flags, since we cannot give it any other sensible value when
+        -:  412:    // performing a null_buffers operation.
+        -:  413:    out_flags = 0;
+        -:  414:
+        -:  415:    return 0;
+        -:  416:  }
+        -:  417:
+        -:  418:  // Start an asynchronous receive. The buffer for the data being received
+        -:  419:  // must be valid for the lifetime of the asynchronous operation.
+        -:  420:  template <typename MutableBufferSequence,
+        -:  421:      typename Handler, typename IoExecutor>
+        -:  422:  void async_receive_with_flags(base_implementation_type& impl,
+        -:  423:      const MutableBufferSequence& buffers, socket_base::message_flags in_flags,
+        -:  424:      socket_base::message_flags& out_flags, Handler& handler,
+        -:  425:      const IoExecutor& io_ex)
+        -:  426:  {
+        -:  427:    bool is_continuation =
+        -:  428:      boost_asio_handler_cont_helpers::is_continuation(handler);
+        -:  429:
+        -:  430:    // Allocate and construct an operation to wrap the handler.
+        -:  431:    typedef reactive_socket_recvmsg_op<
+        -:  432:        MutableBufferSequence, Handler, IoExecutor> op;
+        -:  433:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+        -:  434:      op::ptr::allocate(handler), 0 };
+        -:  435:    p.p = new (p.v) op(impl.socket_, buffers,
+        -:  436:        in_flags, out_flags, handler, io_ex);
+        -:  437:
+        -:  438:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  439:          &impl, impl.socket_, "async_receive_with_flags"));
+        -:  440:
+        -:  441:    start_op(impl,
+        -:  442:        (in_flags & socket_base::message_out_of_band)
+        -:  443:          ? reactor::except_op : reactor::read_op,
+        -:  444:        p.p, is_continuation,
+        -:  445:        (in_flags & socket_base::message_out_of_band) == 0, false);
+        -:  446:    p.v = p.p = 0;
+        -:  447:  }
+        -:  448:
+        -:  449:  // Wait until data can be received without blocking.
+        -:  450:  template <typename Handler, typename IoExecutor>
+        -:  451:  void async_receive_with_flags(base_implementation_type& impl,
+        -:  452:      const null_buffers&, socket_base::message_flags in_flags,
+        -:  453:      socket_base::message_flags& out_flags, Handler& handler,
+        -:  454:      const IoExecutor& io_ex)
+        -:  455:  {
+        -:  456:    bool is_continuation =
+        -:  457:      boost_asio_handler_cont_helpers::is_continuation(handler);
+        -:  458:
+        -:  459:    // Allocate and construct an operation to wrap the handler.
+        -:  460:    typedef reactive_null_buffers_op<Handler, IoExecutor> op;
+        -:  461:    typename op::ptr p = { boost::asio::detail::addressof(handler),
+        -:  462:      op::ptr::allocate(handler), 0 };
+        -:  463:    p.p = new (p.v) op(handler, io_ex);
+        -:  464:
+        -:  465:    BOOST_ASIO_HANDLER_CREATION((reactor_.context(), *p.p, "socket",
+        -:  466:          &impl, impl.socket_, "async_receive_with_flags(null_buffers)"));
+        -:  467:
+        -:  468:    // Clear out_flags, since we cannot give it any other sensible value when
+        -:  469:    // performing a null_buffers operation.
+        -:  470:    out_flags = 0;
+        -:  471:
+        -:  472:    start_op(impl,
+        -:  473:        (in_flags & socket_base::message_out_of_band)
+        -:  474:          ? reactor::except_op : reactor::read_op,
+        -:  475:        p.p, is_continuation, false, false);
+        -:  476:    p.v = p.p = 0;
+        -:  477:  }
+        -:  478:
+        -:  479:protected:
+        -:  480:  // Open a new socket implementation.
+        -:  481:  BOOST_ASIO_DECL boost::system::error_code do_open(
+        -:  482:      base_implementation_type& impl, int af,
+        -:  483:      int type, int protocol, boost::system::error_code& ec);
+        -:  484:
+        -:  485:  // Assign a native socket to a socket implementation.
+        -:  486:  BOOST_ASIO_DECL boost::system::error_code do_assign(
+        -:  487:      base_implementation_type& impl, int type,
+        -:  488:      const native_handle_type& native_socket, boost::system::error_code& ec);
+        -:  489:
+        -:  490:  // Start the asynchronous read or write operation.
+        -:  491:  BOOST_ASIO_DECL void start_op(base_implementation_type& impl, int op_type,
+        -:  492:      reactor_op* op, bool is_continuation, bool is_non_blocking, bool noop);
+        -:  493:
+        -:  494:  // Start the asynchronous accept operation.
+        -:  495:  BOOST_ASIO_DECL void start_accept_op(base_implementation_type& impl,
+        -:  496:      reactor_op* op, bool is_continuation, bool peer_is_open);
+        -:  497:
+        -:  498:  // Start the asynchronous connect operation.
+        -:  499:  BOOST_ASIO_DECL void start_connect_op(base_implementation_type& impl,
+        -:  500:      reactor_op* op, bool is_continuation,
+        -:  501:      const socket_addr_type* addr, size_t addrlen);
+        -:  502:
+        -:  503:  // The selector that performs event demultiplexing for the service.
+        -:  504:  reactor& reactor_;
+        -:  505:};
+        -:  506:
+        -:  507:} // namespace detail
+        -:  508:} // namespace asio
+        -:  509:} // namespace boost
+        -:  510:
+        -:  511:#include <boost/asio/detail/pop_options.hpp>
+        -:  512:
+        -:  513:#if defined(BOOST_ASIO_HEADER_ONLY)
+        -:  514:# include <boost/asio/detail/impl/reactive_socket_service_base.ipp>
+        -:  515:#endif // defined(BOOST_ASIO_HEADER_ONLY)
+        -:  516:
+        -:  517:#endif // !defined(BOOST_ASIO_HAS_IOCP)
+        -:  518:       //   && !defined(BOOST_ASIO_WINDOWS_RUNTIME)
+        -:  519:
+        -:  520:#endif // BOOST_ASIO_DETAIL_REACTIVE_SOCKET_SERVICE_BASE_HPP

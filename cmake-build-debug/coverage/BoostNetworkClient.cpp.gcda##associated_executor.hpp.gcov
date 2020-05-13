@@ -1,0 +1,278 @@
+        -:    0:Source:/usr/include/boost/asio/associated_executor.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// associated_executor.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_ASSOCIATED_EXECUTOR_HPP
+        -:   12:#define BOOST_ASIO_ASSOCIATED_EXECUTOR_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <boost/asio/detail/type_traits.hpp>
+        -:   20:#include <boost/asio/is_executor.hpp>
+        -:   21:#include <boost/asio/system_executor.hpp>
+        -:   22:
+        -:   23:#include <boost/asio/detail/push_options.hpp>
+        -:   24:
+        -:   25:namespace boost {
+        -:   26:namespace asio {
+        -:   27:namespace detail {
+        -:   28:
+        -:   29:template <typename>
+        -:   30:struct associated_executor_check
+        -:   31:{
+        -:   32:  typedef void type;
+        -:   33:};
+        -:   34:
+        -:   35:template <typename T, typename E, typename = void>
+        -:   36:struct associated_executor_impl
+        -:   37:{
+        -:   38:  typedef E type;
+        -:   39:
+       8*:   40:  static type get(const T&, const E& e) BOOST_ASIO_NOEXCEPT
+        -:   41:  {
+       8*:   42:    return e;
+        -:   43:  }
+------------------
+_ZN5boost4asio6detail24associated_executor_implIZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlS7_mE_NS1_18io_object_executorINS0_8executorEEEvE3getERKS8_RKSB_:
+        2:   40:  static type get(const T&, const E& e) BOOST_ASIO_NOEXCEPT
+        -:   41:  {
+        2:   42:    return e;
+        2:   42-block  0
+        -:   43:  }
+------------------
+_ZN5boost4asio6detail24associated_executor_implIZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlS7_mE0_NS1_18io_object_executorINS0_8executorEEEvE3getERKS8_RKSB_:
+    #####:   40:  static type get(const T&, const E& e) BOOST_ASIO_NOEXCEPT
+        -:   41:  {
+    #####:   42:    return e;
+    %%%%%:   42-block  0
+        -:   43:  }
+------------------
+_ZN5boost4asio6detail24associated_executor_implIZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlS7_mE_NS1_18io_object_executorINS0_8executorEEEvE3getERKS8_RKSB_:
+    #####:   40:  static type get(const T&, const E& e) BOOST_ASIO_NOEXCEPT
+        -:   41:  {
+    #####:   42:    return e;
+    %%%%%:   42-block  0
+        -:   43:  }
+------------------
+_ZN5boost4asio6detail24associated_executor_implIZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlS7_mE_NS1_18io_object_executorINS0_8executorEEEvE3getERKS8_RKSB_:
+        2:   40:  static type get(const T&, const E& e) BOOST_ASIO_NOEXCEPT
+        -:   41:  {
+        2:   42:    return e;
+        2:   42-block  0
+        -:   43:  }
+------------------
+_ZN5boost4asio6detail24associated_executor_implIZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlS7_mE_NS1_18io_object_executorINS0_8executorEEEvE3getERKS8_RKSB_:
+        2:   40:  static type get(const T&, const E& e) BOOST_ASIO_NOEXCEPT
+        -:   41:  {
+        2:   42:    return e;
+        2:   42-block  0
+        -:   43:  }
+------------------
+_ZN5boost4asio6detail24associated_executor_implIZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlS7_mE_NS1_18io_object_executorINS0_8executorEEEvE3getERKS8_RKSB_:
+    #####:   40:  static type get(const T&, const E& e) BOOST_ASIO_NOEXCEPT
+        -:   41:  {
+    #####:   42:    return e;
+    %%%%%:   42-block  0
+        -:   43:  }
+------------------
+_ZN5boost4asio6detail24associated_executor_implIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_NS0_15system_executorEvE3getERKS8_RKS9_:
+    #####:   40:  static type get(const T&, const E& e) BOOST_ASIO_NOEXCEPT
+        -:   41:  {
+    #####:   42:    return e;
+    %%%%%:   42-block  0
+        -:   43:  }
+------------------
+_ZN5boost4asio6detail24associated_executor_implIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_NS1_18io_object_executorINS0_8executorEEEvE3getERKS8_RKSB_:
+        2:   40:  static type get(const T&, const E& e) BOOST_ASIO_NOEXCEPT
+        -:   41:  {
+        2:   42:    return e;
+        2:   42-block  0
+        -:   43:  }
+------------------
+        -:   44:};
+        -:   45:
+        -:   46:template <typename T, typename E>
+        -:   47:struct associated_executor_impl<T, E,
+        -:   48:  typename associated_executor_check<typename T::executor_type>::type>
+        -:   49:{
+        -:   50:  typedef typename T::executor_type type;
+        -:   51:
+        -:   52:  static type get(const T& t, const E&) BOOST_ASIO_NOEXCEPT
+        -:   53:  {
+        -:   54:    return t.get_executor();
+        -:   55:  }
+        -:   56:};
+        -:   57:
+        -:   58:} // namespace detail
+        -:   59:
+        -:   60:/// Traits type used to obtain the executor associated with an object.
+        -:   61:/**
+        -:   62: * A program may specialise this traits type if the @c T template parameter in
+        -:   63: * the specialisation is a user-defined type. The template parameter @c
+        -:   64: * Executor shall be a type meeting the Executor requirements.
+        -:   65: *
+        -:   66: * Specialisations shall meet the following requirements, where @c t is a const
+        -:   67: * reference to an object of type @c T, and @c e is an object of type @c
+        -:   68: * Executor.
+        -:   69: *
+        -:   70: * @li Provide a nested typedef @c type that identifies a type meeting the
+        -:   71: * Executor requirements.
+        -:   72: *
+        -:   73: * @li Provide a noexcept static member function named @c get, callable as @c
+        -:   74: * get(t) and with return type @c type.
+        -:   75: *
+        -:   76: * @li Provide a noexcept static member function named @c get, callable as @c
+        -:   77: * get(t,e) and with return type @c type.
+        -:   78: */
+        -:   79:template <typename T, typename Executor = system_executor>
+        -:   80:struct associated_executor
+        -:   81:{
+        -:   82:  /// If @c T has a nested type @c executor_type, <tt>T::executor_type</tt>.
+        -:   83:  /// Otherwise @c Executor.
+        -:   84:#if defined(GENERATING_DOCUMENTATION)
+        -:   85:  typedef see_below type;
+        -:   86:#else // defined(GENERATING_DOCUMENTATION)
+        -:   87:  typedef typename detail::associated_executor_impl<T, Executor>::type type;
+        -:   88:#endif // defined(GENERATING_DOCUMENTATION)
+        -:   89:
+        -:   90:  /// If @c T has a nested type @c executor_type, returns
+        -:   91:  /// <tt>t.get_executor()</tt>. Otherwise returns @c ex.
+       8*:   92:  static type get(const T& t,
+        -:   93:      const Executor& ex = Executor()) BOOST_ASIO_NOEXCEPT
+        -:   94:  {
+       8*:   95:    return detail::associated_executor_impl<T, Executor>::get(t, ex);
+        -:   96:  }
+------------------
+_ZN5boost4asio19associated_executorIZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlS6_mE_NS0_6detail18io_object_executorINS0_8executorEEEE3getERKS7_RKSB_:
+        2:   92:  static type get(const T& t,
+        -:   93:      const Executor& ex = Executor()) BOOST_ASIO_NOEXCEPT
+        -:   94:  {
+        2:   95:    return detail::associated_executor_impl<T, Executor>::get(t, ex);
+        2:   95-block  0
+        -:   96:  }
+------------------
+_ZN5boost4asio19associated_executorIZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlS6_mE0_NS0_6detail18io_object_executorINS0_8executorEEEE3getERKS7_RKSB_:
+    #####:   92:  static type get(const T& t,
+        -:   93:      const Executor& ex = Executor()) BOOST_ASIO_NOEXCEPT
+        -:   94:  {
+    #####:   95:    return detail::associated_executor_impl<T, Executor>::get(t, ex);
+    %%%%%:   95-block  0
+        -:   96:  }
+------------------
+_ZN5boost4asio19associated_executorIZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlS6_mE_NS0_6detail18io_object_executorINS0_8executorEEEE3getERKS7_RKSB_:
+    #####:   92:  static type get(const T& t,
+        -:   93:      const Executor& ex = Executor()) BOOST_ASIO_NOEXCEPT
+        -:   94:  {
+    #####:   95:    return detail::associated_executor_impl<T, Executor>::get(t, ex);
+    %%%%%:   95-block  0
+        -:   96:  }
+------------------
+_ZN5boost4asio19associated_executorIZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlS6_mE_NS0_6detail18io_object_executorINS0_8executorEEEE3getERKS7_RKSB_:
+        2:   92:  static type get(const T& t,
+        -:   93:      const Executor& ex = Executor()) BOOST_ASIO_NOEXCEPT
+        -:   94:  {
+        2:   95:    return detail::associated_executor_impl<T, Executor>::get(t, ex);
+        2:   95-block  0
+        -:   96:  }
+------------------
+_ZN5boost4asio19associated_executorIZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlS6_mE_NS0_6detail18io_object_executorINS0_8executorEEEE3getERKS7_RKSB_:
+        2:   92:  static type get(const T& t,
+        -:   93:      const Executor& ex = Executor()) BOOST_ASIO_NOEXCEPT
+        -:   94:  {
+        2:   95:    return detail::associated_executor_impl<T, Executor>::get(t, ex);
+        2:   95-block  0
+        -:   96:  }
+------------------
+_ZN5boost4asio19associated_executorIZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlS6_mE_NS0_6detail18io_object_executorINS0_8executorEEEE3getERKS7_RKSB_:
+    #####:   92:  static type get(const T& t,
+        -:   93:      const Executor& ex = Executor()) BOOST_ASIO_NOEXCEPT
+        -:   94:  {
+    #####:   95:    return detail::associated_executor_impl<T, Executor>::get(t, ex);
+    %%%%%:   95-block  0
+        -:   96:  }
+------------------
+_ZN5boost4asio19associated_executorIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_NS0_15system_executorEE3getERKS7_RKS8_:
+    #####:   92:  static type get(const T& t,
+        -:   93:      const Executor& ex = Executor()) BOOST_ASIO_NOEXCEPT
+        -:   94:  {
+    #####:   95:    return detail::associated_executor_impl<T, Executor>::get(t, ex);
+    %%%%%:   95-block  0
+        -:   96:  }
+------------------
+_ZN5boost4asio19associated_executorIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_NS0_6detail18io_object_executorINS0_8executorEEEE3getERKS7_RKSB_:
+        2:   92:  static type get(const T& t,
+        -:   93:      const Executor& ex = Executor()) BOOST_ASIO_NOEXCEPT
+        -:   94:  {
+        2:   95:    return detail::associated_executor_impl<T, Executor>::get(t, ex);
+        2:   95-block  0
+        -:   96:  }
+------------------
+        -:   97:};
+        -:   98:
+        -:   99:/// Helper function to obtain an object's associated executor.
+        -:  100:/**
+        -:  101: * @returns <tt>associated_executor<T>::get(t)</tt>
+        -:  102: */
+        -:  103:template <typename T>
+        -:  104:inline typename associated_executor<T>::type
+    #####:  105:get_associated_executor(const T& t) BOOST_ASIO_NOEXCEPT
+        -:  106:{
+    #####:  107:  return associated_executor<T>::get(t);
+    %%%%%:  107-block  0
+        -:  108:}
+        -:  109:
+        -:  110:/// Helper function to obtain an object's associated executor.
+        -:  111:/**
+        -:  112: * @returns <tt>associated_executor<T, Executor>::get(t, ex)</tt>
+        -:  113: */
+        -:  114:template <typename T, typename Executor>
+        -:  115:inline typename associated_executor<T, Executor>::type
+       8*:  116:get_associated_executor(const T& t, const Executor& ex,
+        -:  117:    typename enable_if<is_executor<
+        -:  118:      Executor>::value>::type* = 0) BOOST_ASIO_NOEXCEPT
+        -:  119:{
+       8*:  120:  return associated_executor<T, Executor>::get(t, ex);
+        -:  121:}
+        -:  122:
+        -:  123:/// Helper function to obtain an object's associated executor.
+        -:  124:/**
+        -:  125: * @returns <tt>associated_executor<T, typename
+        -:  126: * ExecutionContext::executor_type>::get(t, ctx.get_executor())</tt>
+        -:  127: */
+        -:  128:template <typename T, typename ExecutionContext>
+        -:  129:inline typename associated_executor<T,
+        -:  130:  typename ExecutionContext::executor_type>::type
+        -:  131:get_associated_executor(const T& t, ExecutionContext& ctx,
+        -:  132:    typename enable_if<is_convertible<ExecutionContext&,
+        -:  133:      execution_context&>::value>::type* = 0) BOOST_ASIO_NOEXCEPT
+        -:  134:{
+        -:  135:  return associated_executor<T,
+        -:  136:    typename ExecutionContext::executor_type>::get(t, ctx.get_executor());
+        -:  137:}
+        -:  138:
+        -:  139:#if defined(BOOST_ASIO_HAS_ALIAS_TEMPLATES)
+        -:  140:
+        -:  141:template <typename T, typename Executor = system_executor>
+        -:  142:using associated_executor_t = typename associated_executor<T, Executor>::type;
+        -:  143:
+        -:  144:#endif // defined(BOOST_ASIO_HAS_ALIAS_TEMPLATES)
+        -:  145:
+        -:  146:} // namespace asio
+        -:  147:} // namespace boost
+        -:  148:
+        -:  149:#include <boost/asio/detail/pop_options.hpp>
+        -:  150:
+        -:  151:#endif // BOOST_ASIO_ASSOCIATED_EXECUTOR_HPP

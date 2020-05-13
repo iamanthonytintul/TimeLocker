@@ -1,0 +1,581 @@
+        -:    0:Source:/usr/include/boost/asio/buffers_iterator.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// buffers_iterator.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_BUFFERS_ITERATOR_HPP
+        -:   12:#define BOOST_ASIO_BUFFERS_ITERATOR_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <cstddef>
+        -:   20:#include <iterator>
+        -:   21:#include <boost/asio/buffer.hpp>
+        -:   22:#include <boost/asio/detail/assert.hpp>
+        -:   23:#include <boost/asio/detail/type_traits.hpp>
+        -:   24:
+        -:   25:#include <boost/asio/detail/push_options.hpp>
+        -:   26:
+        -:   27:namespace boost {
+        -:   28:namespace asio {
+        -:   29:
+        -:   30:namespace detail
+        -:   31:{
+        -:   32:  template <bool IsMutable>
+        -:   33:  struct buffers_iterator_types_helper;
+        -:   34:
+        -:   35:  template <>
+        -:   36:  struct buffers_iterator_types_helper<false>
+        -:   37:  {
+        -:   38:    typedef const_buffer buffer_type;
+        -:   39:    template <typename ByteType>
+        -:   40:    struct byte_type
+        -:   41:    {
+        -:   42:      typedef typename add_const<ByteType>::type type;
+        -:   43:    };
+        -:   44:  };
+        -:   45:
+        -:   46:  template <>
+        -:   47:  struct buffers_iterator_types_helper<true>
+        -:   48:  {
+        -:   49:    typedef mutable_buffer buffer_type;
+        -:   50:    template <typename ByteType>
+        -:   51:    struct byte_type
+        -:   52:    {
+        -:   53:      typedef ByteType type;
+        -:   54:    };
+        -:   55:  };
+        -:   56:
+        -:   57:  template <typename BufferSequence, typename ByteType>
+        -:   58:  struct buffers_iterator_types
+        -:   59:  {
+        -:   60:    enum
+        -:   61:    {
+        -:   62:      is_mutable = is_convertible<
+        -:   63:          typename BufferSequence::value_type,
+        -:   64:          mutable_buffer>::value
+        -:   65:    };
+        -:   66:    typedef buffers_iterator_types_helper<is_mutable> helper;
+        -:   67:    typedef typename helper::buffer_type buffer_type;
+        -:   68:    typedef typename helper::template byte_type<ByteType>::type byte_type;
+        -:   69:    typedef typename BufferSequence::const_iterator const_iterator;
+        -:   70:  };
+        -:   71:
+        -:   72:  template <typename ByteType>
+        -:   73:  struct buffers_iterator_types<mutable_buffer, ByteType>
+        -:   74:  {
+        -:   75:    typedef mutable_buffer buffer_type;
+        -:   76:    typedef ByteType byte_type;
+        -:   77:    typedef const mutable_buffer* const_iterator;
+        -:   78:  };
+        -:   79:
+        -:   80:  template <typename ByteType>
+        -:   81:  struct buffers_iterator_types<const_buffer, ByteType>
+        -:   82:  {
+        -:   83:    typedef const_buffer buffer_type;
+        -:   84:    typedef typename add_const<ByteType>::type byte_type;
+        -:   85:    typedef const const_buffer* const_iterator;
+        -:   86:  };
+        -:   87:
+        -:   88:#if !defined(BOOST_ASIO_NO_DEPRECATED)
+        -:   89:
+        -:   90:  template <typename ByteType>
+        -:   91:  struct buffers_iterator_types<mutable_buffers_1, ByteType>
+        -:   92:  {
+        -:   93:    typedef mutable_buffer buffer_type;
+        -:   94:    typedef ByteType byte_type;
+        -:   95:    typedef const mutable_buffer* const_iterator;
+        -:   96:  };
+        -:   97:
+        -:   98:  template <typename ByteType>
+        -:   99:  struct buffers_iterator_types<const_buffers_1, ByteType>
+        -:  100:  {
+        -:  101:    typedef const_buffer buffer_type;
+        -:  102:    typedef typename add_const<ByteType>::type byte_type;
+        -:  103:    typedef const const_buffer* const_iterator;
+        -:  104:  };
+        -:  105:
+        -:  106:#endif // !defined(BOOST_ASIO_NO_DEPRECATED)
+        -:  107:}
+        -:  108:
+        -:  109:/// A random access iterator over the bytes in a buffer sequence.
+        -:  110:template <typename BufferSequence, typename ByteType = char>
+        -:  111:class buffers_iterator
+        -:  112:{
+        -:  113:private:
+        -:  114:  typedef typename detail::buffers_iterator_types<
+        -:  115:      BufferSequence, ByteType>::buffer_type buffer_type;
+        -:  116:
+        -:  117:  typedef typename detail::buffers_iterator_types<BufferSequence,
+        -:  118:          ByteType>::const_iterator buffer_sequence_iterator_type;
+        -:  119:
+        -:  120:public:
+        -:  121:  /// The type used for the distance between two iterators.
+        -:  122:  typedef std::ptrdiff_t difference_type;
+        -:  123:
+        -:  124:  /// The type of the value pointed to by the iterator.
+        -:  125:  typedef ByteType value_type;
+        -:  126:
+        -:  127:#if defined(GENERATING_DOCUMENTATION)
+        -:  128:  /// The type of the result of applying operator->() to the iterator.
+        -:  129:  /**
+        -:  130:   * If the buffer sequence stores buffer objects that are convertible to
+        -:  131:   * mutable_buffer, this is a pointer to a non-const ByteType. Otherwise, a
+        -:  132:   * pointer to a const ByteType.
+        -:  133:   */
+        -:  134:  typedef const_or_non_const_ByteType* pointer;
+        -:  135:#else // defined(GENERATING_DOCUMENTATION)
+        -:  136:  typedef typename detail::buffers_iterator_types<
+        -:  137:      BufferSequence, ByteType>::byte_type* pointer;
+        -:  138:#endif // defined(GENERATING_DOCUMENTATION)
+        -:  139:
+        -:  140:#if defined(GENERATING_DOCUMENTATION)
+        -:  141:  /// The type of the result of applying operator*() to the iterator.
+        -:  142:  /**
+        -:  143:   * If the buffer sequence stores buffer objects that are convertible to
+        -:  144:   * mutable_buffer, this is a reference to a non-const ByteType. Otherwise, a
+        -:  145:   * reference to a const ByteType.
+        -:  146:   */
+        -:  147:  typedef const_or_non_const_ByteType& reference;
+        -:  148:#else // defined(GENERATING_DOCUMENTATION)
+        -:  149:  typedef typename detail::buffers_iterator_types<
+        -:  150:      BufferSequence, ByteType>::byte_type& reference;
+        -:  151:#endif // defined(GENERATING_DOCUMENTATION)
+        -:  152:
+        -:  153:  /// The iterator category.
+        -:  154:  typedef std::random_access_iterator_tag iterator_category;
+        -:  155:
+        -:  156:  /// Default constructor. Creates an iterator in an undefined state.
+        4:  157:  buffers_iterator()
+        -:  158:    : current_buffer_(),
+        -:  159:      current_buffer_position_(0),
+        -:  160:      begin_(),
+        -:  161:      current_(),
+        -:  162:      end_(),
+        4:  163:      position_(0)
+        4:  163-block  0
+        -:  164:  {
+        4:  165:  }
+        -:  166:
+        -:  167:  /// Construct an iterator representing the beginning of the buffers' data.
+        2:  168:  static buffers_iterator begin(const BufferSequence& buffers)
+        -:  169:#if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 3)
+        -:  170:    __attribute__ ((__noinline__))
+        -:  171:#endif // defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 3)
+        -:  172:  {
+        2:  173:    buffers_iterator new_iter;
+        2:  173-block  0
+        2:  174:    new_iter.begin_ = boost::asio::buffer_sequence_begin(buffers);
+        2:  175:    new_iter.current_ = boost::asio::buffer_sequence_begin(buffers);
+        2:  176:    new_iter.end_ = boost::asio::buffer_sequence_end(buffers);
+        3:  177:    while (new_iter.current_ != new_iter.end_)
+        3:  177-block  0
+        -:  178:    {
+        2:  179:      new_iter.current_buffer_ = *new_iter.current_;
+        2:  180:      if (new_iter.current_buffer_.size() > 0)
+        2:  180-block  0
+        1:  181:        break;
+        1:  181-block  0
+        1:  182:      ++new_iter.current_;
+        1:  182-block  0
+        -:  183:    }
+        2:  184:    return new_iter;
+        2:  184-block  0
+        -:  185:  }
+        -:  186:
+        -:  187:  /// Construct an iterator representing the end of the buffers' data.
+        2:  188:  static buffers_iterator end(const BufferSequence& buffers)
+        -:  189:#if defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 3)
+        -:  190:    __attribute__ ((__noinline__))
+        -:  191:#endif // defined(__GNUC__) && (__GNUC__ == 4) && (__GNUC_MINOR__ == 3)
+        -:  192:  {
+        2:  193:    buffers_iterator new_iter;
+        2:  193-block  0
+        2:  194:    new_iter.begin_ = boost::asio::buffer_sequence_begin(buffers);
+        2:  195:    new_iter.current_ = boost::asio::buffer_sequence_begin(buffers);
+        2:  196:    new_iter.end_ = boost::asio::buffer_sequence_end(buffers);
+        4:  197:    while (new_iter.current_ != new_iter.end_)
+        4:  197-block  0
+        -:  198:    {
+        2:  199:      buffer_type buffer = *new_iter.current_;
+        2:  200:      new_iter.position_ += buffer.size();
+        2:  200-block  0
+        2:  201:      ++new_iter.current_;
+        -:  202:    }
+        2:  203:    return new_iter;
+        2:  203-block  0
+        -:  204:  }
+        -:  205:
+        -:  206:  /// Dereference an iterator.
+       47:  207:  reference operator*() const
+        -:  208:  {
+       47:  209:    return dereference();
+       47:  209-block  0
+        -:  210:  }
+        -:  211:
+        -:  212:  /// Dereference an iterator.
+        -:  213:  pointer operator->() const
+        -:  214:  {
+        -:  215:    return &dereference();
+        -:  216:  }
+        -:  217:
+        -:  218:  /// Access an individual element.
+        -:  219:  reference operator[](std::ptrdiff_t difference) const
+        -:  220:  {
+        -:  221:    buffers_iterator tmp(*this);
+        -:  222:    tmp.advance(difference);
+        -:  223:    return *tmp;
+        -:  224:  }
+        -:  225:
+        -:  226:  /// Increment operator (prefix).
+       47:  227:  buffers_iterator& operator++()
+        -:  228:  {
+       47:  229:    increment();
+       47:  229-block  0
+       47:  230:    return *this;
+        -:  231:  }
+        -:  232:
+        -:  233:  /// Increment operator (postfix).
+        -:  234:  buffers_iterator operator++(int)
+        -:  235:  {
+        -:  236:    buffers_iterator tmp(*this);
+        -:  237:    ++*this;
+        -:  238:    return tmp;
+        -:  239:  }
+        -:  240:
+        -:  241:  /// Decrement operator (prefix).
+        -:  242:  buffers_iterator& operator--()
+        -:  243:  {
+        -:  244:    decrement();
+        -:  245:    return *this;
+        -:  246:  }
+        -:  247:
+        -:  248:  /// Decrement operator (postfix).
+        -:  249:  buffers_iterator operator--(int)
+        -:  250:  {
+        -:  251:    buffers_iterator tmp(*this);
+        -:  252:    --*this;
+        -:  253:    return tmp;
+        -:  254:  }
+        -:  255:
+        -:  256:  /// Addition operator.
+        -:  257:  buffers_iterator& operator+=(std::ptrdiff_t difference)
+        -:  258:  {
+        -:  259:    advance(difference);
+        -:  260:    return *this;
+        -:  261:  }
+        -:  262:
+        -:  263:  /// Subtraction operator.
+        -:  264:  buffers_iterator& operator-=(std::ptrdiff_t difference)
+        -:  265:  {
+        -:  266:    advance(-difference);
+        -:  267:    return *this;
+        -:  268:  }
+        -:  269:
+        -:  270:  /// Addition operator.
+        2:  271:  friend buffers_iterator operator+(const buffers_iterator& iter,
+        -:  272:      std::ptrdiff_t difference)
+        -:  273:  {
+        2:  274:    buffers_iterator tmp(iter);
+        2:  275:    tmp.advance(difference);
+        2:  275-block  0
+        2:  276:    return tmp;
+        -:  277:  }
+        -:  278:
+        -:  279:  /// Addition operator.
+        -:  280:  friend buffers_iterator operator+(std::ptrdiff_t difference,
+        -:  281:      const buffers_iterator& iter)
+        -:  282:  {
+        -:  283:    buffers_iterator tmp(iter);
+        -:  284:    tmp.advance(difference);
+        -:  285:    return tmp;
+        -:  286:  }
+        -:  287:
+        -:  288:  /// Subtraction operator.
+        -:  289:  friend buffers_iterator operator-(const buffers_iterator& iter,
+        -:  290:      std::ptrdiff_t difference)
+        -:  291:  {
+        -:  292:    buffers_iterator tmp(iter);
+        -:  293:    tmp.advance(-difference);
+        -:  294:    return tmp;
+        -:  295:  }
+        -:  296:
+        -:  297:  /// Subtraction operator.
+        2:  298:  friend std::ptrdiff_t operator-(const buffers_iterator& a,
+        -:  299:      const buffers_iterator& b)
+        -:  300:  {
+        2:  301:    return b.distance_to(a);
+        2:  301-block  0
+        -:  302:  }
+        -:  303:
+        -:  304:  /// Test two iterators for equality.
+       47:  305:  friend bool operator==(const buffers_iterator& a, const buffers_iterator& b)
+        -:  306:  {
+       47:  307:    return a.equal(b);
+       47:  307-block  0
+        -:  308:  }
+        -:  309:
+        -:  310:  /// Test two iterators for inequality.
+       46:  311:  friend bool operator!=(const buffers_iterator& a, const buffers_iterator& b)
+        -:  312:  {
+       46:  313:    return !a.equal(b);
+       46:  313-block  0
+        -:  314:  }
+        -:  315:
+        -:  316:  /// Compare two iterators.
+        -:  317:  friend bool operator<(const buffers_iterator& a, const buffers_iterator& b)
+        -:  318:  {
+        -:  319:    return a.distance_to(b) > 0;
+        -:  320:  }
+        -:  321:
+        -:  322:  /// Compare two iterators.
+        -:  323:  friend bool operator<=(const buffers_iterator& a, const buffers_iterator& b)
+        -:  324:  {
+        -:  325:    return !(b < a);
+        -:  326:  }
+        -:  327:
+        -:  328:  /// Compare two iterators.
+        -:  329:  friend bool operator>(const buffers_iterator& a, const buffers_iterator& b)
+        -:  330:  {
+        -:  331:    return b < a;
+        -:  332:  }
+        -:  333:
+        -:  334:  /// Compare two iterators.
+        -:  335:  friend bool operator>=(const buffers_iterator& a, const buffers_iterator& b)
+        -:  336:  {
+        -:  337:    return !(a < b);
+        -:  338:  }
+        -:  339:
+        -:  340:private:
+        -:  341:  // Dereference the iterator.
+       47:  342:  reference dereference() const
+        -:  343:  {
+       47:  344:    return static_cast<pointer>(
+       47:  344-block  0
+       47:  345:        current_buffer_.data())[current_buffer_position_];
+        -:  346:  }
+        -:  347:
+        -:  348:  // Compare two iterators for equality.
+       93:  349:  bool equal(const buffers_iterator& other) const
+        -:  350:  {
+       93:  351:    return position_ == other.position_;
+       93:  351-block  0
+        -:  352:  }
+        -:  353:
+        -:  354:  // Increment the iterator.
+       47:  355:  void increment()
+        -:  356:  {
+      47*:  357:    BOOST_ASIO_ASSERT(current_ != end_ && "iterator out of bounds");
+       47:  357-block  0
+    %%%%%:  357-block  1
+       47:  358:    ++position_;
+        -:  359:
+        -:  360:    // Check if the increment can be satisfied by the current buffer.
+       47:  361:    ++current_buffer_position_;
+       47:  362:    if (current_buffer_position_ != current_buffer_.size())
+       47:  362-block  0
+       46:  363:      return;
+       46:  363-block  0
+        -:  364:
+        -:  365:    // Find the next non-empty buffer.
+        1:  366:    ++current_;
+        1:  367:    current_buffer_position_ = 0;
+        1:  367-block  0
+       1*:  368:    while (current_ != end_)
+        1:  368-block  0
+        -:  369:    {
+    #####:  370:      current_buffer_ = *current_;
+    #####:  371:      if (current_buffer_.size() > 0)
+    %%%%%:  371-block  0
+    #####:  372:        return;
+    %%%%%:  372-block  0
+    #####:  373:      ++current_;
+    %%%%%:  373-block  0
+        -:  374:    }
+        -:  375:  }
+        -:  376:
+        -:  377:  // Decrement the iterator.
+        -:  378:  void decrement()
+        -:  379:  {
+        -:  380:    BOOST_ASIO_ASSERT(position_ > 0 && "iterator out of bounds");
+        -:  381:    --position_;
+        -:  382:
+        -:  383:    // Check if the decrement can be satisfied by the current buffer.
+        -:  384:    if (current_buffer_position_ != 0)
+        -:  385:    {
+        -:  386:      --current_buffer_position_;
+        -:  387:      return;
+        -:  388:    }
+        -:  389:
+        -:  390:    // Find the previous non-empty buffer.
+        -:  391:    buffer_sequence_iterator_type iter = current_;
+        -:  392:    while (iter != begin_)
+        -:  393:    {
+        -:  394:      --iter;
+        -:  395:      buffer_type buffer = *iter;
+        -:  396:      std::size_t buffer_size = buffer.size();
+        -:  397:      if (buffer_size > 0)
+        -:  398:      {
+        -:  399:        current_ = iter;
+        -:  400:        current_buffer_ = buffer;
+        -:  401:        current_buffer_position_ = buffer_size - 1;
+        -:  402:        return;
+        -:  403:      }
+        -:  404:    }
+        -:  405:  }
+        -:  406:
+        -:  407:  // Advance the iterator by the specified distance.
+        2:  408:  void advance(std::ptrdiff_t n)
+        -:  409:  {
+        2:  410:    if (n > 0)
+        2:  410-block  0
+        -:  411:    {
+    #####:  412:      BOOST_ASIO_ASSERT(current_ != end_ && "iterator out of bounds");
+    %%%%%:  412-block  0
+    %%%%%:  412-block  1
+    #####:  413:      for (;;)
+        -:  414:      {
+    #####:  415:        std::ptrdiff_t current_buffer_balance
+    #####:  416:          = current_buffer_.size() - current_buffer_position_;
+    %%%%%:  416-block  0
+        -:  417:
+        -:  418:        // Check if the advance can be satisfied by the current buffer.
+    #####:  419:        if (current_buffer_balance > n)
+        -:  420:        {
+    #####:  421:          position_ += n;
+    #####:  422:          current_buffer_position_ += n;
+    #####:  423:          return;
+    %%%%%:  423-block  0
+        -:  424:        }
+        -:  425:
+        -:  426:        // Update position.
+    #####:  427:        n -= current_buffer_balance;
+    #####:  428:        position_ += current_buffer_balance;
+        -:  429:
+        -:  430:        // Move to next buffer. If it is empty then it will be skipped on the
+        -:  431:        // next iteration of this loop.
+    #####:  432:        if (++current_ == end_)
+    %%%%%:  432-block  0
+        -:  433:        {
+    #####:  434:          BOOST_ASIO_ASSERT(n == 0 && "iterator out of bounds");
+    %%%%%:  434-block  0
+    %%%%%:  434-block  1
+    #####:  435:          current_buffer_ = buffer_type();
+    %%%%%:  435-block  0
+    #####:  436:          current_buffer_position_ = 0;
+    #####:  437:          return;
+        -:  438:        }
+    #####:  439:        current_buffer_ = *current_;
+    #####:  440:        current_buffer_position_ = 0;
+    %%%%%:  440-block  0
+        -:  441:      }
+        -:  442:    }
+        2:  443:    else if (n < 0)
+        2:  443-block  0
+        -:  444:    {
+    #####:  445:      std::size_t abs_n = -n;
+    #####:  446:      BOOST_ASIO_ASSERT(position_ >= abs_n && "iterator out of bounds");
+    %%%%%:  446-block  0
+    %%%%%:  446-block  1
+    #####:  447:      for (;;)
+    %%%%%:  447-block  0
+        -:  448:      {
+        -:  449:        // Check if the advance can be satisfied by the current buffer.
+    #####:  450:        if (current_buffer_position_ >= abs_n)
+    %%%%%:  450-block  0
+        -:  451:        {
+    #####:  452:          position_ -= abs_n;
+    #####:  453:          current_buffer_position_ -= abs_n;
+    #####:  454:          return;
+    %%%%%:  454-block  0
+        -:  455:        }
+        -:  456:
+        -:  457:        // Update position.
+    #####:  458:        abs_n -= current_buffer_position_;
+    #####:  459:        position_ -= current_buffer_position_;
+        -:  460:
+        -:  461:        // Check if we've reached the beginning of the buffers.
+    #####:  462:        if (current_ == begin_)
+    %%%%%:  462-block  0
+        -:  463:        {
+    #####:  464:          BOOST_ASIO_ASSERT(abs_n == 0 && "iterator out of bounds");
+    %%%%%:  464-block  0
+    %%%%%:  464-block  1
+    #####:  465:          current_buffer_position_ = 0;
+    #####:  466:          return;
+    %%%%%:  466-block  0
+        -:  467:        }
+        -:  468:
+        -:  469:        // Find the previous non-empty buffer.
+    #####:  470:        buffer_sequence_iterator_type iter = current_;
+    %%%%%:  470-block  0
+    #####:  471:        while (iter != begin_)
+    %%%%%:  471-block  0
+    %%%%%:  471-block  1
+        -:  472:        {
+    #####:  473:          --iter;
+    #####:  474:          buffer_type buffer = *iter;
+    #####:  475:          std::size_t buffer_size = buffer.size();
+    %%%%%:  475-block  0
+    #####:  476:          if (buffer_size > 0)
+        -:  477:          {
+    #####:  478:            current_ = iter;
+    #####:  479:            current_buffer_ = buffer;
+    #####:  480:            current_buffer_position_ = buffer_size;
+    #####:  481:            break;
+    %%%%%:  481-block  0
+        -:  482:          }
+        -:  483:        }
+        -:  484:      }
+        -:  485:    }
+        -:  486:  }
+        -:  487:
+        -:  488:  // Determine the distance between two iterators.
+        2:  489:  std::ptrdiff_t distance_to(const buffers_iterator& other) const
+        -:  490:  {
+        2:  491:    return other.position_ - position_;
+        2:  491-block  0
+        -:  492:  }
+        -:  493:
+        -:  494:  buffer_type current_buffer_;
+        -:  495:  std::size_t current_buffer_position_;
+        -:  496:  buffer_sequence_iterator_type begin_;
+        -:  497:  buffer_sequence_iterator_type current_;
+        -:  498:  buffer_sequence_iterator_type end_;
+        -:  499:  std::size_t position_;
+        -:  500:};
+        -:  501:
+        -:  502:/// Construct an iterator representing the beginning of the buffers' data.
+        -:  503:template <typename BufferSequence>
+        -:  504:inline buffers_iterator<BufferSequence> buffers_begin(
+        -:  505:    const BufferSequence& buffers)
+        -:  506:{
+        -:  507:  return buffers_iterator<BufferSequence>::begin(buffers);
+        -:  508:}
+        -:  509:
+        -:  510:/// Construct an iterator representing the end of the buffers' data.
+        -:  511:template <typename BufferSequence>
+        -:  512:inline buffers_iterator<BufferSequence> buffers_end(
+        -:  513:    const BufferSequence& buffers)
+        -:  514:{
+        -:  515:  return buffers_iterator<BufferSequence>::end(buffers);
+        -:  516:}
+        -:  517:
+        -:  518:} // namespace asio
+        -:  519:} // namespace boost
+        -:  520:
+        -:  521:#include <boost/asio/detail/pop_options.hpp>
+        -:  522:
+        -:  523:#endif // BOOST_ASIO_BUFFERS_ITERATOR_HPP

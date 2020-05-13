@@ -1,0 +1,764 @@
+        -:    0:Source:/usr/include/boost/asio/async_result.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// async_result.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_ASYNC_RESULT_HPP
+        -:   12:#define BOOST_ASIO_ASYNC_RESULT_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <boost/asio/detail/type_traits.hpp>
+        -:   20:#include <boost/asio/detail/variadic_templates.hpp>
+        -:   21:
+        -:   22:#include <boost/asio/detail/push_options.hpp>
+        -:   23:
+        -:   24:namespace boost {
+        -:   25:namespace asio {
+        -:   26:
+        -:   27:#if defined(BOOST_ASIO_HAS_CONCEPTS) \
+        -:   28:  && defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES) \
+        -:   29:  && defined(BOOST_ASIO_HAS_DECLTYPE)
+        -:   30:
+        -:   31:namespace detail {
+        -:   32:
+        -:   33:template <typename T>
+        -:   34:struct is_completion_signature : false_type
+        -:   35:{
+        -:   36:};
+        -:   37:
+        -:   38:template <typename R, typename... Args>
+        -:   39:struct is_completion_signature<R(Args...)> : true_type
+        -:   40:{
+        -:   41:};
+        -:   42:
+        -:   43:template <typename T, typename... Args>
+        -:   44:BOOST_ASIO_CONCEPT callable_with = requires(T t, Args&&... args)
+        -:   45:{
+        -:   46:  t(static_cast<Args&&>(args)...);
+        -:   47:};
+        -:   48:
+        -:   49:template <typename T, typename Signature>
+        -:   50:struct is_completion_handler_for : false_type
+        -:   51:{
+        -:   52:};
+        -:   53:
+        -:   54:template <typename T, typename R, typename... Args>
+        -:   55:struct is_completion_handler_for<T, R(Args...)>
+        -:   56:  : integral_constant<bool, (callable_with<T, Args...>)>
+        -:   57:{
+        -:   58:};
+        -:   59:
+        -:   60:} // namespace detail
+        -:   61:
+        -:   62:template <typename T>
+        -:   63:BOOST_ASIO_CONCEPT completion_signature =
+        -:   64:  detail::is_completion_signature<T>::value;
+        -:   65:
+        -:   66:#define BOOST_ASIO_COMPLETION_SIGNATURE \
+        -:   67:  ::boost::asio::completion_signature
+        -:   68:
+        -:   69:template <typename T, typename Signature>
+        -:   70:BOOST_ASIO_CONCEPT completion_handler_for =
+        -:   71:  detail::is_completion_signature<Signature>::value
+        -:   72:    && detail::is_completion_handler_for<T, Signature>::value;
+        -:   73:
+        -:   74:#define BOOST_ASIO_COMPLETION_HANDLER_FOR(s) \
+        -:   75:  ::boost::asio::completion_handler_for<s>
+        -:   76:
+        -:   77:#else // defined(BOOST_ASIO_HAS_CONCEPTS)
+        -:   78:      //   && defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+        -:   79:      //   && defined(BOOST_ASIO_HAS_DECLTYPE)
+        -:   80:
+        -:   81:#define BOOST_ASIO_COMPLETION_SIGNATURE typename
+        -:   82:#define BOOST_ASIO_COMPLETION_HANDLER_FOR(s) typename
+        -:   83:
+        -:   84:#endif // defined(BOOST_ASIO_HAS_CONCEPTS)
+        -:   85:       //   && defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+        -:   86:       //   && defined(BOOST_ASIO_HAS_DECLTYPE)
+        -:   87:
+        -:   88:/// An interface for customising the behaviour of an initiating function.
+        -:   89:/**
+        -:   90: * The async_result traits class is used for determining:
+        -:   91: *
+        -:   92: * @li the concrete completion handler type to be called at the end of the
+        -:   93: * asynchronous operation;
+        -:   94: *
+        -:   95: * @li the initiating function return type; and
+        -:   96: *
+        -:   97: * @li how the return value of the initiating function is obtained.
+        -:   98: *
+        -:   99: * The trait allows the handler and return types to be determined at the point
+        -:  100: * where the specific completion handler signature is known.
+        -:  101: *
+        -:  102: * This template may be specialised for user-defined completion token types.
+        -:  103: * The primary template assumes that the CompletionToken is the completion
+        -:  104: * handler.
+        -:  105: */
+        -:  106:template <typename CompletionToken, BOOST_ASIO_COMPLETION_SIGNATURE Signature>
+        -:  107:class async_result
+        -:  108:{
+        -:  109:public:
+        -:  110:  /// The concrete completion handler type for the specific signature.
+        -:  111:  typedef CompletionToken completion_handler_type;
+        -:  112:
+        -:  113:  /// The return type of the initiating function.
+        -:  114:  typedef void return_type;
+        -:  115:
+        -:  116:  /// Construct an async result from a given handler.
+        -:  117:  /**
+        -:  118:   * When using a specalised async_result, the constructor has an opportunity
+        -:  119:   * to initialise some state associated with the completion handler, which is
+        -:  120:   * then returned from the initiating function.
+        -:  121:   */
+        -:  122:  explicit async_result(completion_handler_type& h)
+        -:  123:  {
+        -:  124:    (void)h;
+        -:  125:  }
+        -:  126:
+        -:  127:  /// Obtain the value to be returned from the initiating function.
+        -:  128:  return_type get()
+        -:  129:  {
+        -:  130:  }
+        -:  131:
+        -:  132:#if defined(GENERATING_DOCUMENTATION)
+        -:  133:
+        -:  134:  /// Initiate the asynchronous operation that will produce the result, and
+        -:  135:  /// obtain the value to be returned from the initiating function.
+        -:  136:  template <typename Initiation, typename RawCompletionToken, typename... Args>
+        -:  137:  static return_type initiate(
+        -:  138:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  139:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  140:      BOOST_ASIO_MOVE_ARG(Args)... args);
+        -:  141:
+        -:  142:#elif defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+        -:  143:
+        -:  144:  template <typename Initiation,
+        -:  145:      BOOST_ASIO_COMPLETION_HANDLER_FOR(Signature) RawCompletionToken,
+        -:  146:      typename... Args>
+       7*:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+       7*:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+       7*:  155:  }
+------------------
+_ZN5boost4asio12async_resultINS0_6detail8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS2_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlSI_mE_EEFvSG_mEE8initiateINS8_19initiate_async_sendESK_JRKNS0_15const_buffers_1EiEEEvOT_OT0_DpOT1_:
+        1:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+        1:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+        1:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+        1:  155:  }
+------------------
+_ZN5boost4asio12async_resultINS0_6detail8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS2_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSI_mE0_EEFvSG_mEE8initiateINS8_19initiate_async_sendESK_JRKNS0_15const_buffers_1EiEEEvOT_OT0_DpOT1_:
+    #####:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+    #####:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+    %%%%%:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+    #####:  155:  }
+------------------
+_ZN5boost4asio12async_resultINS0_6detail8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS2_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlSI_mE_EEFvSG_mEE8initiateINS8_19initiate_async_sendESK_JRKNS0_15const_buffers_1EiEEEvOT_OT0_DpOT1_:
+    #####:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+    #####:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+    %%%%%:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+    #####:  155:  }
+------------------
+_ZN5boost4asio12async_resultINS0_6detail29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSG_mE_EEFvSE_mEE8initiateINS8_22initiate_async_receiveESI_JRKNS0_17mutable_buffers_1EiEEEvOT_OT0_DpOT1_:
+        1:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+        1:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+        1:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+        1:  155:  }
+------------------
+_ZN5boost4asio12async_resultINS0_6detail17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS2_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSH_mE_EEFvSF_mEE8initiateINS8_22initiate_async_receiveESJ_JRKNS0_17mutable_buffers_1EiEEEvOT_OT0_DpOT1_:
+        1:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+        1:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+        1:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+        1:  155:  }
+------------------
+_ZN5boost4asio12async_resultINS0_6detail17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS2_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSH_mE_EEFvSF_mEE8initiateINS8_22initiate_async_receiveESJ_JRKNS0_17mutable_buffers_1EiEEEvOT_OT0_DpOT1_:
+    #####:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+    #####:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+    %%%%%:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+    #####:  155:  }
+------------------
+_ZN5boost4asio12async_resultINS0_6detail7binder1IZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_S6_EEFvvEE8initiateINS2_27initiate_post_with_executorINS0_8executorEEESA_JEEEvOT_OT0_DpOT1_:
+    #####:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+    #####:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+    %%%%%:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+    #####:  155:  }
+------------------
+_ZN5boost4asio12async_resultIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_FvS4_EE8initiateINS0_12basic_socketINS0_2ip3tcpENS0_8executorEE22initiate_async_connectES7_JRKNSC_14basic_endpointISD_EERS4_EEEvOT_OT0_DpOT1_:
+        1:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+        1:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+        1:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+        1:  155:  }
+------------------
+_ZN5boost4asio12async_resultIZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlS6_mE_FvS4_mEE8initiateINS0_6detail36initiate_async_write_buffer_sequenceINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEEEES7_JRKNS0_17mutable_buffers_1ENSB_14transfer_all_tEEEEvOT_OT0_DpOT1_:
+        1:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+        1:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+        1:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+        1:  155:  }
+------------------
+_ZN5boost4asio12async_resultIZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlS6_mE0_FvS4_mEE8initiateINS0_6detail36initiate_async_write_buffer_sequenceINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEEEES7_JRKNS0_17mutable_buffers_1ENSB_14transfer_all_tEEEEvOT_OT0_DpOT1_:
+    #####:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+    #####:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+    %%%%%:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+    #####:  155:  }
+------------------
+_ZN5boost4asio12async_resultIZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlS6_mE_FvS4_mEE8initiateINS0_6detail41initiate_async_read_until_delim_string_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEEEES7_JNS0_19basic_streambuf_refISaIcEEENSt7__cxx1112basic_stringIcSt11char_traitsIcESK_EEEEEvOT_OT0_DpOT1_:
+        1:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+        1:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+        1:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+        1:  155:  }
+------------------
+_ZN5boost4asio12async_resultIZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlS6_mE_FvS4_mEE8initiateINS0_6detail36initiate_async_write_buffer_sequenceINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEEEES7_JRKNS0_17mutable_buffers_1ENSB_14transfer_all_tEEEEvOT_OT0_DpOT1_:
+    #####:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+    #####:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+    %%%%%:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+    #####:  155:  }
+------------------
+_ZN5boost4asio12async_resultIZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlS6_mE_FvS4_mEE8initiateINS0_6detail29initiate_async_read_dynbuf_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEEEES7_JNS0_19basic_streambuf_refISaIcEEENSB_19transfer_at_least_tEEEEvOT_OT0_DpOT1_:
+        1:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+        1:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+        1:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+        1:  155:  }
+------------------
+_ZN5boost4asio12async_resultIZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlS6_mE_FvS4_mEE8initiateINS0_6detail29initiate_async_read_dynbuf_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEEEES7_JNS0_19basic_streambuf_refISaIcEEENSB_19transfer_at_least_tEEEEvOT_OT0_DpOT1_:
+    #####:  147:  static return_type initiate(
+        -:  148:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  149:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token,
+        -:  150:      BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  151:  {
+    #####:  152:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+    %%%%%:  152-block  0
+        -:  153:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token),
+        -:  154:        BOOST_ASIO_MOVE_CAST(Args)(args)...);
+    #####:  155:  }
+------------------
+        -:  156:
+        -:  157:#else // defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+        -:  158:
+        -:  159:  template <typename Initiation,
+        -:  160:      BOOST_ASIO_COMPLETION_HANDLER_FOR(Signature) RawCompletionToken>
+        -:  161:  static return_type initiate(
+        -:  162:      BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  163:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token)
+        -:  164:  {
+        -:  165:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+        -:  166:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token));
+        -:  167:  }
+        -:  168:
+        -:  169:#define BOOST_ASIO_PRIVATE_INITIATE_DEF(n) \
+        -:  170:  template <typename Initiation, \
+        -:  171:      BOOST_ASIO_COMPLETION_HANDLER_FOR(Signature) RawCompletionToken, \
+        -:  172:      BOOST_ASIO_VARIADIC_TPARAMS(n)> \
+        -:  173:  static return_type initiate( \
+        -:  174:      BOOST_ASIO_MOVE_ARG(Initiation) initiation, \
+        -:  175:      BOOST_ASIO_MOVE_ARG(RawCompletionToken) token, \
+        -:  176:      BOOST_ASIO_VARIADIC_MOVE_PARAMS(n)) \
+        -:  177:  { \
+        -:  178:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)( \
+        -:  179:        BOOST_ASIO_MOVE_CAST(RawCompletionToken)(token), \
+        -:  180:        BOOST_ASIO_VARIADIC_MOVE_ARGS(n)); \
+        -:  181:  } \
+        -:  182:  /**/
+        -:  183:  BOOST_ASIO_VARIADIC_GENERATE(BOOST_ASIO_PRIVATE_INITIATE_DEF)
+        -:  184:#undef BOOST_ASIO_PRIVATE_INITIATE_DEF
+        -:  185:
+        -:  186:#endif // defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+        -:  187:
+        -:  188:private:
+        -:  189:  async_result(const async_result&) BOOST_ASIO_DELETED;
+        -:  190:  async_result& operator=(const async_result&) BOOST_ASIO_DELETED;
+        -:  191:};
+        -:  192:
+        -:  193:#if !defined(GENERATING_DOCUMENTATION)
+        -:  194:
+        -:  195:template <BOOST_ASIO_COMPLETION_SIGNATURE Signature>
+        -:  196:class async_result<void, Signature>
+        -:  197:{
+        -:  198:  // Empty.
+        -:  199:};
+        -:  200:
+        -:  201:#endif // !defined(GENERATING_DOCUMENTATION)
+        -:  202:
+        -:  203:/// Helper template to deduce the handler type from a CompletionToken, capture
+        -:  204:/// a local copy of the handler, and then create an async_result for the
+        -:  205:/// handler.
+        -:  206:template <typename CompletionToken, BOOST_ASIO_COMPLETION_SIGNATURE Signature>
+        -:  207:struct async_completion
+        -:  208:{
+        -:  209:  /// The real handler type to be used for the asynchronous operation.
+        -:  210:  typedef typename boost::asio::async_result<
+        -:  211:    typename decay<CompletionToken>::type,
+        -:  212:      Signature>::completion_handler_type completion_handler_type;
+        -:  213:
+        -:  214:#if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+        -:  215:  /// Constructor.
+        -:  216:  /**
+        -:  217:   * The constructor creates the concrete completion handler and makes the link
+        -:  218:   * between the handler and the asynchronous result.
+        -:  219:   */
+        -:  220:  explicit async_completion(CompletionToken& token)
+        -:  221:    : completion_handler(static_cast<typename conditional<
+        -:  222:        is_same<CompletionToken, completion_handler_type>::value,
+        -:  223:        completion_handler_type&, CompletionToken&&>::type>(token)),
+        -:  224:      result(completion_handler)
+        -:  225:  {
+        -:  226:  }
+        -:  227:#else // defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+        -:  228:  explicit async_completion(typename decay<CompletionToken>::type& token)
+        -:  229:    : completion_handler(token),
+        -:  230:      result(completion_handler)
+        -:  231:  {
+        -:  232:  }
+        -:  233:
+        -:  234:  explicit async_completion(const typename decay<CompletionToken>::type& token)
+        -:  235:    : completion_handler(token),
+        -:  236:      result(completion_handler)
+        -:  237:  {
+        -:  238:  }
+        -:  239:#endif // defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+        -:  240:
+        -:  241:  /// A copy of, or reference to, a real handler object.
+        -:  242:#if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+        -:  243:  typename conditional<
+        -:  244:    is_same<CompletionToken, completion_handler_type>::value,
+        -:  245:    completion_handler_type&, completion_handler_type>::type completion_handler;
+        -:  246:#else // defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+        -:  247:  completion_handler_type completion_handler;
+        -:  248:#endif // defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+        -:  249:
+        -:  250:  /// The result of the asynchronous operation's initiating function.
+        -:  251:  async_result<typename decay<CompletionToken>::type, Signature> result;
+        -:  252:};
+        -:  253:
+        -:  254:namespace detail {
+        -:  255:
+        -:  256:template <typename CompletionToken, typename Signature>
+        -:  257:struct async_result_helper
+        -:  258:  : async_result<typename decay<CompletionToken>::type, Signature>
+        -:  259:{
+        -:  260:};
+        -:  261:
+        -:  262:struct async_result_memfns_base
+        -:  263:{
+        -:  264:  void initiate();
+        -:  265:};
+        -:  266:
+        -:  267:template <typename T>
+        -:  268:struct async_result_memfns_derived
+        -:  269:  : T, async_result_memfns_base
+        -:  270:{
+        -:  271:};
+        -:  272:
+        -:  273:template <typename T, T>
+        -:  274:struct async_result_memfns_check
+        -:  275:{
+        -:  276:};
+        -:  277:
+        -:  278:template <typename>
+        -:  279:char (&async_result_initiate_memfn_helper(...))[2];
+        -:  280:
+        -:  281:template <typename T>
+        -:  282:char async_result_initiate_memfn_helper(
+        -:  283:    async_result_memfns_check<
+        -:  284:      void (async_result_memfns_base::*)(),
+        -:  285:      &async_result_memfns_derived<T>::initiate>*);
+        -:  286:
+        -:  287:template <typename CompletionToken, typename Signature>
+        -:  288:struct async_result_has_initiate_memfn
+        -:  289:  : integral_constant<bool, sizeof(async_result_initiate_memfn_helper<
+        -:  290:      async_result<typename decay<CompletionToken>::type, Signature>
+        -:  291:    >(0)) != 1>
+        -:  292:{
+        -:  293:};
+        -:  294:
+        -:  295:} // namespace detail
+        -:  296:
+        -:  297:#if defined(GENERATING_DOCUMENTATION)
+        -:  298:# define BOOST_ASIO_INITFN_RESULT_TYPE(ct, sig) \
+        -:  299:  void_or_deduced
+        -:  300:#elif defined(_MSC_VER) && (_MSC_VER < 1500)
+        -:  301:# define BOOST_ASIO_INITFN_RESULT_TYPE(ct, sig) \
+        -:  302:  typename ::boost::asio::detail::async_result_helper< \
+        -:  303:    ct, sig>::return_type
+        -:  304:#define BOOST_ASIO_HANDLER_TYPE(ct, sig) \
+        -:  305:  typename ::boost::asio::detail::async_result_helper< \
+        -:  306:    ct, sig>::completion_handler_type
+        -:  307:#else
+        -:  308:# define BOOST_ASIO_INITFN_RESULT_TYPE(ct, sig) \
+        -:  309:  typename ::boost::asio::async_result< \
+        -:  310:    typename ::boost::asio::decay<ct>::type, sig>::return_type
+        -:  311:#define BOOST_ASIO_HANDLER_TYPE(ct, sig) \
+        -:  312:  typename ::boost::asio::async_result< \
+        -:  313:    typename ::boost::asio::decay<ct>::type, sig>::completion_handler_type
+        -:  314:#endif
+        -:  315:
+        -:  316:#if defined(GENERATION_DOCUMENTATION)
+        -:  317:# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ct, sig) \
+        -:  318:  auto
+        -:  319:#elif defined(BOOST_ASIO_HAS_RETURN_TYPE_DEDUCTION)
+        -:  320:# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ct, sig) \
+        -:  321:  auto
+        -:  322:#else
+        -:  323:# define BOOST_ASIO_INITFN_AUTO_RESULT_TYPE(ct, sig) \
+        -:  324:  BOOST_ASIO_INITFN_RESULT_TYPE(ct, sig)
+        -:  325:#endif
+        -:  326:
+        -:  327:#if defined(GENERATION_DOCUMENTATION)
+        -:  328:# define BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE(ct, sig, expr) \
+        -:  329:  void_or_deduced
+        -:  330:#elif defined(BOOST_ASIO_HAS_DECLTYPE)
+        -:  331:# define BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE(ct, sig, expr) \
+        -:  332:  decltype expr
+        -:  333:#else
+        -:  334:# define BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE(ct, sig, expr) \
+        -:  335:  BOOST_ASIO_INITFN_RESULT_TYPE(ct, sig)
+        -:  336:#endif
+        -:  337:
+        -:  338:#if defined(GENERATING_DOCUMENTATION)
+        -:  339:
+        -:  340:template <typename CompletionToken,
+        -:  341:    completion_signature Signature,
+        -:  342:    typename Initiation, typename... Args>
+        -:  343:void_or_deduced async_initiate(
+        -:  344:    BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  345:    BOOST_ASIO_NONDEDUCED_MOVE_ARG(CompletionToken),
+        -:  346:    BOOST_ASIO_MOVE_ARG(Args)... args);
+        -:  347:
+        -:  348:#elif defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+        -:  349:
+        -:  350:template <typename CompletionToken,
+        -:  351:    BOOST_ASIO_COMPLETION_SIGNATURE Signature,
+        -:  352:    typename Initiation, typename... Args>
+        -:  353:inline typename enable_if<
+        -:  354:    detail::async_result_has_initiate_memfn<CompletionToken, Signature>::value,
+        -:  355:    BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE(CompletionToken, Signature,
+        -:  356:      (async_result<typename decay<CompletionToken>::type,
+        -:  357:        Signature>::initiate(declval<BOOST_ASIO_MOVE_ARG(Initiation)>(),
+        -:  358:          declval<BOOST_ASIO_MOVE_ARG(CompletionToken)>(),
+        -:  359:          declval<BOOST_ASIO_MOVE_ARG(Args)>()...)))>::type
+       7*:  360:async_initiate(BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  361:    BOOST_ASIO_NONDEDUCED_MOVE_ARG(CompletionToken) token,
+        -:  362:    BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  363:{
+        -:  364:  return async_result<typename decay<CompletionToken>::type,
+       7*:  365:    Signature>::initiate(BOOST_ASIO_MOVE_CAST(Initiation)(initiation),
+        -:  366:      BOOST_ASIO_MOVE_CAST(CompletionToken)(token),
+       7*:  367:      BOOST_ASIO_MOVE_CAST(Args)(args)...);
+        -:  368:}
+        -:  369:
+        -:  370:template <typename CompletionToken,
+        -:  371:    BOOST_ASIO_COMPLETION_SIGNATURE Signature,
+        -:  372:    typename Initiation, typename... Args>
+        -:  373:inline typename enable_if<
+        -:  374:    !detail::async_result_has_initiate_memfn<CompletionToken, Signature>::value,
+        -:  375:    BOOST_ASIO_INITFN_RESULT_TYPE(CompletionToken, Signature)>::type
+        -:  376:async_initiate(BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  377:    BOOST_ASIO_NONDEDUCED_MOVE_ARG(CompletionToken) token,
+        -:  378:    BOOST_ASIO_MOVE_ARG(Args)... args)
+        -:  379:{
+        -:  380:  async_completion<CompletionToken, Signature> completion(token);
+        -:  381:
+        -:  382:  BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+        -:  383:      BOOST_ASIO_MOVE_CAST(BOOST_ASIO_HANDLER_TYPE(CompletionToken,
+        -:  384:        Signature))(completion.completion_handler),
+        -:  385:      BOOST_ASIO_MOVE_CAST(Args)(args)...);
+        -:  386:
+        -:  387:  return completion.result.get();
+        -:  388:}
+        -:  389:
+        -:  390:#else // defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+        -:  391:
+        -:  392:template <typename CompletionToken,
+        -:  393:    BOOST_ASIO_COMPLETION_SIGNATURE Signature,
+        -:  394:    typename Initiation>
+        -:  395:inline typename enable_if<
+        -:  396:    detail::async_result_has_initiate_memfn<CompletionToken, Signature>::value,
+        -:  397:    BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE(CompletionToken, Signature,
+        -:  398:      (async_result<typename decay<CompletionToken>::type,
+        -:  399:        Signature>::initiate(declval<BOOST_ASIO_MOVE_ARG(Initiation)>(),
+        -:  400:          declval<BOOST_ASIO_MOVE_ARG(CompletionToken)>())))>::type
+        -:  401:async_initiate(BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  402:    BOOST_ASIO_NONDEDUCED_MOVE_ARG(CompletionToken) token)
+        -:  403:{
+        -:  404:  return async_result<typename decay<CompletionToken>::type,
+        -:  405:    Signature>::initiate(BOOST_ASIO_MOVE_CAST(Initiation)(initiation),
+        -:  406:      BOOST_ASIO_MOVE_CAST(CompletionToken)(token));
+        -:  407:}
+        -:  408:
+        -:  409:template <typename CompletionToken,
+        -:  410:    BOOST_ASIO_COMPLETION_SIGNATURE Signature,
+        -:  411:    typename Initiation>
+        -:  412:inline typename enable_if<
+        -:  413:    !detail::async_result_has_initiate_memfn<CompletionToken, Signature>::value,
+        -:  414:    BOOST_ASIO_INITFN_RESULT_TYPE(CompletionToken, Signature)>::type
+        -:  415:async_initiate(BOOST_ASIO_MOVE_ARG(Initiation) initiation,
+        -:  416:    BOOST_ASIO_NONDEDUCED_MOVE_ARG(CompletionToken) token)
+        -:  417:{
+        -:  418:  async_completion<CompletionToken, Signature> completion(token);
+        -:  419:
+        -:  420:  BOOST_ASIO_MOVE_CAST(Initiation)(initiation)(
+        -:  421:      BOOST_ASIO_MOVE_CAST(BOOST_ASIO_HANDLER_TYPE(CompletionToken,
+        -:  422:        Signature))(completion.completion_handler));
+        -:  423:
+        -:  424:  return completion.result.get();
+        -:  425:}
+        -:  426:
+        -:  427:#define BOOST_ASIO_PRIVATE_INITIATE_DEF(n) \
+        -:  428:  template <typename CompletionToken, \
+        -:  429:      BOOST_ASIO_COMPLETION_SIGNATURE Signature, \
+        -:  430:      typename Initiation, BOOST_ASIO_VARIADIC_TPARAMS(n)> \
+        -:  431:  inline typename enable_if< \
+        -:  432:      detail::async_result_has_initiate_memfn< \
+        -:  433:        CompletionToken, Signature>::value, \
+        -:  434:      BOOST_ASIO_INITFN_DEDUCED_RESULT_TYPE(CompletionToken, Signature, \
+        -:  435:        (async_result<typename decay<CompletionToken>::type, \
+        -:  436:          Signature>::initiate(declval<BOOST_ASIO_MOVE_ARG(Initiation)>(), \
+        -:  437:            declval<BOOST_ASIO_MOVE_ARG(CompletionToken)>(), \
+        -:  438:            BOOST_ASIO_VARIADIC_MOVE_DECLVAL(n))))>::type \
+        -:  439:  async_initiate(BOOST_ASIO_MOVE_ARG(Initiation) initiation, \
+        -:  440:      BOOST_ASIO_NONDEDUCED_MOVE_ARG(CompletionToken) token, \
+        -:  441:      BOOST_ASIO_VARIADIC_MOVE_PARAMS(n)) \
+        -:  442:  { \
+        -:  443:    return async_result<typename decay<CompletionToken>::type, \
+        -:  444:      Signature>::initiate(BOOST_ASIO_MOVE_CAST(Initiation)(initiation), \
+        -:  445:        BOOST_ASIO_MOVE_CAST(CompletionToken)(token), \
+        -:  446:        BOOST_ASIO_VARIADIC_MOVE_ARGS(n)); \
+        -:  447:  } \
+        -:  448:  \
+        -:  449:  template <typename CompletionToken, \
+        -:  450:      BOOST_ASIO_COMPLETION_SIGNATURE Signature, \
+        -:  451:      typename Initiation, BOOST_ASIO_VARIADIC_TPARAMS(n)> \
+        -:  452:  inline typename enable_if< \
+        -:  453:      !detail::async_result_has_initiate_memfn< \
+        -:  454:        CompletionToken, Signature>::value, \
+        -:  455:      BOOST_ASIO_INITFN_RESULT_TYPE(CompletionToken, Signature)>::type \
+        -:  456:  async_initiate(BOOST_ASIO_MOVE_ARG(Initiation) initiation, \
+        -:  457:      BOOST_ASIO_NONDEDUCED_MOVE_ARG(CompletionToken) token, \
+        -:  458:      BOOST_ASIO_VARIADIC_MOVE_PARAMS(n)) \
+        -:  459:  { \
+        -:  460:    async_completion<CompletionToken, Signature> completion(token); \
+        -:  461:  \
+        -:  462:    BOOST_ASIO_MOVE_CAST(Initiation)(initiation)( \
+        -:  463:        BOOST_ASIO_MOVE_CAST(BOOST_ASIO_HANDLER_TYPE(CompletionToken, \
+        -:  464:          Signature))(completion.completion_handler), \
+        -:  465:        BOOST_ASIO_VARIADIC_MOVE_ARGS(n)); \
+        -:  466:  \
+        -:  467:    return completion.result.get(); \
+        -:  468:  } \
+        -:  469:  /**/
+        -:  470:  BOOST_ASIO_VARIADIC_GENERATE(BOOST_ASIO_PRIVATE_INITIATE_DEF)
+        -:  471:#undef BOOST_ASIO_PRIVATE_INITIATE_DEF
+        -:  472:
+        -:  473:#endif // defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+        -:  474:
+        -:  475:#if defined(BOOST_ASIO_HAS_CONCEPTS) \
+        -:  476:  && defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES) \
+        -:  477:  && defined(BOOST_ASIO_HAS_DECLTYPE)
+        -:  478:
+        -:  479:namespace detail {
+        -:  480:
+        -:  481:template <typename Signature>
+        -:  482:struct initiation_archetype
+        -:  483:{
+        -:  484:  template <completion_handler_for<Signature> CompletionHandler>
+        -:  485:  void operator()(CompletionHandler&&) const
+        -:  486:  {
+        -:  487:  }
+        -:  488:};
+        -:  489:
+        -:  490:} // namespace detail
+        -:  491:
+        -:  492:template <typename T, typename Signature>
+        -:  493:BOOST_ASIO_CONCEPT completion_token_for =
+        -:  494:  detail::is_completion_signature<Signature>::value
+        -:  495:  &&
+        -:  496:  requires(T&& t)
+        -:  497:  {
+        -:  498:    async_initiate<T, Signature>(detail::initiation_archetype<Signature>{}, t);
+        -:  499:  };
+        -:  500:
+        -:  501:#define BOOST_ASIO_COMPLETION_TOKEN_FOR(s) \
+        -:  502:  ::boost::asio::completion_token_for<s>
+        -:  503:
+        -:  504:#else // defined(BOOST_ASIO_HAS_CONCEPTS)
+        -:  505:      //   && defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+        -:  506:      //   && defined(BOOST_ASIO_HAS_DECLTYPE)
+        -:  507:
+        -:  508:#define BOOST_ASIO_COMPLETION_TOKEN_FOR(s) typename
+        -:  509:
+        -:  510:#endif // defined(BOOST_ASIO_HAS_CONCEPTS)
+        -:  511:       //   && defined(BOOST_ASIO_HAS_VARIADIC_TEMPLATES)
+        -:  512:       //   && defined(BOOST_ASIO_HAS_DECLTYPE)
+        -:  513:
+        -:  514:namespace detail {
+        -:  515:
+        -:  516:template <typename>
+        -:  517:struct default_completion_token_check
+        -:  518:{
+        -:  519:  typedef void type;
+        -:  520:};
+        -:  521:
+        -:  522:template <typename T, typename = void>
+        -:  523:struct default_completion_token_impl
+        -:  524:{
+        -:  525:  typedef void type;
+        -:  526:};
+        -:  527:
+        -:  528:template <typename T>
+        -:  529:struct default_completion_token_impl<T,
+        -:  530:  typename default_completion_token_check<
+        -:  531:    typename T::default_completion_token_type>::type>
+        -:  532:{
+        -:  533:  typedef typename T::default_completion_token_type type;
+        -:  534:};
+        -:  535:
+        -:  536:} // namespace detail
+        -:  537:
+        -:  538:#if defined(GENERATING_DOCUMENTATION)
+        -:  539:
+        -:  540:/// Traits type used to determine the default completion token type associated
+        -:  541:/// with a type (such as an executor).
+        -:  542:/**
+        -:  543: * A program may specialise this traits type if the @c T template parameter in
+        -:  544: * the specialisation is a user-defined type.
+        -:  545: *
+        -:  546: * Specialisations of this trait may provide a nested typedef @c type, which is
+        -:  547: * a default-constructible completion token type.
+        -:  548: */
+        -:  549:template <typename T>
+        -:  550:struct default_completion_token
+        -:  551:{
+        -:  552:  /// If @c T has a nested type @c default_completion_token_type,
+        -:  553:  /// <tt>T::default_completion_token_type</tt>. Otherwise the typedef @c type
+        -:  554:  /// is not defined.
+        -:  555:  typedef see_below type;
+        -:  556:};
+        -:  557:#else
+        -:  558:template <typename T>
+        -:  559:struct default_completion_token
+        -:  560:  : detail::default_completion_token_impl<T>
+        -:  561:{
+        -:  562:};
+        -:  563:#endif
+        -:  564:
+        -:  565:#if defined(BOOST_ASIO_HAS_ALIAS_TEMPLATES)
+        -:  566:
+        -:  567:template <typename T>
+        -:  568:using default_completion_token_t = typename default_completion_token<T>::type;
+        -:  569:
+        -:  570:#endif // defined(BOOST_ASIO_HAS_ALIAS_TEMPLATES)
+        -:  571:
+        -:  572:#if defined(BOOST_ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
+        -:  573:
+        -:  574:#define BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(e) \
+        -:  575:  = typename ::boost::asio::default_completion_token<e>::type
+        -:  576:#define BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(e) \
+        -:  577:  = typename ::boost::asio::default_completion_token<e>::type()
+        -:  578:
+        -:  579:#else // defined(BOOST_ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
+        -:  580:
+        -:  581:#define BOOST_ASIO_DEFAULT_COMPLETION_TOKEN_TYPE(e)
+        -:  582:#define BOOST_ASIO_DEFAULT_COMPLETION_TOKEN(e)
+        -:  583:
+        -:  584:#endif // defined(BOOST_ASIO_HAS_DEFAULT_FUNCTION_TEMPLATE_ARGUMENTS)
+        -:  585:
+        -:  586:} // namespace asio
+        -:  587:} // namespace boost
+        -:  588:
+        -:  589:#include <boost/asio/detail/pop_options.hpp>
+        -:  590:
+        -:  591:#endif // BOOST_ASIO_ASYNC_RESULT_HPP

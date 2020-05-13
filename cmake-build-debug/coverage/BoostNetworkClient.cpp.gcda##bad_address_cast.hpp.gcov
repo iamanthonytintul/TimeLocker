@@ -1,0 +1,70 @@
+        -:    0:Source:/usr/include/boost/asio/ip/bad_address_cast.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// ip/bad_address_cast.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_IP_BAD_ADDRESS_CAST_HPP
+        -:   12:#define BOOST_ASIO_IP_BAD_ADDRESS_CAST_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <typeinfo>
+        -:   20:
+        -:   21:#include <boost/asio/detail/push_options.hpp>
+        -:   22:
+        -:   23:namespace boost {
+        -:   24:namespace asio {
+        -:   25:namespace ip {
+        -:   26:
+        -:   27:/// Thrown to indicate a failed address conversion.
+        -:   28:class bad_address_cast :
+        -:   29:#if defined(BOOST_ASIO_MSVC) && defined(_HAS_EXCEPTIONS) && !_HAS_EXCEPTIONS
+        -:   30:  public std::exception
+        -:   31:#else
+        -:   32:  public std::bad_cast
+        -:   33:#endif
+        -:   34:{
+        -:   35:public:
+        -:   36:  /// Default constructor.
+    #####:   37:  bad_address_cast() {}
+    %%%%%:   37-block  0
+        -:   38:
+        -:   39:  /// Destructor.
+    #####:   40:  virtual ~bad_address_cast() BOOST_ASIO_NOEXCEPT_OR_NOTHROW {}
+------------------
+_ZN5boost4asio2ip16bad_address_castD0Ev:
+    #####:   40:  virtual ~bad_address_cast() BOOST_ASIO_NOEXCEPT_OR_NOTHROW {}
+    %%%%%:   40-block  0
+------------------
+_ZN5boost4asio2ip16bad_address_castD2Ev:
+    #####:   40:  virtual ~bad_address_cast() BOOST_ASIO_NOEXCEPT_OR_NOTHROW {}
+    %%%%%:   40-block  0
+------------------
+        -:   41:
+        -:   42:  /// Get the message associated with the exception.
+    #####:   43:  virtual const char* what() const BOOST_ASIO_NOEXCEPT_OR_NOTHROW
+        -:   44:  {
+    #####:   45:    return "bad address cast";
+    %%%%%:   45-block  0
+        -:   46:  }
+        -:   47:};
+        -:   48:
+        -:   49:} // namespace ip
+        -:   50:} // namespace asio
+        -:   51:} // namespace boost
+        -:   52:
+        -:   53:#include <boost/asio/detail/pop_options.hpp>
+        -:   54:
+        -:   55:#endif // BOOST_ASIO_IP_ADDRESS_HPP

@@ -1,0 +1,21 @@
+        -:    0:Source:/home/anthonytintul/CLionProjects/TLConsoleApplication/lib/Views/pages/ConsoleViewDownloadFileMessagePage.cpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/Views/pages/ConsoleViewDownloadFileMessagePage.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/Views/pages/ConsoleViewDownloadFileMessagePage.cpp.gcda
+        -:    0:Runs:1
+        -:    1:#include "ViewHeaders/view.h"
+        -:    2:
+    #####:    3:void ConsoleViewDownloadFileMessagePage::attach(AbstractPresenter *observerPresenter) {
+    #####:    4:    vectorOfPresenters.push_back(observerPresenter);
+    %%%%%:    4-block  0
+    #####:    5:}
+        -:    6:
+    #####:    7:int  ConsoleViewDownloadFileMessagePage::printPage() {
+    #####:    8:    output << std::endl << "To download file please enter the key and the password to access it" << std::endl;
+    %%%%%:    8-block  0
+    #####:    9:    return SUCCESS;
+        -:   10:}
+        -:   11:
+    #####:   12:void ConsoleViewDownloadFileMessagePage::accept(AbstractVisitor *visitor) {
+    #####:   13:    visitor->visitDownloadFilePage(this);
+    %%%%%:   13-block  0
+    #####:   14:}

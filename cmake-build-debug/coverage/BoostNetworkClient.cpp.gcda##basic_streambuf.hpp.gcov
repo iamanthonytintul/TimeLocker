@@ -1,0 +1,490 @@
+        -:    0:Source:/usr/include/boost/asio/basic_streambuf.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// basic_streambuf.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_BASIC_STREAMBUF_HPP
+        -:   12:#define BOOST_ASIO_BASIC_STREAMBUF_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:
+        -:   20:#if !defined(BOOST_ASIO_NO_IOSTREAM)
+        -:   21:
+        -:   22:#include <algorithm>
+        -:   23:#include <cstring>
+        -:   24:#include <stdexcept>
+        -:   25:#include <streamBuf>
+        -:   26:#include <vector>
+        -:   27:#include <boost/asio/basic_streambuf_fwd.hpp>
+        -:   28:#include <boost/asio/buffer.hpp>
+        -:   29:#include <boost/asio/detail/limits.hpp>
+        -:   30:#include <boost/asio/detail/noncopyable.hpp>
+        -:   31:#include <boost/asio/detail/throw_exception.hpp>
+        -:   32:
+        -:   33:#include <boost/asio/detail/push_options.hpp>
+        -:   34:
+        -:   35:namespace boost {
+        -:   36:namespace asio {
+        -:   37:
+        -:   38:/// Automatically resizable buffer class based on std::streamBuf.
+        -:   39:/**
+        -:   40: * The @c basic_streambuf class is derived from @c std::streamBuf to associate
+        -:   41: * the streamBuf's input and output sequences with one or more character
+        -:   42: * arrays. These character arrays are internal to the @c basic_streambuf
+        -:   43: * object, but direct access to the array elements is provided to permit them
+        -:   44: * to be used efficiently with I/O operations. Characters written to the output
+        -:   45: * sequence of a @c basic_streambuf object are appended to the input sequence
+        -:   46: * of the same object.
+        -:   47: *
+        -:   48: * The @c basic_streambuf class's public interface is intended to permit the
+        -:   49: * following implementation strategies:
+        -:   50: *
+        -:   51: * @li A single contiguous character array, which is reallocated as necessary
+        -:   52: * to accommodate changes in the size of the character sequence. This is the
+        -:   53: * implementation approach currently used in Asio.
+        -:   54: *
+        -:   55: * @li A sequence of one or more character arrays, where each array is of the
+        -:   56: * same size. Additional character array objects are appended to the sequence
+        -:   57: * to accommodate changes in the size of the character sequence.
+        -:   58: *
+        -:   59: * @li A sequence of one or more character arrays of varying sizes. Additional
+        -:   60: * character array objects are appended to the sequence to accommodate changes
+        -:   61: * in the size of the character sequence.
+        -:   62: *
+        -:   63: * The constructor for basic_streambuf accepts a @c size_t argument specifying
+        -:   64: * the maximum of the sum of the sizes of the input sequence and output
+        -:   65: * sequence. During the lifetime of the @c basic_streambuf object, the following
+        -:   66: * invariant holds:
+        -:   67: * @code size() <= max_size()@endcode
+        -:   68: * Any member function that would, if successful, cause the invariant to be
+        -:   69: * violated shall throw an exception of class @c std::length_error.
+        -:   70: *
+        -:   71: * The constructor for @c basic_streambuf takes an Allocator argument. A copy
+        -:   72: * of this argument is used for any memory allocation performed, by the
+        -:   73: * constructor and by all member functions, during the lifetime of each @c
+        -:   74: * basic_streambuf object.
+        -:   75: *
+        -:   76: * @par Examples
+        -:   77: * Writing directly from an streamBuf to a socket:
+        -:   78: * @code
+        -:   79: * boost::asio::streamBuf b;
+        -:   80: * std::ostream os(&b);
+        -:   81: * os << "Hello, World!\n";
+        -:   82: *
+        -:   83: * // try sending some data in input sequence
+        -:   84: * size_t n = sock.send(b.data());
+        -:   85: *
+        -:   86: * b.consume(n); // sent data is removed from input sequence
+        -:   87: * @endcode
+        -:   88: *
+        -:   89: * Reading from a socket directly into a streamBuf:
+        -:   90: * @code
+        -:   91: * boost::asio::streamBuf b;
+        -:   92: *
+        -:   93: * // reserve 512 bytes in output sequence
+        -:   94: * boost::asio::streamBuf::mutable_buffers_type bufs = b.prepare(512);
+        -:   95: *
+        -:   96: * size_t n = sock.receive(bufs);
+        -:   97: *
+        -:   98: * // received data is "committed" from output sequence to input sequence
+        -:   99: * b.commit(n);
+        -:  100: *
+        -:  101: * std::istream is(&b);
+        -:  102: * std::string s;
+        -:  103: * is >> s;
+        -:  104: * @endcode
+        -:  105: */
+        -:  106:#if defined(GENERATING_DOCUMENTATION)
+        -:  107:template <typename Allocator = std::allocator<char> >
+        -:  108:#else
+        -:  109:template <typename Allocator>
+        -:  110:#endif
+        -:  111:class basic_streambuf
+        -:  112:  : public std::streamBuf,
+        -:  113:    private noncopyable
+        -:  114:{
+        -:  115:public:
+        -:  116:#if defined(GENERATING_DOCUMENTATION)
+        -:  117:  /// The type used to represent the input sequence as a list of buffers.
+        -:  118:  typedef implementation_defined const_buffers_type;
+        -:  119:
+        -:  120:  /// The type used to represent the output sequence as a list of buffers.
+        -:  121:  typedef implementation_defined mutable_buffers_type;
+        -:  122:#else
+        -:  123:  typedef BOOST_ASIO_CONST_BUFFER const_buffers_type;
+        -:  124:  typedef BOOST_ASIO_MUTABLE_BUFFER mutable_buffers_type;
+        -:  125:#endif
+        -:  126:
+        -:  127:  /// Construct a basic_streambuf object.
+        -:  128:  /**
+        -:  129:   * Constructs a streamBuf with the specified maximum size. The initial size
+        -:  130:   * of the streamBuf's input sequence is 0.
+        -:  131:   */
+        -:  132:  explicit basic_streambuf(
+        -:  133:      std::size_t maximum_size = (std::numeric_limits<std::size_t>::max)(),
+        -:  134:      const Allocator& allocator = Allocator())
+        -:  135:    : max_size_(maximum_size),
+        -:  136:      buffer_(allocator)
+        -:  137:  {
+        -:  138:    std::size_t pend = (std::min<std::size_t>)(max_size_, buffer_delta);
+        -:  139:    buffer_.resize((std::max<std::size_t>)(pend, 1));
+        -:  140:    setg(&buffer_[0], &buffer_[0], &buffer_[0]);
+        -:  141:    setp(&buffer_[0], &buffer_[0] + pend);
+        -:  142:  }
+        -:  143:
+        -:  144:  /// Get the size of the input sequence.
+        -:  145:  /**
+        -:  146:   * @returns The size of the input sequence. The value is equal to that
+        -:  147:   * calculated for @c s in the following code:
+        -:  148:   * @code
+        -:  149:   * size_t s = 0;
+        -:  150:   * const_buffers_type bufs = data();
+        -:  151:   * const_buffers_type::const_iterator i = bufs.begin();
+        -:  152:   * while (i != bufs.end())
+        -:  153:   * {
+        -:  154:   *   const_buffer buffer(*i++);
+        -:  155:   *   s += buffer.size();
+        -:  156:   * }
+        -:  157:   * @endcode
+        -:  158:   */
+        8:  159:  std::size_t size() const BOOST_ASIO_NOEXCEPT
+        -:  160:  {
+        8:  161:    return pptr() - gptr();
+        8:  161-block  0
+        -:  162:  }
+        -:  163:
+        -:  164:  /// Get the maximum size of the basic_streambuf.
+        -:  165:  /**
+        -:  166:   * @returns The allowed maximum of the sum of the sizes of the input sequence
+        -:  167:   * and output sequence.
+        -:  168:   */
+        4:  169:  std::size_t max_size() const BOOST_ASIO_NOEXCEPT
+        -:  170:  {
+        4:  171:    return max_size_;
+        4:  171-block  0
+        -:  172:  }
+        -:  173:
+        -:  174:  /// Get the current capacity of the basic_streambuf.
+        -:  175:  /**
+        -:  176:   * @returns The current total capacity of the streamBuf, i.e. for both the
+        -:  177:   * input sequence and output sequence.
+        -:  178:   */
+        3:  179:  std::size_t capacity() const BOOST_ASIO_NOEXCEPT
+        -:  180:  {
+        3:  181:    return buffer_.capacity();
+        3:  181-block  0
+        -:  182:  }
+        -:  183:
+        -:  184:  /// Get a list of buffers that represents the input sequence.
+        -:  185:  /**
+        -:  186:   * @returns An object of type @c const_buffers_type that satisfies
+        -:  187:   * ConstBufferSequence requirements, representing all character arrays in the
+        -:  188:   * input sequence.
+        -:  189:   *
+        -:  190:   * @note The returned object is invalidated by any @c basic_streambuf member
+        -:  191:   * function that modifies the input sequence or output sequence.
+        -:  192:   */
+        2:  193:  const_buffers_type data() const BOOST_ASIO_NOEXCEPT
+        -:  194:  {
+        4:  195:    return boost::asio::buffer(boost::asio::const_buffer(gptr(),
+        2:  195-block  0
+        4:  196:          (pptr() - gptr()) * sizeof(char_type)));
+        2:  196-block  0
+        -:  197:  }
+        -:  198:
+        -:  199:  /// Get a list of buffers that represents the output sequence, with the given
+        -:  200:  /// size.
+        -:  201:  /**
+        -:  202:   * Ensures that the output sequence can accommodate @c n characters,
+        -:  203:   * reallocating character array objects as necessary.
+        -:  204:   *
+        -:  205:   * @returns An object of type @c mutable_buffers_type that satisfies
+        -:  206:   * MutableBufferSequence requirements, representing character array objects
+        -:  207:   * at the start of the output sequence such that the sum of the buffer sizes
+        -:  208:   * is @c n.
+        -:  209:   *
+        -:  210:   * @throws std::length_error If <tt>size() + n > max_size()</tt>.
+        -:  211:   *
+        -:  212:   * @note The returned object is invalidated by any @c basic_streambuf member
+        -:  213:   * function that modifies the input sequence or output sequence.
+        -:  214:   */
+        2:  215:  mutable_buffers_type prepare(std::size_t n)
+        -:  216:  {
+        2:  217:    reserve(n);
+        2:  217-block  0
+        4:  218:    return boost::asio::buffer(boost::asio::mutable_buffer(
+        2:  218-block  0
+        4:  219:          pptr(), n * sizeof(char_type)));
+        -:  220:  }
+        -:  221:
+        -:  222:  /// Move characters from the output sequence to the input sequence.
+        -:  223:  /**
+        -:  224:   * Appends @c n characters from the start of the output sequence to the input
+        -:  225:   * sequence. The beginning of the output sequence is advanced by @c n
+        -:  226:   * characters.
+        -:  227:   *
+        -:  228:   * Requires a preceding call <tt>prepare(x)</tt> where <tt>x >= n</tt>, and
+        -:  229:   * no intervening operations that modify the input or output sequence.
+        -:  230:   *
+        -:  231:   * @note If @c n is greater than the size of the output sequence, the entire
+        -:  232:   * output sequence is moved to the input sequence and no error is issued.
+        -:  233:   */
+        2:  234:  void commit(std::size_t n)
+        -:  235:  {
+        2:  236:    n = std::min<std::size_t>(n, epptr() - pptr());
+        2:  236-block  0
+        2:  237:    pbump(static_cast<int>(n));
+        2:  238:    setg(eback(), gptr(), pptr());
+        2:  239:  }
+        -:  240:
+        -:  241:  /// Remove characters from the input sequence.
+        -:  242:  /**
+        -:  243:   * Removes @c n characters from the beginning of the input sequence.
+        -:  244:   *
+        -:  245:   * @note If @c n is greater than the size of the input sequence, the entire
+        -:  246:   * input sequence is consumed and no error is issued.
+        -:  247:   */
+        -:  248:  void consume(std::size_t n)
+        -:  249:  {
+        -:  250:    if (egptr() < pptr())
+        -:  251:      setg(&buffer_[0], gptr(), pptr());
+        -:  252:    if (gptr() + n > pptr())
+        -:  253:      n = pptr() - gptr();
+        -:  254:    gbump(static_cast<int>(n));
+        -:  255:  }
+        -:  256:
+        -:  257:protected:
+        -:  258:  enum { buffer_delta = 128 };
+        -:  259:
+        -:  260:  /// Override std::streamBuf behaviour.
+        -:  261:  /**
+        -:  262:   * Behaves according to the specification of @c std::streamBuf::underflow().
+        -:  263:   */
+        -:  264:  int_type underflow()
+        -:  265:  {
+        -:  266:    if (gptr() < pptr())
+        -:  267:    {
+        -:  268:      setg(&buffer_[0], gptr(), pptr());
+        -:  269:      return traits_type::to_int_type(*gptr());
+        -:  270:    }
+        -:  271:    else
+        -:  272:    {
+        -:  273:      return traits_type::eof();
+        -:  274:    }
+        -:  275:  }
+        -:  276:
+        -:  277:  /// Override std::streamBuf behaviour.
+        -:  278:  /**
+        -:  279:   * Behaves according to the specification of @c std::streamBuf::overflow(),
+        -:  280:   * with the specialisation that @c std::length_error is thrown if appending
+        -:  281:   * the character to the input sequence would require the condition
+        -:  282:   * <tt>size() > max_size()</tt> to be true.
+        -:  283:   */
+        -:  284:  int_type overflow(int_type c)
+        -:  285:  {
+        -:  286:    if (!traits_type::eq_int_type(c, traits_type::eof()))
+        -:  287:    {
+        -:  288:      if (pptr() == epptr())
+        -:  289:      {
+        -:  290:        std::size_t buffer_size = pptr() - gptr();
+        -:  291:        if (buffer_size < max_size_ && max_size_ - buffer_size < buffer_delta)
+        -:  292:        {
+        -:  293:          reserve(max_size_ - buffer_size);
+        -:  294:        }
+        -:  295:        else
+        -:  296:        {
+        -:  297:          reserve(buffer_delta);
+        -:  298:        }
+        -:  299:      }
+        -:  300:
+        -:  301:      *pptr() = traits_type::to_char_type(c);
+        -:  302:      pbump(1);
+        -:  303:      return c;
+        -:  304:    }
+        -:  305:
+        -:  306:    return traits_type::not_eof(c);
+        -:  307:  }
+        -:  308:
+    #####:  309:  void reserve(std::size_t n)
+        -:  310:  {
+        -:  311:    // Get current stream positions as offsets.
+    #####:  312:    std::size_t gnext = gptr() - &buffer_[0];
+    %%%%%:  312-block  0
+    %%%%%:  312-block  1
+    #####:  313:    std::size_t pnext = pptr() - &buffer_[0];
+    %%%%%:  313-block  0
+    #####:  314:    std::size_t pend = epptr() - &buffer_[0];
+    %%%%%:  314-block  0
+        -:  315:
+        -:  316:    // Check if there is already enough space in the put area.
+    #####:  317:    if (n <= pend - pnext)
+        -:  318:    {
+    #####:  319:      return;
+    %%%%%:  319-block  0
+        -:  320:    }
+        -:  321:
+        -:  322:    // Shift existing contents of get area to start of buffer.
+    #####:  323:    if (gnext > 0)
+    %%%%%:  323-block  0
+        -:  324:    {
+    #####:  325:      pnext -= gnext;
+    #####:  326:      std::memmove(&buffer_[0], &buffer_[0] + gnext, pnext);
+    %%%%%:  326-block  0
+        -:  327:    }
+        -:  328:
+        -:  329:    // Ensure buffer is large enough to hold at least the specified size.
+    #####:  330:    if (n > pend - pnext)
+    %%%%%:  330-block  0
+        -:  331:    {
+    #####:  332:      if (n <= max_size_ && pnext <= max_size_ - n)
+    %%%%%:  332-block  0
+    %%%%%:  332-block  1
+        -:  333:      {
+    #####:  334:        pend = pnext + n;
+    #####:  335:        buffer_.resize((std::max<std::size_t>)(pend, 1));
+    %%%%%:  335-block  0
+    %%%%%:  335-block  1
+    $$$$$:  335-block  2
+        -:  336:      }
+        -:  337:      else
+        -:  338:      {
+    #####:  339:        std::length_error ex("boost::asio::streamBuf too long");
+    %%%%%:  339-block  0
+    $$$$$:  339-block  1
+    #####:  340:        boost::asio::detail::throw_exception(ex);
+    %%%%%:  340-block  0
+        -:  341:      }
+        -:  342:    }
+        -:  343:
+        -:  344:    // Update stream positions.
+    #####:  345:    setg(&buffer_[0], &buffer_[0], &buffer_[0] + pnext);
+    %%%%%:  345-block  0
+    #####:  346:    setp(&buffer_[0] + pnext, &buffer_[0] + pend);
+    %%%%%:  346-block  0
+        -:  347:  }
+        -:  348:
+        -:  349:private:
+        -:  350:  std::size_t max_size_;
+        -:  351:  std::vector<char_type, Allocator> buffer_;
+        -:  352:
+        -:  353:  // Helper function to get the preferred size for reading data.
+        -:  354:  friend std::size_t read_size_helper(
+        -:  355:      basic_streambuf& sb, std::size_t max_size)
+        -:  356:  {
+        -:  357:    return std::min<std::size_t>(
+        -:  358:        std::max<std::size_t>(512, sb.buffer_.capacity() - sb.size()),
+        -:  359:        std::min<std::size_t>(max_size, sb.max_size() - sb.size()));
+        -:  360:  }
+        -:  361:};
+        -:  362:
+        -:  363:/// Adapts basic_streambuf to the dynamic buffer sequence type requirements.
+        -:  364:#if defined(GENERATING_DOCUMENTATION)
+        -:  365:template <typename Allocator = std::allocator<char> >
+        -:  366:#else
+        -:  367:template <typename Allocator>
+        -:  368:#endif
+        -:  369:class basic_streambuf_ref
+        -:  370:{
+        -:  371:public:
+        -:  372:  /// The type used to represent the input sequence as a list of buffers.
+        -:  373:  typedef typename basic_streambuf<Allocator>::const_buffers_type
+        -:  374:    const_buffers_type;
+        -:  375:
+        -:  376:  /// The type used to represent the output sequence as a list of buffers.
+        -:  377:  typedef typename basic_streambuf<Allocator>::mutable_buffers_type
+        -:  378:    mutable_buffers_type;
+        -:  379:
+        -:  380:  /// Construct a basic_streambuf_ref for the given basic_streambuf object.
+        2:  381:  explicit basic_streambuf_ref(basic_streambuf<Allocator>& sb)
+        2:  382:    : sb_(sb)
+        -:  383:  {
+        2:  384:  }
+        -:  385:
+        -:  386:  /// Copy construct a basic_streambuf_ref.
+        -:  387:  basic_streambuf_ref(const basic_streambuf_ref& other) BOOST_ASIO_NOEXCEPT
+        -:  388:    : sb_(other.sb_)
+        -:  389:  {
+        -:  390:  }
+        -:  391:
+        -:  392:#if defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+        -:  393:  /// Move construct a basic_streambuf_ref.
+        6:  394:  basic_streambuf_ref(basic_streambuf_ref&& other) BOOST_ASIO_NOEXCEPT
+        6:  395:    : sb_(other.sb_)
+        -:  396:  {
+        6:  397:  }
+        -:  398:#endif // defined(BOOST_ASIO_HAS_MOVE) || defined(GENERATING_DOCUMENTATION)
+        -:  399:
+        -:  400:  /// Get the size of the input sequence.
+        7:  401:  std::size_t size() const BOOST_ASIO_NOEXCEPT
+        -:  402:  {
+        7:  403:    return sb_.size();
+        7:  403-block  0
+        -:  404:  }
+        -:  405:
+        -:  406:  /// Get the maximum size of the dynamic buffer.
+        4:  407:  std::size_t max_size() const BOOST_ASIO_NOEXCEPT
+        -:  408:  {
+        4:  409:    return sb_.max_size();
+        4:  409-block  0
+        -:  410:  }
+        -:  411:
+        -:  412:  /// Get the current capacity of the dynamic buffer.
+        3:  413:  std::size_t capacity() const BOOST_ASIO_NOEXCEPT
+        -:  414:  {
+        3:  415:    return sb_.capacity();
+        3:  415-block  0
+        -:  416:  }
+        -:  417:
+        -:  418:  /// Get a list of buffers that represents the input sequence.
+        2:  419:  const_buffers_type data() const BOOST_ASIO_NOEXCEPT
+        -:  420:  {
+        2:  421:    return sb_.data();
+        2:  421-block  0
+        -:  422:  }
+        -:  423:
+        -:  424:  /// Get a list of buffers that represents the output sequence, with the given
+        -:  425:  /// size.
+        2:  426:  mutable_buffers_type prepare(std::size_t n)
+        -:  427:  {
+        2:  428:    return sb_.prepare(n);
+        2:  428-block  0
+        -:  429:  }
+        -:  430:
+        -:  431:  /// Move bytes from the output sequence to the input sequence.
+        2:  432:  void commit(std::size_t n)
+        -:  433:  {
+        2:  434:    return sb_.commit(n);
+        2:  434-block  0
+        -:  435:  }
+        -:  436:
+        -:  437:  /// Remove characters from the input sequence.
+        -:  438:  void consume(std::size_t n)
+        -:  439:  {
+        -:  440:    return sb_.consume(n);
+        -:  441:  }
+        -:  442:
+        -:  443:private:
+        -:  444:  basic_streambuf<Allocator>& sb_;
+        -:  445:};
+        -:  446:
+        -:  447:} // namespace asio
+        -:  448:} // namespace boost
+        -:  449:
+        -:  450:#include <boost/asio/detail/pop_options.hpp>
+        -:  451:
+        -:  452:#endif // !defined(BOOST_ASIO_NO_IOSTREAM)
+        -:  453:
+        -:  454:#endif // BOOST_ASIO_BASIC_STREAMBUF_HPP

@@ -1,0 +1,84 @@
+        -:    0:Source:/usr/include/boost/asio/detail/work_dispatcher.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// detail/work_dispatcher.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_DETAIL_WORK_DISPATCHER_HPP
+        -:   12:#define BOOST_ASIO_DETAIL_WORK_DISPATCHER_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <boost/asio/associated_executor.hpp>
+        -:   20:#include <boost/asio/associated_allocator.hpp>
+        -:   21:#include <boost/asio/executor_work_guard.hpp>
+        -:   22:
+        -:   23:#include <boost/asio/detail/push_options.hpp>
+        -:   24:
+        -:   25:namespace boost {
+        -:   26:namespace asio {
+        -:   27:namespace detail {
+        -:   28:
+        -:   29:template <typename Handler>
+        -:   30:class work_dispatcher
+        -:   31:{
+        -:   32:public:
+        -:   33:  template <typename CompletionHandler>
+    #####:   34:  explicit work_dispatcher(BOOST_ASIO_MOVE_ARG(CompletionHandler) handler)
+    #####:   35:    : work_((get_associated_executor)(handler)),
+    #####:   36:      handler_(BOOST_ASIO_MOVE_CAST(CompletionHandler)(handler))
+    %%%%%:   36-block  0
+        -:   37:  {
+    #####:   38:  }
+        -:   39:
+        -:   40:#if defined(BOOST_ASIO_HAS_MOVE)
+        -:   41:  work_dispatcher(const work_dispatcher& other)
+        -:   42:    : work_(other.work_),
+        -:   43:      handler_(other.handler_)
+        -:   44:  {
+        -:   45:  }
+        -:   46:
+    #####:   47:  work_dispatcher(work_dispatcher&& other)
+        -:   48:    : work_(BOOST_ASIO_MOVE_CAST(executor_work_guard<
+    #####:   49:        typename associated_executor<Handler>::type>)(other.work_)),
+    #####:   50:      handler_(BOOST_ASIO_MOVE_CAST(Handler)(other.handler_))
+    %%%%%:   50-block  0
+        -:   51:  {
+    #####:   52:  }
+        -:   53:#endif // defined(BOOST_ASIO_HAS_MOVE)
+        -:   54:
+    #####:   55:  void operator()()
+        -:   56:  {
+        -:   57:    typename associated_allocator<Handler>::type alloc(
+    #####:   58:        (get_associated_allocator)(handler_));
+    %%%%%:   58-block  0
+    #####:   59:    work_.get_executor().dispatch(
+    $$$$$:   59-block  0
+    #####:   60:        BOOST_ASIO_MOVE_CAST(Handler)(handler_), alloc);
+    #####:   61:    work_.reset();
+    %%%%%:   61-block  0
+    #####:   62:  }
+        -:   63:
+        -:   64:private:
+        -:   65:  executor_work_guard<typename associated_executor<Handler>::type> work_;
+        -:   66:  Handler handler_;
+        -:   67:};
+        -:   68:
+        -:   69:} // namespace detail
+        -:   70:} // namespace asio
+        -:   71:} // namespace boost
+        -:   72:
+        -:   73:#include <boost/asio/detail/pop_options.hpp>
+        -:   74:
+        -:   75:#endif // BOOST_ASIO_DETAIL_WORK_DISPATCHER_HPP

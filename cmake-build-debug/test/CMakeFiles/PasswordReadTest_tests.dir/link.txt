@@ -1,0 +1,1 @@
+/usr/bin/c++   --coverage -fprofile-arcs -ftest-coverage -g   CMakeFiles/PasswordReadTest_tests.dir/PasswordReadTest.cpp.o CMakeFiles/PasswordReadTest_tests.dir/main.cpp.o  -o PasswordReadTest_tests  ../googletest-build/googlemock/gtest/libgtestd.a -pthread 

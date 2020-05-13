@@ -1,0 +1,121 @@
+        -:    0:Source:/usr/include/boost/asio/detail/executor_op.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/src/main.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/src/main.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// detail/executor_op.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_DETAIL_EXECUTOR_OP_HPP
+        -:   12:#define BOOST_ASIO_DETAIL_EXECUTOR_OP_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <boost/asio/detail/fenced_block.hpp>
+        -:   20:#include <boost/asio/detail/handler_alloc_helpers.hpp>
+        -:   21:#include <boost/asio/detail/handler_invoke_helpers.hpp>
+        -:   22:#include <boost/asio/detail/scheduler_operation.hpp>
+        -:   23:
+        -:   24:#include <boost/asio/detail/push_options.hpp>
+        -:   25:
+        -:   26:namespace boost {
+        -:   27:namespace asio {
+        -:   28:namespace detail {
+        -:   29:
+        -:   30:template <typename Handler, typename Alloc,
+        -:   31:    typename Operation = scheduler_operation>
+        -:   32:class executor_op : public Operation
+        -:   33:{
+        -:   34:public:
+    #####:   35:  BOOST_ASIO_DEFINE_HANDLER_ALLOCATOR_PTR(executor_op);
+------------------
+_ZN5boost4asio6detail11executor_opINS0_8executor8functionESaIvENS1_19scheduler_operationEE3ptr5resetEv:
+    #####:   35:  BOOST_ASIO_DEFINE_HANDLER_ALLOCATOR_PTR(executor_op);
+    %%%%%:   35-block  0
+    %%%%%:   35-block  1
+    %%%%%:   35-block  2
+    %%%%%:   35-block  3
+    %%%%%:   35-block  4
+    %%%%%:   35-block  5
+    %%%%%:   35-block  6
+------------------
+_ZN5boost4asio6detail11executor_opINS0_8executor8functionESaIvENS1_19scheduler_operationEE3ptrD2Ev:
+    #####:   35:  BOOST_ASIO_DEFINE_HANDLER_ALLOCATOR_PTR(executor_op);
+    %%%%%:   35-block  0
+------------------
+_ZN5boost4asio6detail11executor_opINS0_8executor8functionESaIvENS1_19scheduler_operationEE3ptr8allocateERKS5_:
+    #####:   35:  BOOST_ASIO_DEFINE_HANDLER_ALLOCATOR_PTR(executor_op);
+    %%%%%:   35-block  0
+    %%%%%:   35-block  1
+    %%%%%:   35-block  2
+    %%%%%:   35-block  3
+------------------
+        -:   36:
+        -:   37:  template <typename H>
+    #####:   38:  executor_op(BOOST_ASIO_MOVE_ARG(H) h, const Alloc& allocator)
+        -:   39:    : Operation(&executor_op::do_complete),
+        -:   40:      handler_(BOOST_ASIO_MOVE_CAST(H)(h)),
+    #####:   41:      allocator_(allocator)
+    %%%%%:   41-block  0
+        -:   42:  {
+    #####:   43:  }
+        -:   44:
+    #####:   45:  static void do_complete(void* owner, Operation* base,
+        -:   46:      const boost::system::error_code& /*ec*/,
+        -:   47:      std::size_t /*bytes_transferred*/)
+        -:   48:  {
+        -:   49:    // Take ownership of the handler object.
+    #####:   50:    executor_op* o(static_cast<executor_op*>(base));
+        -:   51:    Alloc allocator(o->allocator_);
+    #####:   52:    ptr p = { detail::addressof(allocator), o, o };
+    %%%%%:   52-block  0
+    $$$$$:   52-block  1
+        -:   53:
+        -:   54:    BOOST_ASIO_HANDLER_COMPLETION((*o));
+        -:   55:
+        -:   56:    // Make a copy of the handler so that the memory can be deallocated before
+        -:   57:    // the upcall is made. Even if we're not about to make an upcall, a
+        -:   58:    // sub-object of the handler may be the true owner of the memory associated
+        -:   59:    // with the handler. Consequently, a local copy of the handler is required
+        -:   60:    // to ensure that any owning sub-object remains valid until after we have
+        -:   61:    // deallocated the memory here.
+    #####:   62:    Handler handler(BOOST_ASIO_MOVE_CAST(Handler)(o->handler_));
+    %%%%%:   62-block  0
+    $$$$$:   62-block  1
+    #####:   63:    p.reset();
+        -:   64:
+        -:   65:    // Make the upcall if required.
+    #####:   66:    if (owner)
+    %%%%%:   66-block  0
+        -:   67:    {
+    #####:   68:      fenced_block b(fenced_block::half);
+    %%%%%:   68-block  0
+    %%%%%:   68-block  1
+    $$$$$:   68-block  2
+        -:   69:      BOOST_ASIO_HANDLER_INVOCATION_BEGIN(());
+    #####:   70:      boost_asio_handler_invoke_helpers::invoke(handler, handler);
+        -:   71:      BOOST_ASIO_HANDLER_INVOCATION_END;
+        -:   72:    }
+    #####:   73:  }
+        -:   74:
+        -:   75:private:
+        -:   76:  Handler handler_;
+        -:   77:  Alloc allocator_;
+        -:   78:};
+        -:   79:
+        -:   80:} // namespace detail
+        -:   81:} // namespace asio
+        -:   82:} // namespace boost
+        -:   83:
+        -:   84:#include <boost/asio/detail/pop_options.hpp>
+        -:   85:
+        -:   86:#endif // BOOST_ASIO_DETAIL_EXECUTOR_OP_HPP

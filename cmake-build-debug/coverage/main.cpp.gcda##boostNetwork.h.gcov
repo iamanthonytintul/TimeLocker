@@ -1,0 +1,88 @@
+        -:    0:Source:/home/anthonytintul/CLionProjects/TLConsoleApplication/include/boostNetwork.h
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/src/main.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/src/main.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// Created by anthonytintul on 12.05.2020.
+        -:    3://
+        -:    4:
+        -:    5:#ifndef TLCONSOLEAPPLICATION_BOOSTNETWORK_H
+        -:    6:#define TLCONSOLEAPPLICATION_BOOSTNETWORK_H
+        -:    7:
+        -:    8:#include <iostream>
+        -:    9:#include <fstream>
+        -:   10:#include <string>
+        -:   11:#include <boost/asio.hpp>
+        -:   12:#include <boost/regex.hpp>
+        -:   13:#include <boost/filesystem.hpp>
+        -:   14:#include <cstdlib>
+        -:   15:#include <algorithm>
+        -:   16:#include <filesystem>
+        -:   17:#include <random>
+        -:   18://#include <iterator>
+        -:   19:#include "Client.h"
+        -:   20:
+        -:   21:
+        -:   22:using std::cin;
+        -:   23:using std::cout;
+        -:   24:
+        -:   25:
+        -:   26:class BoostNetworkClient {
+        -:   27:public:
+        1:   28:    BoostNetworkClient(char mode)
+        1:   29:            : modeReadWrite(mode){}
+        1:   29-block  0
+        1:   29-block  1
+        1:   29-block  2
+        1:   29-block  3
+        1:   29-block  4
+        1:   29-block  5
+    $$$$$:   29-block  6
+    $$$$$:   29-block  7
+    $$$$$:   29-block  8
+    $$$$$:   29-block  9
+    $$$$$:   29-block 10
+    $$$$$:   29-block 11
+    $$$$$:   29-block 12
+    $$$$$:   29-block 13
+        -:   30:
+        -:   31:    void manageConnection();
+        -:   32:
+        -:   33:private:
+        -:   34:    boost::asio::io_service ioService;
+        -:   35:    boost::asio::ip::tcp::socket sock {ioService};
+        -:   36:    boost::asio::ip::tcp::endpoint endPoint;
+        -:   37:    char modeReadWrite;
+        -:   38:    boost::asio::streamBuf streamBuf;
+        -:   39:    std::istream inputStreamFromBuf{&streamBuf};
+        -:   40:    std::size_t sizeOfBody{0};
+        -:   41:    std::ofstream outputFileStream;
+        -:   42:    char buffer[BUF_SIZE];
+        -:   43:    std::string header;
+        -:   44:    std::ifstream inputFileStream;
+        -:   45:    unsigned long long fileSize;
+        -:   46:    unsigned long long sentFileBody = 0;
+        -:   47:
+        -:   48:    void handleConnection(boost::system::error_code const &errorCode);
+        -:   49:
+        -:   50:    void handleReadHeader(boost::system::error_code const &errorCode, std::size_t bytesTransferred);
+        -:   51:
+        -:   52:    void handleReadBody(boost::system::error_code const &errorCode, std::size_t bytesTransferred);
+        -:   53:
+        -:   54:    void handleWriteHeader(boost::system::error_code const &errorCode, std::size_t bytesTransferred);
+        -:   55:
+        -:   56:    void handleWriteBody(boost::system::error_code const &errorCode, std::size_t bytesTransferred);
+        -:   57:
+        -:   58:    void cleanUp();
+        -:   59:};
+        -:   60://
+        -:   61://class AbstractRecieveFileClient {
+        -:   62://
+        -:   63://
+        -:   64://
+        -:   65://};
+        -:   66://
+        -:   67://class RecieveFileClient;
+        -:   68://class SendFileClient;
+        -:   69:
+        -:   70:#endif //TLCONSOLEAPPLICATION_BOOSTNETWORK_H

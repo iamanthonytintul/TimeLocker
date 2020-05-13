@@ -1,0 +1,755 @@
+        -:    0:Source:/usr/include/boost/asio/detail/handler_alloc_helpers.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// detail/handler_alloc_helpers.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_DETAIL_HANDLER_ALLOC_HELPERS_HPP
+        -:   12:#define BOOST_ASIO_DETAIL_HANDLER_ALLOC_HELPERS_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <boost/asio/detail/memory.hpp>
+        -:   20:#include <boost/asio/detail/noncopyable.hpp>
+        -:   21:#include <boost/asio/detail/recycling_allocator.hpp>
+        -:   22:#include <boost/asio/associated_allocator.hpp>
+        -:   23:#include <boost/asio/handler_alloc_hook.hpp>
+        -:   24:
+        -:   25:#include <boost/asio/detail/push_options.hpp>
+        -:   26:
+        -:   27:// Calls to asio_handler_allocate and asio_handler_deallocate must be made from
+        -:   28:// a namespace that does not contain any overloads of these functions. The
+        -:   29:// boost_asio_handler_alloc_helpers namespace is defined here for that purpose.
+        -:   30:namespace boost_asio_handler_alloc_helpers {
+        -:   31:
+        -:   32:template <typename Handler>
+       7*:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+       7*:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIZN18BoostNetworkClient16handleConnectionERKN5boost6system10error_codeEEUlS6_mE_EEPvmRT_:
+        1:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+        1:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+        1:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIZN18BoostNetworkClient17handleWriteHeaderERKN5boost6system10error_codeEmEUlS6_mE0_EEPvmRT_:
+    #####:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+    #####:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+    %%%%%:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIZN18BoostNetworkClient15handleWriteBodyERKN5boost6system10error_codeEmEUlS6_mE_EEPvmRT_:
+    #####:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+    #####:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+    %%%%%:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIZN18BoostNetworkClient17handleWriteHeaderERKN5boost6system10error_codeEmEUlS6_mE_EEPvmRT_:
+        1:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+        1:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+        1:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIZN18BoostNetworkClient16handleReadHeaderERKN5boost6system10error_codeEmEUlS6_mE_EEPvmRT_:
+        1:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+        1:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+        1:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIZN18BoostNetworkClient14handleReadBodyERKN5boost6system10error_codeEmEUlS6_mE_EEPvmRT_:
+    #####:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+    #####:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+    %%%%%:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIN5boost4asio6detail8write_opINS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_17mutable_buffers_1EPKNS2_14mutable_bufferENS3_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS1_6system10error_codeEEUlSJ_mE_EEEEPvmRT_:
+        1:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+        1:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+        1:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIN5boost4asio6detail8write_opINS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_17mutable_buffers_1EPKNS2_14mutable_bufferENS3_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS1_6system10error_codeEmEUlSJ_mE0_EEEEPvmRT_:
+    #####:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+    #####:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+    %%%%%:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIN5boost4asio6detail8write_opINS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_17mutable_buffers_1EPKNS2_14mutable_bufferENS3_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS1_6system10error_codeEmEUlSJ_mE_EEEEPvmRT_:
+    #####:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+    #####:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+    %%%%%:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIN5boost4asio6detail29read_until_delim_string_op_v1INS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS1_6system10error_codeEmEUlSH_mE_EEEEPvmRT_:
+        1:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+        1:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+        1:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIN5boost4asio6detail17read_dynbuf_v1_opINS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_19basic_streambuf_refISaIcEEENS3_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS1_6system10error_codeEmEUlSI_mE_EEEEPvmRT_:
+        1:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+        1:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+        1:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIN5boost4asio6detail17read_dynbuf_v1_opINS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_19basic_streambuf_refISaIcEEENS3_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS1_6system10error_codeEmEUlSI_mE_EEEEPvmRT_:
+    #####:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+    #####:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+    %%%%%:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers8allocateIZN18BoostNetworkClient16manageConnectionEvEUlRKN5boost6system10error_codeEE_EEPvmRT_:
+        1:   33:inline void* allocate(std::size_t s, Handler& h)
+        -:   34:{
+        -:   35:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   36:  return ::operator new(s);
+        -:   37:#else
+        -:   38:  using boost::asio::asio_handler_allocate;
+        1:   39:  return asio_handler_allocate(s, boost::asio::detail::addressof(h));
+        1:   39-block  0
+        -:   40:#endif
+        -:   41:}
+------------------
+        -:   42:
+        -:   43:template <typename Handler>
+       7*:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+       7*:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+        -:   51:#endif
+       7*:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIZN18BoostNetworkClient16handleConnectionERKN5boost6system10error_codeEEUlS6_mE_EEvPvmRT_:
+        1:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+        1:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+        1:   50-block  0
+        -:   51:#endif
+        1:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIZN18BoostNetworkClient17handleWriteHeaderERKN5boost6system10error_codeEmEUlS6_mE0_EEvPvmRT_:
+    #####:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+    #####:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+    %%%%%:   50-block  0
+        -:   51:#endif
+    #####:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIZN18BoostNetworkClient15handleWriteBodyERKN5boost6system10error_codeEmEUlS6_mE_EEvPvmRT_:
+    #####:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+    #####:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+    %%%%%:   50-block  0
+        -:   51:#endif
+    #####:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIZN18BoostNetworkClient17handleWriteHeaderERKN5boost6system10error_codeEmEUlS6_mE_EEvPvmRT_:
+        1:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+        1:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+        1:   50-block  0
+        -:   51:#endif
+        1:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIZN18BoostNetworkClient16handleReadHeaderERKN5boost6system10error_codeEmEUlS6_mE_EEvPvmRT_:
+        1:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+        1:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+        1:   50-block  0
+        -:   51:#endif
+        1:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIZN18BoostNetworkClient14handleReadBodyERKN5boost6system10error_codeEmEUlS6_mE_EEvPvmRT_:
+    #####:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+    #####:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+    %%%%%:   50-block  0
+        -:   51:#endif
+    #####:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIN5boost4asio6detail8write_opINS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_17mutable_buffers_1EPKNS2_14mutable_bufferENS3_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS1_6system10error_codeEEUlSJ_mE_EEEEvPvmRT_:
+        1:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+        1:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+        1:   50-block  0
+        -:   51:#endif
+        1:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIN5boost4asio6detail8write_opINS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_17mutable_buffers_1EPKNS2_14mutable_bufferENS3_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS1_6system10error_codeEmEUlSJ_mE0_EEEEvPvmRT_:
+    #####:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+    #####:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+    %%%%%:   50-block  0
+        -:   51:#endif
+    #####:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIN5boost4asio6detail8write_opINS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_17mutable_buffers_1EPKNS2_14mutable_bufferENS3_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS1_6system10error_codeEmEUlSJ_mE_EEEEvPvmRT_:
+    #####:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+    #####:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+    %%%%%:   50-block  0
+        -:   51:#endif
+    #####:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIN5boost4asio6detail29read_until_delim_string_op_v1INS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS1_6system10error_codeEmEUlSH_mE_EEEEvPvmRT_:
+        1:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+        1:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+        1:   50-block  0
+        -:   51:#endif
+        1:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIN5boost4asio6detail17read_dynbuf_v1_opINS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_19basic_streambuf_refISaIcEEENS3_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS1_6system10error_codeEmEUlSI_mE_EEEEvPvmRT_:
+        1:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+        1:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+        1:   50-block  0
+        -:   51:#endif
+        1:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIN5boost4asio6detail17read_dynbuf_v1_opINS2_19basic_stream_socketINS2_2ip3tcpENS2_8executorEEENS2_19basic_streambuf_refISaIcEEENS3_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS1_6system10error_codeEmEUlSI_mE_EEEEvPvmRT_:
+    #####:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+    #####:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+    %%%%%:   50-block  0
+        -:   51:#endif
+    #####:   52:}
+------------------
+_ZN32boost_asio_handler_alloc_helpers10deallocateIZN18BoostNetworkClient16manageConnectionEvEUlRKN5boost6system10error_codeEE_EEvPvmRT_:
+        1:   44:inline void deallocate(void* p, std::size_t s, Handler& h)
+        -:   45:{
+        -:   46:#if !defined(BOOST_ASIO_HAS_HANDLER_HOOKS)
+        -:   47:  ::operator delete(p);
+        -:   48:#else
+        -:   49:  using boost::asio::asio_handler_deallocate;
+        1:   50:  asio_handler_deallocate(p, s, boost::asio::detail::addressof(h));
+        1:   50-block  0
+        -:   51:#endif
+        1:   52:}
+------------------
+        -:   53:
+        -:   54:} // namespace boost_asio_handler_alloc_helpers
+        -:   55:
+        -:   56:namespace boost {
+        -:   57:namespace asio {
+        -:   58:namespace detail {
+        -:   59:
+        -:   60:template <typename Handler, typename T>
+        -:   61:class hook_allocator
+        -:   62:{
+        -:   63:public:
+        -:   64:  typedef T value_type;
+        -:   65:
+        -:   66:  template <typename U>
+        -:   67:  struct rebind
+        -:   68:  {
+        -:   69:    typedef hook_allocator<Handler, U> other;
+        -:   70:  };
+        -:   71:
+        -:   72:  explicit hook_allocator(Handler& h)
+        -:   73:    : handler_(h)
+        -:   74:  {
+        -:   75:  }
+        -:   76:
+        -:   77:  template <typename U>
+       8*:   78:  hook_allocator(const hook_allocator<Handler, U>& a)
+       8*:   79:    : handler_(a.handler_)
+        -:   80:  {
+       8*:   81:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlSI_mE_EENS1_23reactive_socket_send_opINS0_15const_buffers_1ESK_NS1_18io_object_executorIS7_EEEEEC2IvEERKNS2_ISK_T_EE:
+        2:   78:  hook_allocator(const hook_allocator<Handler, U>& a)
+        2:   79:    : handler_(a.handler_)
+        -:   80:  {
+        2:   81:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSI_mE0_EENS1_23reactive_socket_send_opINS0_15const_buffers_1ESK_NS1_18io_object_executorIS7_EEEEEC2IvEERKNS2_ISK_T_EE:
+    #####:   78:  hook_allocator(const hook_allocator<Handler, U>& a)
+    #####:   79:    : handler_(a.handler_)
+        -:   80:  {
+    #####:   81:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_23reactive_socket_send_opINS0_15const_buffers_1ESK_NS1_18io_object_executorIS7_EEEEEC2IvEERKNS2_ISK_T_EE:
+    #####:   78:  hook_allocator(const hook_allocator<Handler, U>& a)
+    #####:   79:    : handler_(a.handler_)
+        -:   80:  {
+    #####:   81:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSG_mE_EENS1_23reactive_socket_recv_opINS0_17mutable_buffers_1ESI_NS1_18io_object_executorIS7_EEEEEC2IvEERKNS2_ISI_T_EE:
+        2:   78:  hook_allocator(const hook_allocator<Handler, U>& a)
+        2:   79:    : handler_(a.handler_)
+        -:   80:  {
+        2:   81:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_23reactive_socket_recv_opINS0_17mutable_buffers_1ESJ_NS1_18io_object_executorIS7_EEEEEC2IvEERKNS2_ISJ_T_EE:
+        2:   78:  hook_allocator(const hook_allocator<Handler, U>& a)
+        2:   79:    : handler_(a.handler_)
+        -:   80:  {
+        2:   81:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSH_mE_EENS1_23reactive_socket_recv_opINS0_17mutable_buffers_1ESJ_NS1_18io_object_executorIS7_EEEEEC2IvEERKNS2_ISJ_T_EE:
+    #####:   78:  hook_allocator(const hook_allocator<Handler, U>& a)
+    #####:   79:    : handler_(a.handler_)
+        -:   80:  {
+    #####:   81:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_NS1_26reactive_socket_connect_opIS8_NS1_18io_object_executorINS0_8executorEEEEEEC2IvEERKNS2_IS8_T_EE:
+        2:   78:  hook_allocator(const hook_allocator<Handler, U>& a)
+        2:   79:    : handler_(a.handler_)
+        -:   80:  {
+        2:   81:  }
+------------------
+        -:   82:
+       4*:   83:  T* allocate(std::size_t n)
+        -:   84:  {
+        -:   85:    return static_cast<T*>(
+       4*:   86:        boost_asio_handler_alloc_helpers::allocate(sizeof(T) * n, handler_));
+        -:   87:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlSI_mE_EENS1_23reactive_socket_send_opINS0_15const_buffers_1ESK_NS1_18io_object_executorIS7_EEEEE8allocateEm:
+        1:   83:  T* allocate(std::size_t n)
+        -:   84:  {
+        -:   85:    return static_cast<T*>(
+        1:   86:        boost_asio_handler_alloc_helpers::allocate(sizeof(T) * n, handler_));
+        1:   86-block  0
+        -:   87:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSI_mE0_EENS1_23reactive_socket_send_opINS0_15const_buffers_1ESK_NS1_18io_object_executorIS7_EEEEE8allocateEm:
+    #####:   83:  T* allocate(std::size_t n)
+        -:   84:  {
+        -:   85:    return static_cast<T*>(
+    #####:   86:        boost_asio_handler_alloc_helpers::allocate(sizeof(T) * n, handler_));
+    %%%%%:   86-block  0
+        -:   87:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_23reactive_socket_send_opINS0_15const_buffers_1ESK_NS1_18io_object_executorIS7_EEEEE8allocateEm:
+    #####:   83:  T* allocate(std::size_t n)
+        -:   84:  {
+        -:   85:    return static_cast<T*>(
+    #####:   86:        boost_asio_handler_alloc_helpers::allocate(sizeof(T) * n, handler_));
+    %%%%%:   86-block  0
+        -:   87:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSG_mE_EENS1_23reactive_socket_recv_opINS0_17mutable_buffers_1ESI_NS1_18io_object_executorIS7_EEEEE8allocateEm:
+        1:   83:  T* allocate(std::size_t n)
+        -:   84:  {
+        -:   85:    return static_cast<T*>(
+        1:   86:        boost_asio_handler_alloc_helpers::allocate(sizeof(T) * n, handler_));
+        1:   86-block  0
+        -:   87:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_23reactive_socket_recv_opINS0_17mutable_buffers_1ESJ_NS1_18io_object_executorIS7_EEEEE8allocateEm:
+        1:   83:  T* allocate(std::size_t n)
+        -:   84:  {
+        -:   85:    return static_cast<T*>(
+        1:   86:        boost_asio_handler_alloc_helpers::allocate(sizeof(T) * n, handler_));
+        1:   86-block  0
+        -:   87:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSH_mE_EENS1_23reactive_socket_recv_opINS0_17mutable_buffers_1ESJ_NS1_18io_object_executorIS7_EEEEE8allocateEm:
+    #####:   83:  T* allocate(std::size_t n)
+        -:   84:  {
+        -:   85:    return static_cast<T*>(
+    #####:   86:        boost_asio_handler_alloc_helpers::allocate(sizeof(T) * n, handler_));
+    %%%%%:   86-block  0
+        -:   87:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_NS1_26reactive_socket_connect_opIS8_NS1_18io_object_executorINS0_8executorEEEEEE8allocateEm:
+        1:   83:  T* allocate(std::size_t n)
+        -:   84:  {
+        -:   85:    return static_cast<T*>(
+        1:   86:        boost_asio_handler_alloc_helpers::allocate(sizeof(T) * n, handler_));
+        1:   86-block  0
+        -:   87:  }
+------------------
+        -:   88:
+       4*:   89:  void deallocate(T* p, std::size_t n)
+        -:   90:  {
+       4*:   91:    boost_asio_handler_alloc_helpers::deallocate(p, sizeof(T) * n, handler_);
+       4*:   92:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlSI_mE_EENS1_23reactive_socket_send_opINS0_15const_buffers_1ESK_NS1_18io_object_executorIS7_EEEEE10deallocateEPSP_m:
+        1:   89:  void deallocate(T* p, std::size_t n)
+        -:   90:  {
+        1:   91:    boost_asio_handler_alloc_helpers::deallocate(p, sizeof(T) * n, handler_);
+        1:   91-block  0
+        1:   92:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSI_mE0_EENS1_23reactive_socket_send_opINS0_15const_buffers_1ESK_NS1_18io_object_executorIS7_EEEEE10deallocateEPSP_m:
+    #####:   89:  void deallocate(T* p, std::size_t n)
+        -:   90:  {
+    #####:   91:    boost_asio_handler_alloc_helpers::deallocate(p, sizeof(T) * n, handler_);
+    %%%%%:   91-block  0
+    #####:   92:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_23reactive_socket_send_opINS0_15const_buffers_1ESK_NS1_18io_object_executorIS7_EEEEE10deallocateEPSP_m:
+    #####:   89:  void deallocate(T* p, std::size_t n)
+        -:   90:  {
+    #####:   91:    boost_asio_handler_alloc_helpers::deallocate(p, sizeof(T) * n, handler_);
+    %%%%%:   91-block  0
+    #####:   92:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSG_mE_EENS1_23reactive_socket_recv_opINS0_17mutable_buffers_1ESI_NS1_18io_object_executorIS7_EEEEE10deallocateEPSN_m:
+        1:   89:  void deallocate(T* p, std::size_t n)
+        -:   90:  {
+        1:   91:    boost_asio_handler_alloc_helpers::deallocate(p, sizeof(T) * n, handler_);
+        1:   91-block  0
+        1:   92:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_23reactive_socket_recv_opINS0_17mutable_buffers_1ESJ_NS1_18io_object_executorIS7_EEEEE10deallocateEPSO_m:
+        1:   89:  void deallocate(T* p, std::size_t n)
+        -:   90:  {
+        1:   91:    boost_asio_handler_alloc_helpers::deallocate(p, sizeof(T) * n, handler_);
+        1:   91-block  0
+        1:   92:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSH_mE_EENS1_23reactive_socket_recv_opINS0_17mutable_buffers_1ESJ_NS1_18io_object_executorIS7_EEEEE10deallocateEPSO_m:
+    #####:   89:  void deallocate(T* p, std::size_t n)
+        -:   90:  {
+    #####:   91:    boost_asio_handler_alloc_helpers::deallocate(p, sizeof(T) * n, handler_);
+    %%%%%:   91-block  0
+    #####:   92:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_NS1_26reactive_socket_connect_opIS8_NS1_18io_object_executorINS0_8executorEEEEEE10deallocateEPSD_m:
+        1:   89:  void deallocate(T* p, std::size_t n)
+        -:   90:  {
+        1:   91:    boost_asio_handler_alloc_helpers::deallocate(p, sizeof(T) * n, handler_);
+        1:   91-block  0
+        1:   92:  }
+------------------
+        -:   93:
+        -:   94://private:
+        -:   95:  Handler& handler_;
+        -:   96:};
+        -:   97:
+        -:   98:template <typename Handler>
+        -:   99:class hook_allocator<Handler, void>
+        -:  100:{
+        -:  101:public:
+        -:  102:  typedef void value_type;
+        -:  103:
+        -:  104:  template <typename U>
+        -:  105:  struct rebind
+        -:  106:  {
+        -:  107:    typedef hook_allocator<Handler, U> other;
+        -:  108:  };
+        -:  109:
+       8*:  110:  explicit hook_allocator(Handler& h)
+       8*:  111:    : handler_(h)
+        -:  112:  {
+       8*:  113:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlSI_mE_EEvEC2ERSK_:
+        2:  110:  explicit hook_allocator(Handler& h)
+        2:  111:    : handler_(h)
+        -:  112:  {
+        2:  113:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSI_mE0_EEvEC2ERSK_:
+    #####:  110:  explicit hook_allocator(Handler& h)
+    #####:  111:    : handler_(h)
+        -:  112:  {
+    #####:  113:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlSI_mE_EEvEC2ERSK_:
+    #####:  110:  explicit hook_allocator(Handler& h)
+    #####:  111:    : handler_(h)
+        -:  112:  {
+    #####:  113:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSG_mE_EEvEC2ERSI_:
+        2:  110:  explicit hook_allocator(Handler& h)
+        2:  111:    : handler_(h)
+        -:  112:  {
+        2:  113:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSH_mE_EEvEC2ERSJ_:
+        2:  110:  explicit hook_allocator(Handler& h)
+        2:  111:    : handler_(h)
+        -:  112:  {
+        2:  113:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSH_mE_EEvEC2ERSJ_:
+    #####:  110:  explicit hook_allocator(Handler& h)
+    #####:  111:    : handler_(h)
+        -:  112:  {
+    #####:  113:  }
+------------------
+_ZN5boost4asio6detail14hook_allocatorIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_vEC2ERS8_:
+        2:  110:  explicit hook_allocator(Handler& h)
+        2:  111:    : handler_(h)
+        -:  112:  {
+        2:  113:  }
+------------------
+        -:  114:
+        -:  115:  template <typename U>
+        -:  116:  hook_allocator(const hook_allocator<Handler, U>& a)
+        -:  117:    : handler_(a.handler_)
+        -:  118:  {
+        -:  119:  }
+        -:  120:
+        -:  121://private:
+        -:  122:  Handler& handler_;
+        -:  123:};
+        -:  124:
+        -:  125:template <typename Handler, typename Allocator>
+        -:  126:struct get_hook_allocator
+        -:  127:{
+        -:  128:  typedef Allocator type;
+        -:  129:
+        -:  130:  static type get(Handler&, const Allocator& a)
+        -:  131:  {
+        -:  132:    return a;
+        -:  133:  }
+        -:  134:};
+        -:  135:
+        -:  136:template <typename Handler, typename T>
+        -:  137:struct get_hook_allocator<Handler, std::allocator<T> >
+        -:  138:{
+        -:  139:  typedef hook_allocator<Handler, T> type;
+        -:  140:
+       8*:  141:  static type get(Handler& handler, const std::allocator<T>&)
+        -:  142:  {
+       8*:  143:    return type(handler);
+        -:  144:  }
+        -:  145:};
+        -:  146:
+        -:  147:} // namespace detail
+        -:  148:} // namespace asio
+        -:  149:} // namespace boost
+        -:  150:
+        -:  151:#define BOOST_ASIO_DEFINE_HANDLER_PTR(op) \
+        -:  152:  struct ptr \
+        -:  153:  { \
+        -:  154:    Handler* h; \
+        -:  155:    op* v; \
+        -:  156:    op* p; \
+        -:  157:    ~ptr() \
+        -:  158:    { \
+        -:  159:      reset(); \
+        -:  160:    } \
+        -:  161:    static op* allocate(Handler& handler) \
+        -:  162:    { \
+        -:  163:      typedef typename ::boost::asio::associated_allocator< \
+        -:  164:        Handler>::type associated_allocator_type; \
+        -:  165:      typedef typename ::boost::asio::detail::get_hook_allocator< \
+        -:  166:        Handler, associated_allocator_type>::type hook_allocator_type; \
+        -:  167:      BOOST_ASIO_REBIND_ALLOC(hook_allocator_type, op) a( \
+        -:  168:            ::boost::asio::detail::get_hook_allocator< \
+        -:  169:              Handler, associated_allocator_type>::get( \
+        -:  170:                handler, ::boost::asio::get_associated_allocator(handler))); \
+        -:  171:      return a.allocate(1); \
+        -:  172:    } \
+        -:  173:    void reset() \
+        -:  174:    { \
+        -:  175:      if (p) \
+        -:  176:      { \
+        -:  177:        p->~op(); \
+        -:  178:        p = 0; \
+        -:  179:      } \
+        -:  180:      if (v) \
+        -:  181:      { \
+        -:  182:        typedef typename ::boost::asio::associated_allocator< \
+        -:  183:          Handler>::type associated_allocator_type; \
+        -:  184:        typedef typename ::boost::asio::detail::get_hook_allocator< \
+        -:  185:          Handler, associated_allocator_type>::type hook_allocator_type; \
+        -:  186:        BOOST_ASIO_REBIND_ALLOC(hook_allocator_type, op) a( \
+        -:  187:              ::boost::asio::detail::get_hook_allocator< \
+        -:  188:                Handler, associated_allocator_type>::get( \
+        -:  189:                  *h, ::boost::asio::get_associated_allocator(*h))); \
+        -:  190:        a.deallocate(static_cast<op*>(v), 1); \
+        -:  191:        v = 0; \
+        -:  192:      } \
+        -:  193:    } \
+        -:  194:  } \
+        -:  195:  /**/
+        -:  196:
+        -:  197:#define BOOST_ASIO_DEFINE_TAGGED_HANDLER_ALLOCATOR_PTR(purpose, op) \
+        -:  198:  struct ptr \
+        -:  199:  { \
+        -:  200:    const Alloc* a; \
+        -:  201:    void* v; \
+        -:  202:    op* p; \
+        -:  203:    ~ptr() \
+        -:  204:    { \
+        -:  205:      reset(); \
+        -:  206:    } \
+        -:  207:    static op* allocate(const Alloc& a) \
+        -:  208:    { \
+        -:  209:      typedef typename ::boost::asio::detail::get_recycling_allocator< \
+        -:  210:        Alloc, purpose>::type recycling_allocator_type; \
+        -:  211:      BOOST_ASIO_REBIND_ALLOC(recycling_allocator_type, op) a1( \
+        -:  212:            ::boost::asio::detail::get_recycling_allocator< \
+        -:  213:              Alloc, purpose>::get(a)); \
+        -:  214:      return a1.allocate(1); \
+        -:  215:    } \
+        -:  216:    void reset() \
+        -:  217:    { \
+        -:  218:      if (p) \
+        -:  219:      { \
+        -:  220:        p->~op(); \
+        -:  221:        p = 0; \
+        -:  222:      } \
+        -:  223:      if (v) \
+        -:  224:      { \
+        -:  225:        typedef typename ::boost::asio::detail::get_recycling_allocator< \
+        -:  226:          Alloc, purpose>::type recycling_allocator_type; \
+        -:  227:        BOOST_ASIO_REBIND_ALLOC(recycling_allocator_type, op) a1( \
+        -:  228:              ::boost::asio::detail::get_recycling_allocator< \
+        -:  229:                Alloc, purpose>::get(*a)); \
+        -:  230:        a1.deallocate(static_cast<op*>(v), 1); \
+        -:  231:        v = 0; \
+        -:  232:      } \
+        -:  233:    } \
+        -:  234:  } \
+        -:  235:  /**/
+        -:  236:
+        -:  237:#define BOOST_ASIO_DEFINE_HANDLER_ALLOCATOR_PTR(op) \
+        -:  238:  BOOST_ASIO_DEFINE_TAGGED_HANDLER_ALLOCATOR_PTR( \
+        -:  239:      ::boost::asio::detail::thread_info_base::default_tag, op ) \
+        -:  240:  /**/
+        -:  241:
+        -:  242:#include <boost/asio/detail/pop_options.hpp>
+        -:  243:
+        -:  244:#endif // BOOST_ASIO_DETAIL_HANDLER_ALLOC_HELPERS_HPP

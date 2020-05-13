@@ -1,0 +1,135 @@
+        -:    0:Source:/usr/include/boost/asio/system_executor.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// system_executor.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_SYSTEM_EXECUTOR_HPP
+        -:   12:#define BOOST_ASIO_SYSTEM_EXECUTOR_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:
+        -:   20:#include <boost/asio/detail/push_options.hpp>
+        -:   21:
+        -:   22:namespace boost {
+        -:   23:namespace asio {
+        -:   24:
+        -:   25:class system_context;
+        -:   26:
+        -:   27:/// An executor that uses arbitrary threads.
+        -:   28:/**
+        -:   29: * The system executor represents an execution context where functions are
+        -:   30: * permitted to run on arbitrary threads. The post() and defer() functions
+        -:   31: * schedule the function to run on an unspecified system thread pool, and
+        -:   32: * dispatch() invokes the function immediately.
+        -:   33: */
+        -:   34:class system_executor
+        -:   35:{
+        -:   36:public:
+        -:   37:  /// Obtain the underlying execution context.
+        -:   38:  system_context& context() const BOOST_ASIO_NOEXCEPT;
+        -:   39:
+        -:   40:  /// Inform the executor that it has some outstanding work to do.
+        -:   41:  /**
+        -:   42:   * For the system executor, this is a no-op.
+        -:   43:   */
+    #####:   44:  void on_work_started() const BOOST_ASIO_NOEXCEPT
+        -:   45:  {
+    #####:   46:  }
+        -:   47:
+        -:   48:  /// Inform the executor that some work is no longer outstanding.
+        -:   49:  /**
+        -:   50:   * For the system executor, this is a no-op.
+        -:   51:   */
+    #####:   52:  void on_work_finished() const BOOST_ASIO_NOEXCEPT
+        -:   53:  {
+    #####:   54:  }
+        -:   55:
+        -:   56:  /// Request the system executor to invoke the given function object.
+        -:   57:  /**
+        -:   58:   * This function is used to ask the executor to execute the given function
+        -:   59:   * object. The function object will always be executed inside this function.
+        -:   60:   *
+        -:   61:   * @param f The function object to be called. The executor will make
+        -:   62:   * a copy of the handler object as required. The function signature of the
+        -:   63:   * function object must be: @code void function(); @endcode
+        -:   64:   *
+        -:   65:   * @param a An allocator that may be used by the executor to allocate the
+        -:   66:   * internal storage needed for function invocation.
+        -:   67:   */
+        -:   68:  template <typename Function, typename Allocator>
+        -:   69:  void dispatch(BOOST_ASIO_MOVE_ARG(Function) f, const Allocator& a) const;
+        -:   70:
+        -:   71:  /// Request the system executor to invoke the given function object.
+        -:   72:  /**
+        -:   73:   * This function is used to ask the executor to execute the given function
+        -:   74:   * object. The function object will never be executed inside this function.
+        -:   75:   * Instead, it will be scheduled to run on an unspecified system thread pool.
+        -:   76:   *
+        -:   77:   * @param f The function object to be called. The executor will make
+        -:   78:   * a copy of the handler object as required. The function signature of the
+        -:   79:   * function object must be: @code void function(); @endcode
+        -:   80:   *
+        -:   81:   * @param a An allocator that may be used by the executor to allocate the
+        -:   82:   * internal storage needed for function invocation.
+        -:   83:   */
+        -:   84:  template <typename Function, typename Allocator>
+        -:   85:  void post(BOOST_ASIO_MOVE_ARG(Function) f, const Allocator& a) const;
+        -:   86:
+        -:   87:  /// Request the system executor to invoke the given function object.
+        -:   88:  /**
+        -:   89:   * This function is used to ask the executor to execute the given function
+        -:   90:   * object. The function object will never be executed inside this function.
+        -:   91:   * Instead, it will be scheduled to run on an unspecified system thread pool.
+        -:   92:   *
+        -:   93:   * @param f The function object to be called. The executor will make
+        -:   94:   * a copy of the handler object as required. The function signature of the
+        -:   95:   * function object must be: @code void function(); @endcode
+        -:   96:   *
+        -:   97:   * @param a An allocator that may be used by the executor to allocate the
+        -:   98:   * internal storage needed for function invocation.
+        -:   99:   */
+        -:  100:  template <typename Function, typename Allocator>
+        -:  101:  void defer(BOOST_ASIO_MOVE_ARG(Function) f, const Allocator& a) const;
+        -:  102:
+        -:  103:  /// Compare two executors for equality.
+        -:  104:  /**
+        -:  105:   * System executors always compare equal.
+        -:  106:   */
+        -:  107:  friend bool operator==(const system_executor&,
+        -:  108:      const system_executor&) BOOST_ASIO_NOEXCEPT
+        -:  109:  {
+        -:  110:    return true;
+        -:  111:  }
+        -:  112:
+        -:  113:  /// Compare two executors for inequality.
+        -:  114:  /**
+        -:  115:   * System executors always compare equal.
+        -:  116:   */
+        -:  117:  friend bool operator!=(const system_executor&,
+        -:  118:      const system_executor&) BOOST_ASIO_NOEXCEPT
+        -:  119:  {
+        -:  120:    return false;
+        -:  121:  }
+        -:  122:};
+        -:  123:
+        -:  124:} // namespace asio
+        -:  125:} // namespace boost
+        -:  126:
+        -:  127:#include <boost/asio/detail/pop_options.hpp>
+        -:  128:
+        -:  129:#include <boost/asio/impl/system_executor.hpp>
+        -:  130:
+        -:  131:#endif // BOOST_ASIO_SYSTEM_EXECUTOR_HPP

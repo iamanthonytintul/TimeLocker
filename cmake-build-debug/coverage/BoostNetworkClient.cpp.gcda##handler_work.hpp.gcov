@@ -1,0 +1,368 @@
+        -:    0:Source:/usr/include/boost/asio/detail/handler_work.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// detail/handler_work.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_DETAIL_HANDLER_WORK_HPP
+        -:   12:#define BOOST_ASIO_DETAIL_HANDLER_WORK_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <boost/asio/associated_executor.hpp>
+        -:   20:#include <boost/asio/detail/handler_invoke_helpers.hpp>
+        -:   21:
+        -:   22:#include <boost/asio/detail/push_options.hpp>
+        -:   23:
+        -:   24:namespace boost {
+        -:   25:namespace asio {
+        -:   26:namespace detail {
+        -:   27:
+        -:   28:// A helper class template to allow completion handlers to be dispatched
+        -:   29:// through either the new executors framework or the old invocaton hook. The
+        -:   30:// primary template uses the new executors framework.
+        -:   31:template <typename Handler,
+        -:   32:    typename IoExecutor = system_executor, typename HandlerExecutor
+        -:   33:      = typename associated_executor<Handler, IoExecutor>::type>
+        -:   34:class handler_work
+        -:   35:{
+        -:   36:public:
+        -:   37:  explicit handler_work(Handler& handler) BOOST_ASIO_NOEXCEPT
+        -:   38:    : io_executor_(),
+        -:   39:      executor_(boost::asio::get_associated_executor(handler, io_executor_))
+        -:   40:  {
+        -:   41:  }
+        -:   42:
+       4*:   43:  handler_work(Handler& handler, const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   44:    : io_executor_(io_ex),
+       4*:   45:      executor_(boost::asio::get_associated_executor(handler, io_executor_))
+        -:   46:  {
+       4*:   47:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlSI_mE_EENS1_18io_object_executorIS7_EESM_EC2ERSK_RKSM_:
+        1:   43:  handler_work(Handler& handler, const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   44:    : io_executor_(io_ex),
+        1:   45:      executor_(boost::asio::get_associated_executor(handler, io_executor_))
+        1:   45-block  0
+        -:   46:  {
+        1:   47:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSI_mE0_EENS1_18io_object_executorIS7_EESM_EC2ERSK_RKSM_:
+    #####:   43:  handler_work(Handler& handler, const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   44:    : io_executor_(io_ex),
+    #####:   45:      executor_(boost::asio::get_associated_executor(handler, io_executor_))
+    %%%%%:   45-block  0
+        -:   46:  {
+    #####:   47:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS7_EESM_EC2ERSK_RKSM_:
+    #####:   43:  handler_work(Handler& handler, const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   44:    : io_executor_(io_ex),
+    #####:   45:      executor_(boost::asio::get_associated_executor(handler, io_executor_))
+    %%%%%:   45-block  0
+        -:   46:  {
+    #####:   47:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSG_mE_EENS1_18io_object_executorIS7_EESK_EC2ERSI_RKSK_:
+        1:   43:  handler_work(Handler& handler, const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   44:    : io_executor_(io_ex),
+        1:   45:      executor_(boost::asio::get_associated_executor(handler, io_executor_))
+        1:   45-block  0
+        -:   46:  {
+        1:   47:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS7_EESL_EC2ERSJ_RKSL_:
+        1:   43:  handler_work(Handler& handler, const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   44:    : io_executor_(io_ex),
+        1:   45:      executor_(boost::asio::get_associated_executor(handler, io_executor_))
+        1:   45-block  0
+        -:   46:  {
+        1:   47:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS7_EESL_EC2ERSJ_RKSL_:
+    #####:   43:  handler_work(Handler& handler, const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   44:    : io_executor_(io_ex),
+    #####:   45:      executor_(boost::asio::get_associated_executor(handler, io_executor_))
+    %%%%%:   45-block  0
+        -:   46:  {
+    #####:   47:  }
+------------------
+_ZN5boost4asio6detail12handler_workIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_NS1_18io_object_executorINS0_8executorEEESB_EC2ERS8_RKSB_:
+        1:   43:  handler_work(Handler& handler, const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   44:    : io_executor_(io_ex),
+        1:   45:      executor_(boost::asio::get_associated_executor(handler, io_executor_))
+        1:   45-block  0
+        -:   46:  {
+        1:   47:  }
+------------------
+        -:   48:
+        -:   49:  static void start(Handler& handler) BOOST_ASIO_NOEXCEPT
+        -:   50:  {
+        -:   51:    HandlerExecutor ex(boost::asio::get_associated_executor(handler));
+        -:   52:    ex.on_work_started();
+        -:   53:  }
+        -:   54:
+       4*:   55:  static void start(Handler& handler,
+        -:   56:      const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   57:  {
+       8*:   58:    HandlerExecutor ex(boost::asio::get_associated_executor(handler, io_ex));
+       4*:   59:    ex.on_work_started();
+       4*:   60:    io_ex.on_work_started();
+       4*:   61:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlSI_mE_EENS1_18io_object_executorIS7_EESM_E5startERSK_RKSM_:
+        1:   55:  static void start(Handler& handler,
+        -:   56:      const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   57:  {
+        2:   58:    HandlerExecutor ex(boost::asio::get_associated_executor(handler, io_ex));
+        1:   58-block  0
+        1:   59:    ex.on_work_started();
+        1:   60:    io_ex.on_work_started();
+        1:   61:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSI_mE0_EENS1_18io_object_executorIS7_EESM_E5startERSK_RKSM_:
+    #####:   55:  static void start(Handler& handler,
+        -:   56:      const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   57:  {
+    #####:   58:    HandlerExecutor ex(boost::asio::get_associated_executor(handler, io_ex));
+    %%%%%:   58-block  0
+    #####:   59:    ex.on_work_started();
+    #####:   60:    io_ex.on_work_started();
+    #####:   61:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS7_EESM_E5startERSK_RKSM_:
+    #####:   55:  static void start(Handler& handler,
+        -:   56:      const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   57:  {
+    #####:   58:    HandlerExecutor ex(boost::asio::get_associated_executor(handler, io_ex));
+    %%%%%:   58-block  0
+    #####:   59:    ex.on_work_started();
+    #####:   60:    io_ex.on_work_started();
+    #####:   61:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSG_mE_EENS1_18io_object_executorIS7_EESK_E5startERSI_RKSK_:
+        1:   55:  static void start(Handler& handler,
+        -:   56:      const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   57:  {
+        2:   58:    HandlerExecutor ex(boost::asio::get_associated_executor(handler, io_ex));
+        1:   58-block  0
+        1:   59:    ex.on_work_started();
+        1:   60:    io_ex.on_work_started();
+        1:   61:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS7_EESL_E5startERSJ_RKSL_:
+        1:   55:  static void start(Handler& handler,
+        -:   56:      const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   57:  {
+        2:   58:    HandlerExecutor ex(boost::asio::get_associated_executor(handler, io_ex));
+        1:   58-block  0
+        1:   59:    ex.on_work_started();
+        1:   60:    io_ex.on_work_started();
+        1:   61:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS7_EESL_E5startERSJ_RKSL_:
+    #####:   55:  static void start(Handler& handler,
+        -:   56:      const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   57:  {
+    #####:   58:    HandlerExecutor ex(boost::asio::get_associated_executor(handler, io_ex));
+    %%%%%:   58-block  0
+    #####:   59:    ex.on_work_started();
+    #####:   60:    io_ex.on_work_started();
+    #####:   61:  }
+------------------
+_ZN5boost4asio6detail12handler_workIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_NS1_18io_object_executorINS0_8executorEEESB_E5startERS8_RKSB_:
+        1:   55:  static void start(Handler& handler,
+        -:   56:      const IoExecutor& io_ex) BOOST_ASIO_NOEXCEPT
+        -:   57:  {
+        2:   58:    HandlerExecutor ex(boost::asio::get_associated_executor(handler, io_ex));
+        1:   58-block  0
+        1:   59:    ex.on_work_started();
+        1:   60:    io_ex.on_work_started();
+        1:   61:  }
+------------------
+        -:   62:
+       4*:   63:  ~handler_work()
+        -:   64:  {
+       4*:   65:    io_executor_.on_work_finished();
+       4*:   66:    executor_.on_work_finished();
+       4*:   67:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlSI_mE_EENS1_18io_object_executorIS7_EESM_ED2Ev:
+        1:   63:  ~handler_work()
+        -:   64:  {
+        1:   65:    io_executor_.on_work_finished();
+        1:   65-block  0
+        1:   66:    executor_.on_work_finished();
+        1:   67:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSI_mE0_EENS1_18io_object_executorIS7_EESM_ED2Ev:
+    #####:   63:  ~handler_work()
+        -:   64:  {
+    #####:   65:    io_executor_.on_work_finished();
+    %%%%%:   65-block  0
+    #####:   66:    executor_.on_work_finished();
+    #####:   67:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS7_EESM_ED2Ev:
+    #####:   63:  ~handler_work()
+        -:   64:  {
+    #####:   65:    io_executor_.on_work_finished();
+    %%%%%:   65-block  0
+    #####:   66:    executor_.on_work_finished();
+    #####:   67:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSG_mE_EENS1_18io_object_executorIS7_EESK_ED2Ev:
+        1:   63:  ~handler_work()
+        -:   64:  {
+        1:   65:    io_executor_.on_work_finished();
+        1:   65-block  0
+        1:   66:    executor_.on_work_finished();
+        1:   67:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS7_EESL_ED2Ev:
+        1:   63:  ~handler_work()
+        -:   64:  {
+        1:   65:    io_executor_.on_work_finished();
+        1:   65-block  0
+        1:   66:    executor_.on_work_finished();
+        1:   67:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS7_EESL_ED2Ev:
+    #####:   63:  ~handler_work()
+        -:   64:  {
+    #####:   65:    io_executor_.on_work_finished();
+    %%%%%:   65-block  0
+    #####:   66:    executor_.on_work_finished();
+    #####:   67:  }
+------------------
+_ZN5boost4asio6detail12handler_workIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_NS1_18io_object_executorINS0_8executorEEESB_ED2Ev:
+        1:   63:  ~handler_work()
+        -:   64:  {
+        1:   65:    io_executor_.on_work_finished();
+        1:   65-block  0
+        1:   66:    executor_.on_work_finished();
+        1:   67:  }
+------------------
+        -:   68:
+        -:   69:  template <typename Function>
+       4*:   70:  void complete(Function& function, Handler& handler)
+        -:   71:  {
+       4*:   72:    executor_.dispatch(BOOST_ASIO_MOVE_CAST(Function)(function),
+       4*:   73:        boost::asio::get_associated_allocator(handler));
+       4*:   74:  }
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient16handleConnectionERKNS_6system10error_codeEEUlSI_mE_EENS1_18io_object_executorIS7_EESM_E8completeINS1_7binder2ISK_SG_mEEEEvRT_RSK_:
+        1:   70:  void complete(Function& function, Handler& handler)
+        -:   71:  {
+        1:   72:    executor_.dispatch(BOOST_ASIO_MOVE_CAST(Function)(function),
+        1:   73:        boost::asio::get_associated_allocator(handler));
+        1:   73-block  0
+        1:   74:  }
+        1:   74-block  0
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSI_mE0_EENS1_18io_object_executorIS7_EESM_E8completeINS1_7binder2ISK_SG_mEEEEvRT_RSK_:
+    #####:   70:  void complete(Function& function, Handler& handler)
+        -:   71:  {
+    #####:   72:    executor_.dispatch(BOOST_ASIO_MOVE_CAST(Function)(function),
+    #####:   73:        boost::asio::get_associated_allocator(handler));
+    %%%%%:   73-block  0
+    #####:   74:  }
+    %%%%%:   74-block  0
+------------------
+_ZN5boost4asio6detail12handler_workINS1_8write_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_17mutable_buffers_1EPKNS0_14mutable_bufferENS1_14transfer_all_tEZN18BoostNetworkClient15handleWriteBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS7_EESM_E8completeINS1_7binder2ISK_SG_mEEEEvRT_RSK_:
+    #####:   70:  void complete(Function& function, Handler& handler)
+        -:   71:  {
+    #####:   72:    executor_.dispatch(BOOST_ASIO_MOVE_CAST(Function)(function),
+    #####:   73:        boost::asio::get_associated_allocator(handler));
+    %%%%%:   73-block  0
+    #####:   74:  }
+    %%%%%:   74-block  0
+------------------
+_ZN5boost4asio6detail12handler_workINS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSG_mE_EENS1_18io_object_executorIS7_EESK_E8completeINS1_7binder2ISI_SE_mEEEEvRT_RSI_:
+        1:   70:  void complete(Function& function, Handler& handler)
+        -:   71:  {
+        1:   72:    executor_.dispatch(BOOST_ASIO_MOVE_CAST(Function)(function),
+        1:   73:        boost::asio::get_associated_allocator(handler));
+        1:   73-block  0
+        1:   74:  }
+        1:   74-block  0
+------------------
+_ZN5boost4asio6detail12handler_workINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS7_EESL_E8completeINS1_7binder2ISJ_SF_mEEEEvRT_RSJ_:
+        1:   70:  void complete(Function& function, Handler& handler)
+        -:   71:  {
+        1:   72:    executor_.dispatch(BOOST_ASIO_MOVE_CAST(Function)(function),
+        1:   73:        boost::asio::get_associated_allocator(handler));
+        1:   73-block  0
+        1:   74:  }
+        1:   74-block  0
+------------------
+_ZN5boost4asio6detail12handler_workINS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS7_EESL_E8completeINS1_7binder2ISJ_SF_mEEEEvRT_RSJ_:
+    #####:   70:  void complete(Function& function, Handler& handler)
+        -:   71:  {
+    #####:   72:    executor_.dispatch(BOOST_ASIO_MOVE_CAST(Function)(function),
+    #####:   73:        boost::asio::get_associated_allocator(handler));
+    %%%%%:   73-block  0
+    #####:   74:  }
+    %%%%%:   74-block  0
+------------------
+_ZN5boost4asio6detail12handler_workIZN18BoostNetworkClient16manageConnectionEvEUlRKNS_6system10error_codeEE_NS1_18io_object_executorINS0_8executorEEESB_E8completeINS1_7binder1IS8_S5_EEEEvRT_RS8_:
+        1:   70:  void complete(Function& function, Handler& handler)
+        -:   71:  {
+        1:   72:    executor_.dispatch(BOOST_ASIO_MOVE_CAST(Function)(function),
+        1:   73:        boost::asio::get_associated_allocator(handler));
+        1:   73-block  0
+        1:   74:  }
+        1:   74-block  0
+------------------
+        -:   75:
+        -:   76:private:
+        -:   77:  // Disallow copying and assignment.
+        -:   78:  handler_work(const handler_work&);
+        -:   79:  handler_work& operator=(const handler_work&);
+        -:   80:
+        -:   81:  IoExecutor io_executor_;
+        -:   82:  HandlerExecutor executor_;
+        -:   83:};
+        -:   84:
+        -:   85:// This specialisation dispatches a handler through the old invocation hook.
+        -:   86:// The specialisation is not strictly required for correctness, as the
+        -:   87:// system_executor will dispatch through the hook anyway. However, by doing
+        -:   88:// this we avoid an extra copy of the handler.
+        -:   89:template <typename Handler>
+        -:   90:class handler_work<Handler, system_executor, system_executor>
+        -:   91:{
+        -:   92:public:
+        -:   93:  explicit handler_work(Handler&) BOOST_ASIO_NOEXCEPT {}
+        -:   94:  static void start(Handler&) BOOST_ASIO_NOEXCEPT {}
+        -:   95:  ~handler_work() {}
+        -:   96:
+        -:   97:  template <typename Function>
+        -:   98:  void complete(Function& function, Handler& handler)
+        -:   99:  {
+        -:  100:    boost_asio_handler_invoke_helpers::invoke(function, handler);
+        -:  101:  }
+        -:  102:
+        -:  103:private:
+        -:  104:  // Disallow copying and assignment.
+        -:  105:  handler_work(const handler_work&);
+        -:  106:  handler_work& operator=(const handler_work&);
+        -:  107:};
+        -:  108:
+        -:  109:} // namespace detail
+        -:  110:} // namespace asio
+        -:  111:} // namespace boost
+        -:  112:
+        -:  113:#include <boost/asio/detail/pop_options.hpp>
+        -:  114:
+        -:  115:#endif // BOOST_ASIO_DETAIL_HANDLER_WORK_HPP

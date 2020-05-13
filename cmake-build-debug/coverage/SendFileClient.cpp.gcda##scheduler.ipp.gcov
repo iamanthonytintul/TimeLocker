@@ -1,0 +1,629 @@
+        -:    0:Source:/usr/include/boost/asio/detail/impl/scheduler.ipp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/SendFileClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/SendFileClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// detail/impl/scheduler.ipp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_DETAIL_IMPL_SCHEDULER_IPP
+        -:   12:#define BOOST_ASIO_DETAIL_IMPL_SCHEDULER_IPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:
+        -:   20:#include <boost/asio/detail/concurrency_hint.hpp>
+        -:   21:#include <boost/asio/detail/event.hpp>
+        -:   22:#include <boost/asio/detail/limits.hpp>
+        -:   23:#include <boost/asio/detail/reactor.hpp>
+        -:   24:#include <boost/asio/detail/scheduler.hpp>
+        -:   25:#include <boost/asio/detail/scheduler_thread_info.hpp>
+        -:   26:#include <boost/asio/detail/signal_blocker.hpp>
+        -:   27:
+        -:   28:#include <boost/asio/detail/push_options.hpp>
+        -:   29:
+        -:   30:namespace boost {
+        -:   31:namespace asio {
+        -:   32:namespace detail {
+        -:   33:
+        -:   34:class scheduler::thread_function
+        -:   35:{
+        -:   36:public:
+        -:   37:  explicit thread_function(scheduler* s)
+        -:   38:    : this_(s)
+        -:   39:  {
+        -:   40:  }
+        -:   41:
+        -:   42:  void operator()()
+        -:   43:  {
+        -:   44:    boost::system::error_code ec;
+        -:   45:    this_->run(ec);
+        -:   46:  }
+        -:   47:
+        -:   48:private:
+        -:   49:  scheduler* this_;
+        -:   50:};
+        -:   51:
+        -:   52:struct scheduler::task_cleanup
+        -:   53:{
+        -:   54:  ~task_cleanup()
+        -:   55:  {
+        -:   56:    if (this_thread_->private_outstanding_work > 0)
+        -:   57:    {
+        -:   58:      boost::asio::detail::increment(
+        -:   59:          scheduler_->outstanding_work_,
+        -:   60:          this_thread_->private_outstanding_work);
+        -:   61:    }
+        -:   62:    this_thread_->private_outstanding_work = 0;
+        -:   63:
+        -:   64:    // Enqueue the completed operations and reinsert the task at the end of
+        -:   65:    // the operation queue.
+        -:   66:    lock_->lock();
+        -:   67:    scheduler_->task_interrupted_ = true;
+        -:   68:    scheduler_->op_queue_.push(this_thread_->private_op_queue);
+        -:   69:    scheduler_->op_queue_.push(&scheduler_->task_operation_);
+        -:   70:  }
+        -:   71:
+        -:   72:  scheduler* scheduler_;
+        -:   73:  mutex::scoped_lock* lock_;
+        -:   74:  thread_info* this_thread_;
+        -:   75:};
+        -:   76:
+        -:   77:struct scheduler::work_cleanup
+        -:   78:{
+        -:   79:  ~work_cleanup()
+        -:   80:  {
+        -:   81:    if (this_thread_->private_outstanding_work > 1)
+        -:   82:    {
+        -:   83:      boost::asio::detail::increment(
+        -:   84:          scheduler_->outstanding_work_,
+        -:   85:          this_thread_->private_outstanding_work - 1);
+        -:   86:    }
+        -:   87:    else if (this_thread_->private_outstanding_work < 1)
+        -:   88:    {
+        -:   89:      scheduler_->work_finished();
+        -:   90:    }
+        -:   91:    this_thread_->private_outstanding_work = 0;
+        -:   92:
+        -:   93:#if defined(BOOST_ASIO_HAS_THREADS)
+        -:   94:    if (!this_thread_->private_op_queue.empty())
+        -:   95:    {
+        -:   96:      lock_->lock();
+        -:   97:      scheduler_->op_queue_.push(this_thread_->private_op_queue);
+        -:   98:    }
+        -:   99:#endif // defined(BOOST_ASIO_HAS_THREADS)
+        -:  100:  }
+        -:  101:
+        -:  102:  scheduler* scheduler_;
+        -:  103:  mutex::scoped_lock* lock_;
+        -:  104:  thread_info* this_thread_;
+        -:  105:};
+        -:  106:
+        -:  107:scheduler::scheduler(boost::asio::execution_context& ctx,
+        -:  108:    int concurrency_hint, bool own_thread)
+        -:  109:  : boost::asio::detail::execution_context_service_base<scheduler>(ctx),
+        -:  110:    one_thread_(concurrency_hint == 1
+        -:  111:        || !BOOST_ASIO_CONCURRENCY_HINT_IS_LOCKING(
+        -:  112:          SCHEDULER, concurrency_hint)
+        -:  113:        || !BOOST_ASIO_CONCURRENCY_HINT_IS_LOCKING(
+        -:  114:          REACTOR_IO, concurrency_hint)),
+        -:  115:    mutex_(BOOST_ASIO_CONCURRENCY_HINT_IS_LOCKING(
+        -:  116:          SCHEDULER, concurrency_hint)),
+        -:  117:    task_(0),
+        -:  118:    task_interrupted_(true),
+        -:  119:    outstanding_work_(0),
+        -:  120:    stopped_(false),
+        -:  121:    shutdown_(false),
+        -:  122:    concurrency_hint_(concurrency_hint),
+        -:  123:    thread_(0)
+        -:  124:{
+        -:  125:  BOOST_ASIO_HANDLER_TRACKING_INIT;
+        -:  126:
+        -:  127:  if (own_thread)
+        -:  128:  {
+        -:  129:    ++outstanding_work_;
+        -:  130:    boost::asio::detail::signal_blocker sb;
+        -:  131:    thread_ = new boost::asio::detail::thread(thread_function(this));
+        -:  132:  }
+        -:  133:}
+        -:  134:
+        -:  135:scheduler::~scheduler()
+        -:  136:{
+        -:  137:  if (thread_)
+        -:  138:  {
+        -:  139:    thread_->join();
+        -:  140:    delete thread_;
+        -:  141:  }
+        -:  142:}
+        -:  143:
+        -:  144:void scheduler::shutdown()
+        -:  145:{
+        -:  146:  mutex::scoped_lock lock(mutex_);
+        -:  147:  shutdown_ = true;
+        -:  148:  if (thread_)
+        -:  149:    stop_all_threads(lock);
+        -:  150:  lock.unlock();
+        -:  151:
+        -:  152:  // Join thread to ensure task operation is returned to queue.
+        -:  153:  if (thread_)
+        -:  154:  {
+        -:  155:    thread_->join();
+        -:  156:    delete thread_;
+        -:  157:    thread_ = 0;
+        -:  158:  }
+        -:  159:
+        -:  160:  // Destroy handler objects.
+        -:  161:  while (!op_queue_.empty())
+        -:  162:  {
+        -:  163:    operation* o = op_queue_.front();
+        -:  164:    op_queue_.pop();
+        -:  165:    if (o != &task_operation_)
+        -:  166:      o->destroy();
+        -:  167:  }
+        -:  168:
+        -:  169:  // Reset to initial state.
+        -:  170:  task_ = 0;
+        -:  171:}
+        -:  172:
+        -:  173:void scheduler::init_task()
+        -:  174:{
+        -:  175:  mutex::scoped_lock lock(mutex_);
+        -:  176:  if (!shutdown_ && !task_)
+        -:  177:  {
+        -:  178:    task_ = &use_service<reactor>(this->context());
+        -:  179:    op_queue_.push(&task_operation_);
+        -:  180:    wake_one_thread_and_unlock(lock);
+        -:  181:  }
+        -:  182:}
+        -:  183:
+        -:  184:std::size_t scheduler::run(boost::system::error_code& ec)
+        -:  185:{
+        -:  186:  ec = boost::system::error_code();
+        -:  187:  if (outstanding_work_ == 0)
+        -:  188:  {
+        -:  189:    stop();
+        -:  190:    return 0;
+        -:  191:  }
+        -:  192:
+        -:  193:  thread_info this_thread;
+        -:  194:  this_thread.private_outstanding_work = 0;
+        -:  195:  thread_call_stack::context ctx(this, this_thread);
+        -:  196:
+        -:  197:  mutex::scoped_lock lock(mutex_);
+        -:  198:
+        -:  199:  std::size_t n = 0;
+        -:  200:  for (; do_run_one(lock, this_thread, ec); lock.lock())
+        -:  201:    if (n != (std::numeric_limits<std::size_t>::max)())
+        -:  202:      ++n;
+        -:  203:  return n;
+        -:  204:}
+        -:  205:
+        -:  206:std::size_t scheduler::run_one(boost::system::error_code& ec)
+        -:  207:{
+        -:  208:  ec = boost::system::error_code();
+        -:  209:  if (outstanding_work_ == 0)
+        -:  210:  {
+        -:  211:    stop();
+        -:  212:    return 0;
+        -:  213:  }
+        -:  214:
+        -:  215:  thread_info this_thread;
+        -:  216:  this_thread.private_outstanding_work = 0;
+        -:  217:  thread_call_stack::context ctx(this, this_thread);
+        -:  218:
+        -:  219:  mutex::scoped_lock lock(mutex_);
+        -:  220:
+        -:  221:  return do_run_one(lock, this_thread, ec);
+        -:  222:}
+        -:  223:
+        -:  224:std::size_t scheduler::wait_one(long usec, boost::system::error_code& ec)
+        -:  225:{
+        -:  226:  ec = boost::system::error_code();
+        -:  227:  if (outstanding_work_ == 0)
+        -:  228:  {
+        -:  229:    stop();
+        -:  230:    return 0;
+        -:  231:  }
+        -:  232:
+        -:  233:  thread_info this_thread;
+        -:  234:  this_thread.private_outstanding_work = 0;
+        -:  235:  thread_call_stack::context ctx(this, this_thread);
+        -:  236:
+        -:  237:  mutex::scoped_lock lock(mutex_);
+        -:  238:
+        -:  239:  return do_wait_one(lock, this_thread, usec, ec);
+        -:  240:}
+        -:  241:
+        -:  242:std::size_t scheduler::poll(boost::system::error_code& ec)
+        -:  243:{
+        -:  244:  ec = boost::system::error_code();
+        -:  245:  if (outstanding_work_ == 0)
+        -:  246:  {
+        -:  247:    stop();
+        -:  248:    return 0;
+        -:  249:  }
+        -:  250:
+        -:  251:  thread_info this_thread;
+        -:  252:  this_thread.private_outstanding_work = 0;
+        -:  253:  thread_call_stack::context ctx(this, this_thread);
+        -:  254:
+        -:  255:  mutex::scoped_lock lock(mutex_);
+        -:  256:
+        -:  257:#if defined(BOOST_ASIO_HAS_THREADS)
+        -:  258:  // We want to support nested calls to poll() and poll_one(), so any handlers
+        -:  259:  // that are already on a thread-private queue need to be put on to the main
+        -:  260:  // queue now.
+        -:  261:  if (one_thread_)
+        -:  262:    if (thread_info* outer_info = static_cast<thread_info*>(ctx.next_by_key()))
+        -:  263:      op_queue_.push(outer_info->private_op_queue);
+        -:  264:#endif // defined(BOOST_ASIO_HAS_THREADS)
+        -:  265:
+        -:  266:  std::size_t n = 0;
+        -:  267:  for (; do_poll_one(lock, this_thread, ec); lock.lock())
+        -:  268:    if (n != (std::numeric_limits<std::size_t>::max)())
+        -:  269:      ++n;
+        -:  270:  return n;
+        -:  271:}
+        -:  272:
+        -:  273:std::size_t scheduler::poll_one(boost::system::error_code& ec)
+        -:  274:{
+        -:  275:  ec = boost::system::error_code();
+        -:  276:  if (outstanding_work_ == 0)
+        -:  277:  {
+        -:  278:    stop();
+        -:  279:    return 0;
+        -:  280:  }
+        -:  281:
+        -:  282:  thread_info this_thread;
+        -:  283:  this_thread.private_outstanding_work = 0;
+        -:  284:  thread_call_stack::context ctx(this, this_thread);
+        -:  285:
+        -:  286:  mutex::scoped_lock lock(mutex_);
+        -:  287:
+        -:  288:#if defined(BOOST_ASIO_HAS_THREADS)
+        -:  289:  // We want to support nested calls to poll() and poll_one(), so any handlers
+        -:  290:  // that are already on a thread-private queue need to be put on to the main
+        -:  291:  // queue now.
+        -:  292:  if (one_thread_)
+        -:  293:    if (thread_info* outer_info = static_cast<thread_info*>(ctx.next_by_key()))
+        -:  294:      op_queue_.push(outer_info->private_op_queue);
+        -:  295:#endif // defined(BOOST_ASIO_HAS_THREADS)
+        -:  296:
+        -:  297:  return do_poll_one(lock, this_thread, ec);
+        -:  298:}
+        -:  299:
+    #####:  300:void scheduler::stop()
+        -:  301:{
+    #####:  302:  mutex::scoped_lock lock(mutex_);
+    %%%%%:  302-block  0
+    %%%%%:  302-block  1
+    $$$$$:  302-block  2
+    #####:  303:  stop_all_threads(lock);
+    #####:  304:}
+        -:  305:
+        -:  306:bool scheduler::stopped() const
+        -:  307:{
+        -:  308:  mutex::scoped_lock lock(mutex_);
+        -:  309:  return stopped_;
+        -:  310:}
+        -:  311:
+        -:  312:void scheduler::restart()
+        -:  313:{
+        -:  314:  mutex::scoped_lock lock(mutex_);
+        -:  315:  stopped_ = false;
+        -:  316:}
+        -:  317:
+        -:  318:void scheduler::compensating_work_started()
+        -:  319:{
+        -:  320:  thread_info_base* this_thread = thread_call_stack::contains(this);
+        -:  321:  ++static_cast<thread_info*>(this_thread)->private_outstanding_work;
+        -:  322:}
+        -:  323:
+        -:  324:void scheduler::post_immediate_completion(
+        -:  325:    scheduler::operation* op, bool is_continuation)
+        -:  326:{
+        -:  327:#if defined(BOOST_ASIO_HAS_THREADS)
+        -:  328:  if (one_thread_ || is_continuation)
+        -:  329:  {
+        -:  330:    if (thread_info_base* this_thread = thread_call_stack::contains(this))
+        -:  331:    {
+        -:  332:      ++static_cast<thread_info*>(this_thread)->private_outstanding_work;
+        -:  333:      static_cast<thread_info*>(this_thread)->private_op_queue.push(op);
+        -:  334:      return;
+        -:  335:    }
+        -:  336:  }
+        -:  337:#else // defined(BOOST_ASIO_HAS_THREADS)
+        -:  338:  (void)is_continuation;
+        -:  339:#endif // defined(BOOST_ASIO_HAS_THREADS)
+        -:  340:
+        -:  341:  work_started();
+        -:  342:  mutex::scoped_lock lock(mutex_);
+        -:  343:  op_queue_.push(op);
+        -:  344:  wake_one_thread_and_unlock(lock);
+        -:  345:}
+        -:  346:
+        -:  347:void scheduler::post_deferred_completion(scheduler::operation* op)
+        -:  348:{
+        -:  349:#if defined(BOOST_ASIO_HAS_THREADS)
+        -:  350:  if (one_thread_)
+        -:  351:  {
+        -:  352:    if (thread_info_base* this_thread = thread_call_stack::contains(this))
+        -:  353:    {
+        -:  354:      static_cast<thread_info*>(this_thread)->private_op_queue.push(op);
+        -:  355:      return;
+        -:  356:    }
+        -:  357:  }
+        -:  358:#endif // defined(BOOST_ASIO_HAS_THREADS)
+        -:  359:
+        -:  360:  mutex::scoped_lock lock(mutex_);
+        -:  361:  op_queue_.push(op);
+        -:  362:  wake_one_thread_and_unlock(lock);
+        -:  363:}
+        -:  364:
+        -:  365:void scheduler::post_deferred_completions(
+        -:  366:    op_queue<scheduler::operation>& ops)
+        -:  367:{
+        -:  368:  if (!ops.empty())
+        -:  369:  {
+        -:  370:#if defined(BOOST_ASIO_HAS_THREADS)
+        -:  371:    if (one_thread_)
+        -:  372:    {
+        -:  373:      if (thread_info_base* this_thread = thread_call_stack::contains(this))
+        -:  374:      {
+        -:  375:        static_cast<thread_info*>(this_thread)->private_op_queue.push(ops);
+        -:  376:        return;
+        -:  377:      }
+        -:  378:    }
+        -:  379:#endif // defined(BOOST_ASIO_HAS_THREADS)
+        -:  380:
+        -:  381:    mutex::scoped_lock lock(mutex_);
+        -:  382:    op_queue_.push(ops);
+        -:  383:    wake_one_thread_and_unlock(lock);
+        -:  384:  }
+        -:  385:}
+        -:  386:
+        -:  387:void scheduler::do_dispatch(
+        -:  388:    scheduler::operation* op)
+        -:  389:{
+        -:  390:  work_started();
+        -:  391:  mutex::scoped_lock lock(mutex_);
+        -:  392:  op_queue_.push(op);
+        -:  393:  wake_one_thread_and_unlock(lock);
+        -:  394:}
+        -:  395:
+        -:  396:void scheduler::abandon_operations(
+        -:  397:    op_queue<scheduler::operation>& ops)
+        -:  398:{
+        -:  399:  op_queue<scheduler::operation> ops2;
+        -:  400:  ops2.push(ops);
+        -:  401:}
+        -:  402:
+        -:  403:std::size_t scheduler::do_run_one(mutex::scoped_lock& lock,
+        -:  404:    scheduler::thread_info& this_thread,
+        -:  405:    const boost::system::error_code& ec)
+        -:  406:{
+        -:  407:  while (!stopped_)
+        -:  408:  {
+        -:  409:    if (!op_queue_.empty())
+        -:  410:    {
+        -:  411:      // Prepare to execute first handler from queue.
+        -:  412:      operation* o = op_queue_.front();
+        -:  413:      op_queue_.pop();
+        -:  414:      bool more_handlers = (!op_queue_.empty());
+        -:  415:
+        -:  416:      if (o == &task_operation_)
+        -:  417:      {
+        -:  418:        task_interrupted_ = more_handlers;
+        -:  419:
+        -:  420:        if (more_handlers && !one_thread_)
+        -:  421:          wakeup_event_.unlock_and_signal_one(lock);
+        -:  422:        else
+        -:  423:          lock.unlock();
+        -:  424:
+        -:  425:        task_cleanup on_exit = { this, &lock, &this_thread };
+        -:  426:        (void)on_exit;
+        -:  427:
+        -:  428:        // Run the task. May throw an exception. Only block if the operation
+        -:  429:        // queue is empty and we're not polling, otherwise we want to return
+        -:  430:        // as soon as possible.
+        -:  431:        task_->run(more_handlers ? 0 : -1, this_thread.private_op_queue);
+        -:  432:      }
+        -:  433:      else
+        -:  434:      {
+        -:  435:        std::size_t task_result = o->task_result_;
+        -:  436:
+        -:  437:        if (more_handlers && !one_thread_)
+        -:  438:          wake_one_thread_and_unlock(lock);
+        -:  439:        else
+        -:  440:          lock.unlock();
+        -:  441:
+        -:  442:        // Ensure the count of outstanding work is decremented on block exit.
+        -:  443:        work_cleanup on_exit = { this, &lock, &this_thread };
+        -:  444:        (void)on_exit;
+        -:  445:
+        -:  446:        // Complete the operation. May throw an exception. Deletes the object.
+        -:  447:        o->complete(this, ec, task_result);
+        -:  448:
+        -:  449:        return 1;
+        -:  450:      }
+        -:  451:    }
+        -:  452:    else
+        -:  453:    {
+        -:  454:      wakeup_event_.clear(lock);
+        -:  455:      wakeup_event_.wait(lock);
+        -:  456:    }
+        -:  457:  }
+        -:  458:
+        -:  459:  return 0;
+        -:  460:}
+        -:  461:
+        -:  462:std::size_t scheduler::do_wait_one(mutex::scoped_lock& lock,
+        -:  463:    scheduler::thread_info& this_thread, long usec,
+        -:  464:    const boost::system::error_code& ec)
+        -:  465:{
+        -:  466:  if (stopped_)
+        -:  467:    return 0;
+        -:  468:
+        -:  469:  operation* o = op_queue_.front();
+        -:  470:  if (o == 0)
+        -:  471:  {
+        -:  472:    wakeup_event_.clear(lock);
+        -:  473:    wakeup_event_.wait_for_usec(lock, usec);
+        -:  474:    usec = 0; // Wait at most once.
+        -:  475:    o = op_queue_.front();
+        -:  476:  }
+        -:  477:
+        -:  478:  if (o == &task_operation_)
+        -:  479:  {
+        -:  480:    op_queue_.pop();
+        -:  481:    bool more_handlers = (!op_queue_.empty());
+        -:  482:
+        -:  483:    task_interrupted_ = more_handlers;
+        -:  484:
+        -:  485:    if (more_handlers && !one_thread_)
+        -:  486:      wakeup_event_.unlock_and_signal_one(lock);
+        -:  487:    else
+        -:  488:      lock.unlock();
+        -:  489:
+        -:  490:    {
+        -:  491:      task_cleanup on_exit = { this, &lock, &this_thread };
+        -:  492:      (void)on_exit;
+        -:  493:
+        -:  494:      // Run the task. May throw an exception. Only block if the operation
+        -:  495:      // queue is empty and we're not polling, otherwise we want to return
+        -:  496:      // as soon as possible.
+        -:  497:      task_->run(more_handlers ? 0 : usec, this_thread.private_op_queue);
+        -:  498:    }
+        -:  499:
+        -:  500:    o = op_queue_.front();
+        -:  501:    if (o == &task_operation_)
+        -:  502:    {
+        -:  503:      if (!one_thread_)
+        -:  504:        wakeup_event_.maybe_unlock_and_signal_one(lock);
+        -:  505:      return 0;
+        -:  506:    }
+        -:  507:  }
+        -:  508:
+        -:  509:  if (o == 0)
+        -:  510:    return 0;
+        -:  511:
+        -:  512:  op_queue_.pop();
+        -:  513:  bool more_handlers = (!op_queue_.empty());
+        -:  514:
+        -:  515:  std::size_t task_result = o->task_result_;
+        -:  516:
+        -:  517:  if (more_handlers && !one_thread_)
+        -:  518:    wake_one_thread_and_unlock(lock);
+        -:  519:  else
+        -:  520:    lock.unlock();
+        -:  521:
+        -:  522:  // Ensure the count of outstanding work is decremented on block exit.
+        -:  523:  work_cleanup on_exit = { this, &lock, &this_thread };
+        -:  524:  (void)on_exit;
+        -:  525:
+        -:  526:  // Complete the operation. May throw an exception. Deletes the object.
+        -:  527:  o->complete(this, ec, task_result);
+        -:  528:
+        -:  529:  return 1;
+        -:  530:}
+        -:  531:
+        -:  532:std::size_t scheduler::do_poll_one(mutex::scoped_lock& lock,
+        -:  533:    scheduler::thread_info& this_thread,
+        -:  534:    const boost::system::error_code& ec)
+        -:  535:{
+        -:  536:  if (stopped_)
+        -:  537:    return 0;
+        -:  538:
+        -:  539:  operation* o = op_queue_.front();
+        -:  540:  if (o == &task_operation_)
+        -:  541:  {
+        -:  542:    op_queue_.pop();
+        -:  543:    lock.unlock();
+        -:  544:
+        -:  545:    {
+        -:  546:      task_cleanup c = { this, &lock, &this_thread };
+        -:  547:      (void)c;
+        -:  548:
+        -:  549:      // Run the task. May throw an exception. Only block if the operation
+        -:  550:      // queue is empty and we're not polling, otherwise we want to return
+        -:  551:      // as soon as possible.
+        -:  552:      task_->run(0, this_thread.private_op_queue);
+        -:  553:    }
+        -:  554:
+        -:  555:    o = op_queue_.front();
+        -:  556:    if (o == &task_operation_)
+        -:  557:    {
+        -:  558:      wakeup_event_.maybe_unlock_and_signal_one(lock);
+        -:  559:      return 0;
+        -:  560:    }
+        -:  561:  }
+        -:  562:
+        -:  563:  if (o == 0)
+        -:  564:    return 0;
+        -:  565:
+        -:  566:  op_queue_.pop();
+        -:  567:  bool more_handlers = (!op_queue_.empty());
+        -:  568:
+        -:  569:  std::size_t task_result = o->task_result_;
+        -:  570:
+        -:  571:  if (more_handlers && !one_thread_)
+        -:  572:    wake_one_thread_and_unlock(lock);
+        -:  573:  else
+        -:  574:    lock.unlock();
+        -:  575:
+        -:  576:  // Ensure the count of outstanding work is decremented on block exit.
+        -:  577:  work_cleanup on_exit = { this, &lock, &this_thread };
+        -:  578:  (void)on_exit;
+        -:  579:
+        -:  580:  // Complete the operation. May throw an exception. Deletes the object.
+        -:  581:  o->complete(this, ec, task_result);
+        -:  582:
+        -:  583:  return 1;
+        -:  584:}
+        -:  585:
+    #####:  586:void scheduler::stop_all_threads(
+        -:  587:    mutex::scoped_lock& lock)
+        -:  588:{
+    #####:  589:  stopped_ = true;
+    #####:  590:  wakeup_event_.signal_all(lock);
+    %%%%%:  590-block  0
+        -:  591:
+    #####:  592:  if (!task_interrupted_ && task_)
+    %%%%%:  592-block  0
+        -:  593:  {
+    #####:  594:    task_interrupted_ = true;
+    #####:  595:    task_->interrupt();
+    %%%%%:  595-block  0
+        -:  596:  }
+    #####:  597:}
+        -:  598:
+        -:  599:void scheduler::wake_one_thread_and_unlock(
+        -:  600:    mutex::scoped_lock& lock)
+        -:  601:{
+        -:  602:  if (!wakeup_event_.maybe_unlock_and_signal_one(lock))
+        -:  603:  {
+        -:  604:    if (!task_interrupted_ && task_)
+        -:  605:    {
+        -:  606:      task_interrupted_ = true;
+        -:  607:      task_->interrupt();
+        -:  608:    }
+        -:  609:    lock.unlock();
+        -:  610:  }
+        -:  611:}
+        -:  612:
+        -:  613:} // namespace detail
+        -:  614:} // namespace asio
+        -:  615:} // namespace boost
+        -:  616:
+        -:  617:#include <boost/asio/detail/pop_options.hpp>
+        -:  618:
+        -:  619:#endif // BOOST_ASIO_DETAIL_IMPL_SCHEDULER_IPP

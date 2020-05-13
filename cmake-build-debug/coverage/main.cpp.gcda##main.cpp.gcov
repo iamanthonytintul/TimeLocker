@@ -1,0 +1,16 @@
+        -:    0:Source:/home/anthonytintul/CLionProjects/TLConsoleApplication/src/main.cpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/src/main.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/src/main.cpp.gcda
+        -:    0:Runs:1
+        -:    1:#include <iostream>
+        -:    2:#include "boostNetwork.h"
+        -:    3:
+        1:    4:int main(int argc, char *argv[]) {
+        1:    5:    BoostNetworkClient *boostNetworkClient = new BoostNetworkClient{'d'};
+        1:    5-block  0
+    $$$$$:    5-block  1
+        -:    6:
+        1:    7:    boostNetworkClient->manageConnection();
+        1:    7-block  0
+        1:    8:    return 0;
+        -:    9:}

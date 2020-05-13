@@ -1,0 +1,389 @@
+        -:    0:Source:/usr/include/boost/asio/detail/reactive_socket_recv_op.hpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/BoostNetworkClient/BoostNetworkClient.cpp.gcda
+        -:    0:Runs:1
+        -:    1://
+        -:    2:// detail/reactive_socket_recv_op.hpp
+        -:    3:// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        -:    4://
+        -:    5:// Copyright (c) 2003-2020 Christopher M. Kohlhoff (chris at kohlhoff dot com)
+        -:    6://
+        -:    7:// Distributed under the Boost Software License, Version 1.0. (See accompanying
+        -:    8:// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+        -:    9://
+        -:   10:
+        -:   11:#ifndef BOOST_ASIO_DETAIL_REACTIVE_SOCKET_RECV_OP_HPP
+        -:   12:#define BOOST_ASIO_DETAIL_REACTIVE_SOCKET_RECV_OP_HPP
+        -:   13:
+        -:   14:#if defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   15:# pragma once
+        -:   16:#endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
+        -:   17:
+        -:   18:#include <boost/asio/detail/config.hpp>
+        -:   19:#include <boost/asio/detail/bind_handler.hpp>
+        -:   20:#include <boost/asio/detail/buffer_sequence_adapter.hpp>
+        -:   21:#include <boost/asio/detail/fenced_block.hpp>
+        -:   22:#include <boost/asio/detail/memory.hpp>
+        -:   23:#include <boost/asio/detail/reactor_op.hpp>
+        -:   24:#include <boost/asio/detail/socket_ops.hpp>
+        -:   25:
+        -:   26:#include <boost/asio/detail/push_options.hpp>
+        -:   27:
+        -:   28:namespace boost {
+        -:   29:namespace asio {
+        -:   30:namespace detail {
+        -:   31:
+        -:   32:template <typename MutableBufferSequence>
+        -:   33:class reactive_socket_recv_op_base : public reactor_op
+        -:   34:{
+        -:   35:public:
+        2:   36:  reactive_socket_recv_op_base(socket_type socket,
+        -:   37:      socket_ops::state_type state, const MutableBufferSequence& buffers,
+        -:   38:      socket_base::message_flags flags, func_type complete_func)
+        -:   39:    : reactor_op(&reactive_socket_recv_op_base::do_perform, complete_func),
+        -:   40:      socket_(socket),
+        -:   41:      state_(state),
+        -:   42:      buffers_(buffers),
+        2:   43:      flags_(flags)
+        2:   43-block  0
+        -:   44:  {
+        2:   45:  }
+        -:   46:
+        3:   47:  static status do_perform(reactor_op* base)
+        -:   48:  {
+        3:   49:    reactive_socket_recv_op_base* o(
+        -:   50:        static_cast<reactive_socket_recv_op_base*>(base));
+        -:   51:
+        -:   52:    buffer_sequence_adapter<boost::asio::mutable_buffer,
+        3:   53:        MutableBufferSequence> bufs(o->buffers_);
+        3:   53-block  0
+        -:   54:
+        3:   55:    status result = socket_ops::non_blocking_recv(o->socket_,
+        -:   56:        bufs.buffers(), bufs.count(), o->flags_,
+        3:   57:        (o->state_ & socket_ops::stream_oriented) != 0,
+        6:   58:        o->ec_, o->bytes_transferred_) ? done : not_done;
+        3:   58-block  0
+        2:   58-block  1
+        1:   58-block  2
+        -:   59:
+        3:   60:    if (result == done)
+        3:   60-block  0
+        2:   61:      if ((o->state_ & socket_ops::stream_oriented) != 0)
+        2:   61-block  0
+        2:   62:        if (o->bytes_transferred_ == 0)
+        2:   62-block  0
+    #####:   63:          result = done_and_exhausted;
+    %%%%%:   63-block  0
+        -:   64:
+        -:   65:    BOOST_ASIO_HANDLER_REACTOR_OPERATION((*o, "non_blocking_recv",
+        -:   66:          o->ec_, o->bytes_transferred_));
+        -:   67:
+        3:   68:    return result;
+        3:   68-block  0
+        3:   68-block  1
+        -:   69:  }
+        -:   70:
+        -:   71:private:
+        -:   72:  socket_type socket_;
+        -:   73:  socket_ops::state_type state_;
+        -:   74:  MutableBufferSequence buffers_;
+        -:   75:  socket_base::message_flags flags_;
+        -:   76:};
+        -:   77:
+        -:   78:template <typename MutableBufferSequence, typename Handler, typename IoExecutor>
+        -:   79:class reactive_socket_recv_op :
+        -:   80:  public reactive_socket_recv_op_base<MutableBufferSequence>
+        -:   81:{
+        -:   82:public:
+      12*:   83:  BOOST_ASIO_DEFINE_HANDLER_PTR(reactive_socket_recv_op);
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS8_EEE3ptr5resetEv:
+        3:   83:  BOOST_ASIO_DEFINE_HANDLER_PTR(reactive_socket_recv_op);
+        3:   83-block  0
+        1:   83-block  1
+        3:   83-block  2
+        1:   83-block  3
+        1:   83-block  4
+        1:   83-block  5
+        3:   83-block  6
+    $$$$$:   83-block  7
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS8_EEE3ptr5resetEv:
+        3:   83:  BOOST_ASIO_DEFINE_HANDLER_PTR(reactive_socket_recv_op);
+        3:   83-block  0
+        1:   83-block  1
+        3:   83-block  2
+        1:   83-block  3
+        1:   83-block  4
+        1:   83-block  5
+        3:   83-block  6
+    $$$$$:   83-block  7
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS8_EEE3ptr5resetEv:
+    #####:   83:  BOOST_ASIO_DEFINE_HANDLER_PTR(reactive_socket_recv_op);
+    %%%%%:   83-block  0
+    %%%%%:   83-block  1
+    %%%%%:   83-block  2
+    %%%%%:   83-block  3
+    %%%%%:   83-block  4
+    %%%%%:   83-block  5
+    %%%%%:   83-block  6
+    $$$$$:   83-block  7
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS8_EEE3ptrD2Ev:
+        2:   83:  BOOST_ASIO_DEFINE_HANDLER_PTR(reactive_socket_recv_op);
+        2:   83-block  0
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS8_EEE3ptr8allocateERSJ_:
+        1:   83:  BOOST_ASIO_DEFINE_HANDLER_PTR(reactive_socket_recv_op);
+        1:   83-block  0
+        1:   83-block  1
+        1:   83-block  2
+        1:   83-block  3
+    $$$$$:   83-block  4
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS8_EEE3ptrD2Ev:
+        2:   83:  BOOST_ASIO_DEFINE_HANDLER_PTR(reactive_socket_recv_op);
+        2:   83-block  0
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS8_EEE3ptr8allocateERSK_:
+        1:   83:  BOOST_ASIO_DEFINE_HANDLER_PTR(reactive_socket_recv_op);
+        1:   83-block  0
+        1:   83-block  1
+        1:   83-block  2
+        1:   83-block  3
+    $$$$$:   83-block  4
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS8_EEE3ptrD2Ev:
+    #####:   83:  BOOST_ASIO_DEFINE_HANDLER_PTR(reactive_socket_recv_op);
+    %%%%%:   83-block  0
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS8_EEE3ptr8allocateERSK_:
+    #####:   83:  BOOST_ASIO_DEFINE_HANDLER_PTR(reactive_socket_recv_op);
+    %%%%%:   83-block  0
+    %%%%%:   83-block  1
+    %%%%%:   83-block  2
+    %%%%%:   83-block  3
+    $$$$$:   83-block  4
+------------------
+        -:   84:
+       2*:   85:  reactive_socket_recv_op(socket_type socket, socket_ops::state_type state,
+        -:   86:      const MutableBufferSequence& buffers, socket_base::message_flags flags,
+        -:   87:      Handler& handler, const IoExecutor& io_ex)
+        -:   88:    : reactive_socket_recv_op_base<MutableBufferSequence>(socket, state,
+        -:   89:        buffers, flags, &reactive_socket_recv_op::do_complete),
+        -:   90:      handler_(BOOST_ASIO_MOVE_CAST(Handler)(handler)),
+       2*:   91:      io_executor_(io_ex)
+        -:   92:  {
+       2*:   93:    handler_work<Handler, IoExecutor>::start(handler_, io_executor_);
+       2*:   94:  }
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS8_EEEC2EihRKS3_iRSJ_RKSL_:
+        1:   85:  reactive_socket_recv_op(socket_type socket, socket_ops::state_type state,
+        -:   86:      const MutableBufferSequence& buffers, socket_base::message_flags flags,
+        -:   87:      Handler& handler, const IoExecutor& io_ex)
+        -:   88:    : reactive_socket_recv_op_base<MutableBufferSequence>(socket, state,
+        -:   89:        buffers, flags, &reactive_socket_recv_op::do_complete),
+        -:   90:      handler_(BOOST_ASIO_MOVE_CAST(Handler)(handler)),
+        1:   91:      io_executor_(io_ex)
+        1:   91-block  0
+        -:   92:  {
+        1:   93:    handler_work<Handler, IoExecutor>::start(handler_, io_executor_);
+        1:   94:  }
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS8_EEEC2EihRKS3_iRSK_RKSM_:
+        1:   85:  reactive_socket_recv_op(socket_type socket, socket_ops::state_type state,
+        -:   86:      const MutableBufferSequence& buffers, socket_base::message_flags flags,
+        -:   87:      Handler& handler, const IoExecutor& io_ex)
+        -:   88:    : reactive_socket_recv_op_base<MutableBufferSequence>(socket, state,
+        -:   89:        buffers, flags, &reactive_socket_recv_op::do_complete),
+        -:   90:      handler_(BOOST_ASIO_MOVE_CAST(Handler)(handler)),
+        1:   91:      io_executor_(io_ex)
+        1:   91-block  0
+        -:   92:  {
+        1:   93:    handler_work<Handler, IoExecutor>::start(handler_, io_executor_);
+        1:   94:  }
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS8_EEEC2EihRKS3_iRSK_RKSM_:
+    #####:   85:  reactive_socket_recv_op(socket_type socket, socket_ops::state_type state,
+        -:   86:      const MutableBufferSequence& buffers, socket_base::message_flags flags,
+        -:   87:      Handler& handler, const IoExecutor& io_ex)
+        -:   88:    : reactive_socket_recv_op_base<MutableBufferSequence>(socket, state,
+        -:   89:        buffers, flags, &reactive_socket_recv_op::do_complete),
+        -:   90:      handler_(BOOST_ASIO_MOVE_CAST(Handler)(handler)),
+    #####:   91:      io_executor_(io_ex)
+    %%%%%:   91-block  0
+        -:   92:  {
+    #####:   93:    handler_work<Handler, IoExecutor>::start(handler_, io_executor_);
+    #####:   94:  }
+------------------
+        -:   95:
+       2*:   96:  static void do_complete(void* owner, operation* base,
+        -:   97:      const boost::system::error_code& /*ec*/,
+        -:   98:      std::size_t /*bytes_transferred*/)
+        -:   99:  {
+        -:  100:    // Take ownership of the handler object.
+       2*:  101:    reactive_socket_recv_op* o(static_cast<reactive_socket_recv_op*>(base));
+       4*:  102:    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+       4*:  103:    handler_work<Handler, IoExecutor> w(o->handler_, o->io_executor_);
+        -:  104:
+        -:  105:    BOOST_ASIO_HANDLER_COMPLETION((*o));
+        -:  106:
+        -:  107:    // Make a copy of the handler so that the memory can be deallocated before
+        -:  108:    // the upcall is made. Even if we're not about to make an upcall, a
+        -:  109:    // sub-object of the handler may be the true owner of the memory associated
+        -:  110:    // with the handler. Consequently, a local copy of the handler is required
+        -:  111:    // to ensure that any owning sub-object remains valid until after we have
+        -:  112:    // deallocated the memory here.
+        -:  113:    detail::binder2<Handler, boost::system::error_code, std::size_t>
+       3*:  114:      handler(o->handler_, o->ec_, o->bytes_transferred_);
+       2*:  115:    p.h = boost::asio::detail::addressof(handler.handler_);
+       2*:  116:    p.reset();
+        -:  117:
+        -:  118:    // Make the upcall if required.
+       2*:  119:    if (owner)
+        -:  120:    {
+       4*:  121:      fenced_block b(fenced_block::half);
+        -:  122:      BOOST_ASIO_HANDLER_INVOCATION_BEGIN((handler.arg1_, handler.arg2_));
+       2*:  123:      w.complete(handler, handler.handler_);
+        -:  124:      BOOST_ASIO_HANDLER_INVOCATION_END;
+        -:  125:    }
+       2*:  126:  }
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_29read_until_delim_string_op_v1INS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEEZN18BoostNetworkClient17handleWriteHeaderERKNS_6system10error_codeEmEUlSH_mE_EENS1_18io_object_executorIS8_EEE11do_completeEPvPNS1_19scheduler_operationESH_m:
+        1:   96:  static void do_complete(void* owner, operation* base,
+        -:   97:      const boost::system::error_code& /*ec*/,
+        -:   98:      std::size_t /*bytes_transferred*/)
+        -:   99:  {
+        -:  100:    // Take ownership of the handler object.
+        1:  101:    reactive_socket_recv_op* o(static_cast<reactive_socket_recv_op*>(base));
+        2:  102:    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+        1:  102-block  0
+    $$$$$:  102-block  1
+        2:  103:    handler_work<Handler, IoExecutor> w(o->handler_, o->io_executor_);
+    $$$$$:  103-block  0
+        -:  104:
+        -:  105:    BOOST_ASIO_HANDLER_COMPLETION((*o));
+        -:  106:
+        -:  107:    // Make a copy of the handler so that the memory can be deallocated before
+        -:  108:    // the upcall is made. Even if we're not about to make an upcall, a
+        -:  109:    // sub-object of the handler may be the true owner of the memory associated
+        -:  110:    // with the handler. Consequently, a local copy of the handler is required
+        -:  111:    // to ensure that any owning sub-object remains valid until after we have
+        -:  112:    // deallocated the memory here.
+        -:  113:    detail::binder2<Handler, boost::system::error_code, std::size_t>
+        2:  114:      handler(o->handler_, o->ec_, o->bytes_transferred_);
+        1:  114-block  0
+    $$$$$:  114-block  1
+        1:  115:    p.h = boost::asio::detail::addressof(handler.handler_);
+        1:  116:    p.reset();
+        -:  117:
+        -:  118:    // Make the upcall if required.
+        1:  119:    if (owner)
+        1:  119-block  0
+        -:  120:    {
+        2:  121:      fenced_block b(fenced_block::half);
+        1:  121-block  0
+        1:  121-block  1
+    $$$$$:  121-block  2
+        -:  122:      BOOST_ASIO_HANDLER_INVOCATION_BEGIN((handler.arg1_, handler.arg2_));
+        1:  123:      w.complete(handler, handler.handler_);
+        -:  124:      BOOST_ASIO_HANDLER_INVOCATION_END;
+        -:  125:    }
+        1:  126:  }
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient16handleReadHeaderERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS8_EEE11do_completeEPvPNS1_19scheduler_operationESI_m:
+        1:   96:  static void do_complete(void* owner, operation* base,
+        -:   97:      const boost::system::error_code& /*ec*/,
+        -:   98:      std::size_t /*bytes_transferred*/)
+        -:   99:  {
+        -:  100:    // Take ownership of the handler object.
+        1:  101:    reactive_socket_recv_op* o(static_cast<reactive_socket_recv_op*>(base));
+        2:  102:    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+        1:  102-block  0
+    $$$$$:  102-block  1
+        2:  103:    handler_work<Handler, IoExecutor> w(o->handler_, o->io_executor_);
+        1:  103-block  0
+    $$$$$:  103-block  1
+        -:  104:
+        -:  105:    BOOST_ASIO_HANDLER_COMPLETION((*o));
+        -:  106:
+        -:  107:    // Make a copy of the handler so that the memory can be deallocated before
+        -:  108:    // the upcall is made. Even if we're not about to make an upcall, a
+        -:  109:    // sub-object of the handler may be the true owner of the memory associated
+        -:  110:    // with the handler. Consequently, a local copy of the handler is required
+        -:  111:    // to ensure that any owning sub-object remains valid until after we have
+        -:  112:    // deallocated the memory here.
+        -:  113:    detail::binder2<Handler, boost::system::error_code, std::size_t>
+        1:  114:      handler(o->handler_, o->ec_, o->bytes_transferred_);
+        1:  115:    p.h = boost::asio::detail::addressof(handler.handler_);
+        1:  116:    p.reset();
+        -:  117:
+        -:  118:    // Make the upcall if required.
+        1:  119:    if (owner)
+        1:  119-block  0
+        -:  120:    {
+        2:  121:      fenced_block b(fenced_block::half);
+        1:  121-block  0
+        1:  121-block  1
+    $$$$$:  121-block  2
+        -:  122:      BOOST_ASIO_HANDLER_INVOCATION_BEGIN((handler.arg1_, handler.arg2_));
+        1:  123:      w.complete(handler, handler.handler_);
+        -:  124:      BOOST_ASIO_HANDLER_INVOCATION_END;
+        -:  125:    }
+        1:  126:  }
+------------------
+_ZN5boost4asio6detail23reactive_socket_recv_opINS0_17mutable_buffers_1ENS1_17read_dynbuf_v1_opINS0_19basic_stream_socketINS0_2ip3tcpENS0_8executorEEENS0_19basic_streambuf_refISaIcEEENS1_19transfer_at_least_tEZN18BoostNetworkClient14handleReadBodyERKNS_6system10error_codeEmEUlSI_mE_EENS1_18io_object_executorIS8_EEE11do_completeEPvPNS1_19scheduler_operationESI_m:
+    #####:   96:  static void do_complete(void* owner, operation* base,
+        -:   97:      const boost::system::error_code& /*ec*/,
+        -:   98:      std::size_t /*bytes_transferred*/)
+        -:   99:  {
+        -:  100:    // Take ownership of the handler object.
+    #####:  101:    reactive_socket_recv_op* o(static_cast<reactive_socket_recv_op*>(base));
+    #####:  102:    ptr p = { boost::asio::detail::addressof(o->handler_), o, o };
+    %%%%%:  102-block  0
+    $$$$$:  102-block  1
+    #####:  103:    handler_work<Handler, IoExecutor> w(o->handler_, o->io_executor_);
+    %%%%%:  103-block  0
+    $$$$$:  103-block  1
+        -:  104:
+        -:  105:    BOOST_ASIO_HANDLER_COMPLETION((*o));
+        -:  106:
+        -:  107:    // Make a copy of the handler so that the memory can be deallocated before
+        -:  108:    // the upcall is made. Even if we're not about to make an upcall, a
+        -:  109:    // sub-object of the handler may be the true owner of the memory associated
+        -:  110:    // with the handler. Consequently, a local copy of the handler is required
+        -:  111:    // to ensure that any owning sub-object remains valid until after we have
+        -:  112:    // deallocated the memory here.
+        -:  113:    detail::binder2<Handler, boost::system::error_code, std::size_t>
+    #####:  114:      handler(o->handler_, o->ec_, o->bytes_transferred_);
+    #####:  115:    p.h = boost::asio::detail::addressof(handler.handler_);
+    #####:  116:    p.reset();
+        -:  117:
+        -:  118:    // Make the upcall if required.
+    #####:  119:    if (owner)
+    %%%%%:  119-block  0
+        -:  120:    {
+    #####:  121:      fenced_block b(fenced_block::half);
+    %%%%%:  121-block  0
+    %%%%%:  121-block  1
+    $$$$$:  121-block  2
+        -:  122:      BOOST_ASIO_HANDLER_INVOCATION_BEGIN((handler.arg1_, handler.arg2_));
+    #####:  123:      w.complete(handler, handler.handler_);
+        -:  124:      BOOST_ASIO_HANDLER_INVOCATION_END;
+        -:  125:    }
+    #####:  126:  }
+------------------
+        -:  127:
+        -:  128:private:
+        -:  129:  Handler handler_;
+        -:  130:  IoExecutor io_executor_;
+        -:  131:};
+        -:  132:
+        -:  133:} // namespace detail
+        -:  134:} // namespace asio
+        -:  135:} // namespace boost
+        -:  136:
+        -:  137:#include <boost/asio/detail/pop_options.hpp>
+        -:  138:
+        -:  139:#endif // BOOST_ASIO_DETAIL_REACTIVE_SOCKET_RECV_OP_HPP

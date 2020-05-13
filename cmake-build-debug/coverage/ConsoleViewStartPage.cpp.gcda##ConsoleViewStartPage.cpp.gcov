@@ -1,0 +1,19 @@
+        -:    0:Source:/home/anthonytintul/CLionProjects/TLConsoleApplication/lib/Views/pages/ConsoleViewStartPage.cpp
+        -:    0:Graph:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/Views/pages/ConsoleViewStartPage.cpp.gcno
+        -:    0:Data:/home/anthonytintul/CLionProjects/TLConsoleApplication/cmake-build-debug/CMakeFiles/TLConsoleApplication.dir/lib/Views/pages/ConsoleViewStartPage.cpp.gcda
+        -:    0:Runs:1
+        -:    1:#include "ViewHeaders/view.h"
+        -:    2:
+    #####:    3:void ConsoleViewStartPage::attach(AbstractPresenter *observerPresenter) {
+    #####:    4:    vectorOfPresenters.push_back(observerPresenter);
+    %%%%%:    4-block  0
+    #####:    5:}
+        -:    6:
+    #####:    7:int ConsoleViewStartPage::printPage() {
+        -:    8:
+    #####:    9:}
+        -:   10:
+    #####:   11:void ConsoleViewStartPage::accept(AbstractVisitor *visitor) {
+    #####:   12:    visitor->visitStartPage(this);
+    %%%%%:   12-block  0
+    #####:   13:}

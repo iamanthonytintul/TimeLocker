@@ -103,23 +103,6 @@ private:
     ostream &output;
 };
 
-//class ConsoleViewGetAutoPasswordPage : public AbstractView {
-//public:
-//    ConsoleViewGetAutoPasswordPage(ApplicationPresenter *applicationPresenter, istream &cin_ = std::cin,
-//                                   ostream &cout_ = std::cout) : input(cin_), output(cout_),
-//                                                                 presenter(applicationPresenter) {
-//        errorView = new ConsoleErrorView();
-//    }
-//
-//    int printPage() override;
-//
-//private:
-//    ApplicationPresenter *presenter;
-//    ConsoleErrorView *errorView;
-//    istream &input;
-//    ostream &output;
-//};
-
 class ConsoleViewSetFileLifetimePage : public AbstractView {
 public:
     ConsoleViewSetFileLifetimePage(ApplicationPresenter *applicationPresenter, istream &cin_ = std::cin,

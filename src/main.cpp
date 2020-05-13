@@ -7,7 +7,6 @@ int main(int argc, char *argv[]) {
     ApplicationPresenter* applicationPresenter = new ApplicationPresenter{model};
 
     applicationPresenter->start();
-
     BoostNetworkClient *boostNetworkClient = new BoostNetworkClient{model};
     boostNetworkClient->manageConnection();
 

@@ -12,7 +12,7 @@ int  ConsoleViewSetFileLifetimePage::printPage() {
             errorView->fileLifeTimeErrorPrint(output, errorCode);
         }
 
-        output << std::endl << "Please set the lifetime for the file ( 1 - 7 days ): ";
+        output << std::endl << "Please set the lifetime for the file ( 1 - " << MAX_FILE_LIFETIME_DAYS << " days ): ";
 
         input >> enteredLifetime;
         errorCode = isValidFileLifetime(enteredLifetime);

@@ -1,14 +1,16 @@
 #include <iostream>
-#include "view_presenter.h"
+#include "View.h"
+#include "BoostNetwork.h"
 
 int main(int argc, char *argv[]) {
 
     AbstractModel* model = new Model();
-    ApplicationPresenter* applicationPresenter = new ApplicationPresenter{model};
-
+    AbstractNetworkClient *networkClient = new BoostNetworkClient{model};
+    auto* applicationPresenter = new ApplicationPresenter{model, networkClient};
     applicationPresenter->start();
-    BoostNetworkClient *boostNetworkClient = new BoostNetworkClient{model};
-    boostNetworkClient->manageConnection();
 
+    delete model;
+    delete networkClient;
+    delete applicationPresenter;
     return 0;
 }

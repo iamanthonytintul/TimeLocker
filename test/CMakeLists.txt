@@ -1,28 +1,25 @@
-file(GLOB tests "${PROJECT_SOURCE_DIR}/test/ReaderTest.cpp")
-#list(REMOVE_ITEM tests "${PROJECT_SOURCE_DIR}/test/main.cpp")
+file(GLOB tests "${PROJECT_SOURCE_DIR}/test/ViewTests/*.cpp" "${PROJECT_SOURCE_DIR}/test/PresenterTests/*.cpp" "${PROJECT_SOURCE_DIR}/test/ModelTests/*.cpp")
 
-include_directories(${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/lib ${PROJECT_SOURCE_DIR}/test/path/to)
+include_directories(${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/library ${PROJECT_SOURCE_DIR}/test/path/to)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -fprofile-arcs -ftest-coverage")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -fprofile-arcs -ftest-coverage")
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage")
+set(CMAKE_CXX_STANDARD 17)
 
-add_definitions(-DVALID_PASSWORD_TEST="${PROJECT_SOURCE_DIR}/test/path/to/passwordTests/ValidPasswordTest"
-        -DTOO_LONG_PASSWORD_TEST="${PROJECT_SOURCE_DIR}/test/path/to/passwordTests/TooLongPasswordTest"
-        -DTOO_SHORT_PASSWORD_TEST="${PROJECT_SOURCE_DIR}/test/path/to/passwordTests/TooShortPasswordTest")
-
-add_definitions(-DVALID_FILE_PATH_TEST="${PROJECT_SOURCE_DIR}/test/path/to/filePathTests/ValidFilePathTest"
-        -DNO_SUCH_FILE_TEST="${PROJECT_SOURCE_DIR}/test/path/to/filePathTests/NoSuchFileTest")
-
-add_definitions(-DDOWNLOAD_ARGUMENT_TEST="${PROJECT_SOURCE_DIR}/test/path/to/argumentHandlerTests/DownloadArgumentTest"
-        -DUPLOAD_ARGUMENT_TEST="${PROJECT_SOURCE_DIR}/test/path/to/argumentHandlerTests/UploadArgumentTest"
-        -DNO_ARGUMENTS_TEST="${PROJECT_SOURCE_DIR}/test/path/to/argumentHandlerTests/NoArgumentsTest"
-        -DINVALID_COUNT_OF_ARGUMENTS_TEST="${PROJECT_SOURCE_DIR}/test/path/to/argumentHandlerTests/InvalidCountOfArgumentsTest")
-
-add_definitions(-DVALID_DOWNLOAD_TEST="${PROJECT_SOURCE_DIR}/test/path/to/downloadManagerTests/ValidDownloadTest"
-              -DINVALID_DOWNLOAD_TEST="${PROJECT_SOURCE_DIR}/test/path/to/downloadManagerTests/InvalidDownloadTest")
-
-#add_library(ConsoleApplication STATIC ${PROJECT_SOURCE_DIR}/lib/ConsoleApplication.cpp)
+add_definitions(-DOUTPUT="${PROJECT_SOURCE_DIR}/test/path/to/outputFile")
+add_definitions(-DVALID_FILE_KEY="${PROJECT_SOURCE_DIR}/test/path/to/correct/fileKey")
+add_definitions(-DINVALID_FILE_KEY="${PROJECT_SOURCE_DIR}/test/path/to/incorrect/fileKey")
+add_definitions(-DVALID_PASSWORD="${PROJECT_SOURCE_DIR}/test/path/to/correct/filePassword")
+add_definitions(-DINVALID_PASSWORD="${PROJECT_SOURCE_DIR}/test/path/to/incorrect/filePassword")
+add_definitions(-DVALID_FILE_PATH="${PROJECT_SOURCE_DIR}/test/path/to/correct/filePath")
+add_definitions(-DINVALID_FILE_PATH="${PROJECT_SOURCE_DIR}/test/path/to/incorrect/filePath")
+add_definitions(-DVALID_PASSWORD_PAIR="${PROJECT_SOURCE_DIR}/test/path/to/correct/filePasswordPair")
+add_definitions(-DINVALID_PASSWORD_PAIR="${PROJECT_SOURCE_DIR}/test/path/to/incorrect/filePasswordPair")
+add_definitions(-DVALID_FILE_LIFETIME="${PROJECT_SOURCE_DIR}/test/path/to/correct/fileLifetime")
+add_definitions(-DINVALID_FILE_LIFETIME="${PROJECT_SOURCE_DIR}/test/path/to/incorrect/fileLifetime")
+add_definitions(-DVALID_APP_MODE="${PROJECT_SOURCE_DIR}/test/path/to/correct/appMode")
+add_definitions(-DINVALID_APP_MODE="${PROJECT_SOURCE_DIR}/test/path/to/incorrect/appMode")
+add_definitions(-DDOWNLOAD_SCRIPT="${PROJECT_SOURCE_DIR}/test/path/to/correct/downloadScript")
+add_definitions(-DUPLOAD_SCRIPT="${PROJECT_SOURCE_DIR}/test/path/to/correct/uploadScript")
 
 foreach (file ${tests})
     set(name)
@@ -31,6 +28,6 @@ foreach (file ${tests})
             ${sources}
             ${file}
             "${PROJECT_SOURCE_DIR}/test/main.cpp")
-    target_link_libraries("${name}_tests" gtest gmock gmock_main)
+    target_link_libraries("${name}_tests" gmock gmock_main TLConsoleApp)
     add_test(NAME ${name} COMMAND "${name}_tests")
 endforeach ()

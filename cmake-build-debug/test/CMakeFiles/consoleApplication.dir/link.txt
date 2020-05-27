@@ -1,2 +1,0 @@
-/usr/bin/ar qc libconsoleApplication.a  CMakeFiles/consoleApplication.dir/__/lib/ConsoleApplication.cpp.o
-/usr/bin/ranlib libconsoleApplication.a

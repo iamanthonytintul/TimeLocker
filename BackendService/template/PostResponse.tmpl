@@ -1,0 +1,13 @@
+<% c++ #include "Content.h" %>
+<% skin view %>
+<% view message uses content::message %>
+<% template render() %>
+<html>
+<body>
+<h1><a href = "/get/<%=link%>"><%= link %></a></h1>
+<h1>Pass: <%=pass%></h1>
+</body>
+<html>
+<% end template %>
+<% end view %>
+<% end skin %>

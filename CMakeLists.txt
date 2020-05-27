@@ -1,11 +1,11 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.11)
 project(BackEndService)
 
 
 
 include_directories(${CMAKE_SOURCE_DIR})
 option(STATIC_VIEW "Build Static View instead of dynamically loaded one" OFF)
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 #  GTest
 configure_file(CMakeLists.txt.in
         googletest-download/CMakeLists.txt)
@@ -21,7 +21,8 @@ enable_testing()
 add_subdirectory(test)
 
 add_definitions(-DPATH_TO_UPLOADS="${PROJECT_SOURCE_DIR}/uploads/")
-
+add_definitions(-DPATH_TO_DB_CONFIG="${PROJECT_SOURCE_DIR}/src/configs/database.config"
+        -DPATH_TO_STRING_CREATOR="${PROJECT_SOURCE_DIR}/src/configs/stringCreator.config")
 #library
 find_library(LIB_BOOSTER booster)
 find_library(LIB_CPPCMS cppcms)
@@ -49,7 +50,12 @@ set(FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR ${PROJECT_SOURCE_DIR}/mysql-connector-c
 include_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include)
 link_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib)
 
-add_executable(FileService src/main.cpp library/source/src.cpp BackendService/src/WebSite.cpp)
+
+file (GLOB sources
+        "BackendService/src/WebSite.cpp"
+        "${PROJECT_SOURCE_DIR}/library/source/*.cpp"
+        "${PROJECT_SOURCE_DIR}/src/*.cpp")
+add_executable(FileService ${sources})
 
 #templates
 set(VIEW_TEMPLATES ${TEMPLATES}/PostForm.tmpl ${TEMPLATES}/GetForm.tmpl ${TEMPLATES}/PostResponse.tmpl)

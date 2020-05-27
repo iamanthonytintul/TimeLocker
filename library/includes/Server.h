@@ -6,7 +6,7 @@
 
 class AbstractServer{
 public:
-    explicit AbstractServer(AbstractController* _view):view(_view){};
+    explicit AbstractServer(AbstractController* _view,Logger* log):view(_view),logger(log){};
     virtual void GetResponse(std::string key) = 0;
     virtual void PostResponse() = 0;
     virtual void APIGETResponse() = 0;
@@ -15,6 +15,7 @@ public:
 
 protected:
     AbstractController * view;
+    Logger* logger;
 };
 
 #endif //BACKENDSERVICE_SERVER_H

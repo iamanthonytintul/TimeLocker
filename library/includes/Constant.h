@@ -5,8 +5,10 @@ namespace constants {
     const std::string ACCEPTABLE_MIME = "application/zip";
     const std::string MIME_REGEX = ".*\\.zip";
     const std::string FILE_TYPE = ".zip";
-    const std::string TIMEHEADER = "File-Lifetime";
-    const std::string PASSHEADER = "File-Password";
+    const std::string TIMEHEADER = "HTTP_FILE_LIFETIME";
+    const std::string PASSHEADER = "HTTP_FILE_PASSWORD";
+    const std::string FILEKEY = "File-Key";
+    const std::string AUTHHEADER = "HTTP_AUTHORIZATION";
     const std::string KEYMAP = "Key";
     const std::string PASSMAP = "Password";
     const int MIN_LIMIT = 0;

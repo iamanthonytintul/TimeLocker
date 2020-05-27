@@ -1,9 +1,12 @@
 include_directories(../googletest-src/googlemock/include/gmock/)
+set (CMAKE_CXX_STANDARD 17)
 file(GLOB tests "${PROJECT_SOURCE_DIR}/test/*.cpp")
 list(REMOVE_ITEM tests "${PROJECT_SOURCE_DIR}/test/main.cpp")
 
 add_definitions(-DPATH_TO_UPLOADS="${PROJECT_SOURCE_DIR}/uploads/")
-
+add_definitions(-DPATH_TO_DB_CONFIG="${PROJECT_SOURCE_DIR}/src/configs/database.config"
+        -DPATH_TO_STRING_CREATOR="${PROJECT_SOURCE_DIR}/src/configs/stringCreator.config")
+add_definitions(-DPATH_TO_FILE_LOGS="${PROJECT_SOURCE_DIR}/test/log_files/")
 #library
 find_library(LIB_BOOSTER booster)
 find_library(LIB_CPPCMS cppcms)
@@ -24,6 +27,10 @@ include_directories(${PROJECT_SOURCE_DIR}/BackendService)
 include_directories(${PROJECT_SOURCE_DIR}/BackendService/template)
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
+file (GLOB source
+        "${PROJECT_SOURCE_DIR}/BackendService/src/WebSite.cpp"
+        "${PROJECT_SOURCE_DIR}/library/source/*.cpp")
+
 
 foreach(file ${tests})
     set(name)
@@ -31,10 +38,10 @@ foreach(file ${tests})
     add_executable("${name}_tests"
             ${sources}
             ${file}
-            "${PROJECT_SOURCE_DIR}/test/main.cpp" "${PROJECT_SOURCE_DIR}/library/source/src.cpp" "${PROJECT_SOURCE_DIR}/BackendService/src/WebSite.cpp")
-    target_link_libraries("${name}_tests" gtest_main gmock ${LIB_CPPCMS} ${LIB_BOOSTER})
+            "${PROJECT_SOURCE_DIR}/test/main.cpp" ${source})
+    target_link_libraries("${name}_tests" gtest_main gmock ${LIB_CPPCMS} ${LIB_BOOSTER} mysqlcppconn)
     add_dependencies("${name}_tests" view)
-    set (CMAKE_CXX_STANDARD 11)
+    set (CMAKE_CXX_STANDARD 17)
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --coverage -fprofile-arcs -ftest-coverage -Wall -Werror -Wpedantic")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --coverage -fprofile-arcs -ftest-coverage")
     add_test(NAME ${name} COMMAND "${name}_tests")

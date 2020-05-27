@@ -1,13 +1,12 @@
 #ifndef TIMELOCKER_STORAGE_H
 #define TIMELOCKER_STORAGE_H
 
-template <typename DBRow>
+template <typename QuerySet, typename Logger>
 class AbstractDBManager {
 public:
-    virtual ~AbstractDBManager() = default;
-    virtual int connect(std::string host, std::string user, std::string password, std::string database) = 0;
-    virtual int saveData(std::string key, std::string password, std::string deletionDate) = 0;
-    virtual DBRow getData(std::string key) = 0;
+    virtual int connect(string host, string user, string password, string database, Logger*& logger) = 0;
+    virtual int saveData(string key, string password, string deletionDate, Logger*& logger) = 0;
+    virtual int getData(string key, QuerySet*& querySet, Logger*& logger) = 0;
     virtual bool isConnected() = 0;
 };
 

@@ -1,15 +1,16 @@
 #ifndef TIMELOCKER_RESOURCEMANAGERDATABASE_H
 #define TIMELOCKER_RESOURCEMANAGERDATABASE_H
-#include <iostream>
+
+#include <string>
 #include "resourceManager.h"
+
 using std::string;
 
 class ResourceManagerDatabase: public AbstractResourceManager {
 public:
-    explicit ResourceManagerDatabase(string path);
+    explicit ResourceManagerDatabase(std::string_view path);
     ResourceManagerDatabase(const ResourceManagerDatabase&) = delete;
     void operator=(const ResourceManagerDatabase&) = delete;
-    ~ResourceManagerDatabase() override = default;
 
     void parseFile() override;
     string getHost() const;
@@ -17,7 +18,7 @@ public:
     string getPassword() const;
     string getDatabase() const;
 private:
-    const string _pathToFile;
+    const std::string _pathToFile;
     string _host;
     string _user;
     string _password;

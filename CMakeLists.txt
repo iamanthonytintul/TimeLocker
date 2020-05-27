@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.8)
 project(TimeLocker)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 
 configure_file(CMakeLists.txt.in
         googletest-download/CMakeLists.txt)
@@ -17,13 +17,22 @@ set(FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR ~/mysql-connector-cpp)
 include_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/include)
 link_directories(${FULL_PATH_TO_MYSQL_CONNECTOR_CPP_DIR}/lib)
 add_definitions(-DPATH_TO_DB_CONFIG="${PROJECT_SOURCE_DIR}/src/configs/database.config"
-                -DPATH_TO_STRING_CREATOR="${PROJECT_SOURCE_DIR}/src/configs/stringCreator.config")
+                -DPATH_TO_STRING_CREATOR="${PROJECT_SOURCE_DIR}/src/configs/stringCreator.config"
+                -DPATH_TO_DATABASE_LOG="${PROJECT_SOURCE_DIR}/src/logs/database.log"
+                -DBOOST_LOG_DYN_LINK
+                -BOOST_ALL_DYN_LINK)
 
+find_package(Boost 1.58.0 COMPONENTS filesystem REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
 enable_testing()
 add_subdirectory(test)
-include_directories(${PROJECT_SOURCE_DIR}/library/includes ${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/include
+                    ${PROJECT_SOURCE_DIR}/library/includes
+                    ${PROJECT_SOURCE_DIR}/src)
 file (GLOB sources
         "${PROJECT_SOURCE_DIR}/library/source/*.cpp"
         "${PROJECT_SOURCE_DIR}/src/*.cpp")
 add_executable(TimeLocker ${sources})
-target_link_libraries(TimeLocker mysqlcppconn)
+target_link_libraries(TimeLocker mysqlcppconn pthread boost_log_setup boost_log
+                        ${Boost_LIBRARIES} boost_thread)
+

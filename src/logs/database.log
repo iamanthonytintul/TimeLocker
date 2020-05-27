@@ -1,0 +1,60 @@
+[2020-05-27 15:03:42.226229] [0x000000000404ab80] [trace] Connection to database"TimelockerStorage" is stated
+[2020-05-27 15:03:42.293464] [0x000000000404ab80] [trace] Getting data using key "ddrkjncabljujqiifldiywgmpifkgikzqhxnklwl"
+[2020-05-27 15:03:42.295526] [0x000000000404ab80] [error] SQLException in /home/dansik/CLionProjects/CorC++/TimeLocker/src/loggerDatabase.cpp
+[2020-05-27 15:03:42.297342] [0x000000000404ab80] [error] (LogOperationGetData) on line 58
+[2020-05-27 15:03:42.299404] [0x000000000404ab80] [error] 
+[2020-05-27 15:03:42.301371] [0x000000000404ab80] [error] (MySQL error code: 0, SQLState: HY000)
+[2020-05-27 15:03:42.303351] [0x000000000404ab80] [error] Extraction failed
+[2020-05-27 15:03:42.470108] [0x000000000404ab80] [trace] Inserting data using key "ddrkjncabljujqiifldiywgmpifkgikzqhxnklwl"
+[2020-05-27 15:03:42.477679] [0x000000000404ab80] [error] SQLException in /home/dansik/CLionProjects/CorC++/TimeLocker/src/loggerDatabase.cpp
+[2020-05-27 15:03:42.483964] [0x000000000404ab80] [error] (LogOperationSaveData) on line 39
+[2020-05-27 15:03:42.490790] [0x000000000404ab80] [error] 
+[2020-05-27 15:03:42.497284] [0x000000000404ab80] [error] (MySQL error code: 0, SQLState: HY000)
+[2020-05-27 15:03:42.501632] [0x000000000404ab80] [error] Insertion failed
+[2020-05-27 15:03:42.573448] [0x000000000404ab80] [trace] Getting data using key "ddrkjncabljujqiifldiywgmpifkgikzqhxnklwl"
+[2020-05-27 15:03:42.575822] [0x000000000404ab80] [error] SQLException in /home/dansik/CLionProjects/CorC++/TimeLocker/src/loggerDatabase.cpp
+[2020-05-27 15:03:42.577703] [0x000000000404ab80] [error] (LogOperationGetData) on line 58
+[2020-05-27 15:03:42.579618] [0x000000000404ab80] [error] 
+[2020-05-27 15:03:42.582216] [0x000000000404ab80] [error] (MySQL error code: 0, SQLState: HY000)
+[2020-05-27 15:03:42.584348] [0x000000000404ab80] [error] Extraction failed
+key "ddrkjncabljujqiifldiywgmpifkgikzqhxnklwl"
+[2020-05-27 15:03:42.477679] [0x000000000404ab80] [error] SQLException in /home/dansik/CLionProjects/CorC++/TimeLocker/src/loggerDatabase.cpp
+[2020-05-27 15:03:42.483964] [0x000000000404ab80] [error] (LogOperationSaveData) on line 39
+[2020-05-27 15:03:42.490790] [0x000000000404ab80] [error] 
+[2020-05-27 15:03:42.497284] [0x000000000404ab80] [error] (MySQL error code: 0, SQLState: HY000)
+[2020-05-27 15:03:42.501632] [0x000000000404ab80] [error] Insertion failed
+[2020-05-27 15:03:42.573448] [0x000000000404ab80] [trace] Getting data using key "ddrkjncabljujqiifldiywgmpifkgikzqhxnklwl"
+[2020-05-27 15:03:42.575822] [0x000000000404ab80] [error] SQLException in /home/dansik/CLionProjects/CorC++/TimeLocker/src/loggerDatabase.cpp
+[2020-05-27 15:03:42.577703] [0x000000000404ab80] [error] (LogOperationGetData) on line 58
+[2020-05-27 15:03:42.579618] [0x000000000404ab80] [error] 
+[2020-05-27 15:03:42.582216] [0x000000000404ab80] [error] (MySQL error code: 0, SQLState: HY000)
+[2020-05-27 15:03:42.584348] [0x000000000404ab80] [error] Extraction failed
+tated
+[2020-05-27 15:03:42.165152] [0x000000000404ab80] [error] Insertion failed
+[2020-05-27 15:03:42.226229] [0x000000000404ab80] [trace] Connection to database"TimelockerStorage" is stated
+[2020-05-27 15:03:42.293464] [0x000000000404ab80] [trace] Getting data using key "ddrkjncabljujqiifldiywgmpifkgikzqhxnklwl"
+[2020-05-27 15:03:42.295526] [0x000000000404ab80] [error] SQLException in /home/dansik/CLionProjects/CorC++/TimeLocker/src/loggerDatabase.cpp
+[2020-05-27 15:03:42.297342] [0x000000000404ab80] [error] (LogOperationGetData) on line 58
+[2020-05-27 15:03:42.299404] [0x000000000404ab80] [error] 
+[2020-05-27 15:03:42.301371] [0x000000000404ab80] [error] (MySQL error code: 0, SQLState: HY000)
+[2020-05-27 15:03:42.303351] [0x000000000404ab80] [error] Extraction failed
+[2020-05-27 15:03:42.470108] [0x000000000404ab80] [trace] Inserting data using key "ddrkjncabljujqiifldiywgmpifkgikzqhxnklwl"
+[2020-05-27 15:03:42.477679] [0x000000000404ab80] [error] SQLException in /home/dansik/CLionProjects/CorC++/TimeLocker/src/loggerDatabase.cpp
+[2020-05-27 15:03:42.483964] [0x000000000404ab80] [error] (LogOperationSaveData) on line 39
+[2020-05-27 15:03:42.490790] [0x000000000404ab80] [error] 
+[2020-05-27 15:03:42.497284] [0x000000000404ab80] [error] (MySQL error code: 0, SQLState: HY000)
+[2020-05-27 15:03:42.501632] [0x000000000404ab80] [error] Insertion failed
+[2020-05-27 15:03:42.573448] [0x000000000404ab80] [trace] Getting data using key "ddrkjncabljujqiifldiywgmpifkgikzqhxnklwl"
+[2020-05-27 15:03:42.575822] [0x000000000404ab80] [error] SQLException in /home/dansik/CLionProjects/CorC++/TimeLocker/src/loggerDatabase.cpp
+[2020-05-27 15:03:42.577703] [0x000000000404ab80] [error] (LogOperationGetData) on line 58
+[2020-05-27 15:03:42.579618] [0x000000000404ab80] [error] 
+[2020-05-27 15:03:42.582216] [0x000000000404ab80] [error] (MySQL error code: 0, SQLState: HY000)
+[2020-05-27 15:03:42.584348] [0x000000000404ab80] [error] Extraction failed
+ SQLState: HY000)
+[2020-05-27 15:03:42.501632] [0x000000000404ab80] [error] Insertion failed
+[2020-05-27 15:03:42.573448] [0x000000000404ab80] [trace] Getting data using key "ddrkjncabljujqiifldiywgmpifkgikzqhxnklwl"
+[2020-05-27 15:03:42.575822] [0x000000000404ab80] [error] SQLException in /home/dansik/CLionProjects/CorC++/TimeLocker/src/loggerDatabase.cpp
+[2020-05-27 15:03:42.577703] [0x000000000404ab80] [error] (LogOperationGetData) on line 58
+[2020-05-27 15:03:42.579618] [0x000000000404ab80] [error] 
+[2020-05-27 15:03:42.582216] [0x000000000404ab80] [error] (MySQL error code: 0, SQLState: HY000)
+[2020-05-27 15:03:42.584348] [0x000000000404ab80] [error] Extraction failed

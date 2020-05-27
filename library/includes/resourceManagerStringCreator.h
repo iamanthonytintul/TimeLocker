@@ -1,16 +1,14 @@
 #ifndef TIMELOCKER_RESOURCEMANAGERSTRINGCREATOR_H
 #define TIMELOCKER_RESOURCEMANAGERSTRINGCREATOR_H
-#include <iostream>
-#include "resourceManager.h"
 
-const int FIRST_SYMBOL = 0;
+#include <string>
+#include "resourceManager.h"
 
 class ResourceManagerStringCreator: public AbstractResourceManager {
 public:
-    explicit ResourceManagerStringCreator(std::string path);
+    explicit ResourceManagerStringCreator(std::string_view path);
     ResourceManagerStringCreator(const ResourceManagerStringCreator&) = delete;
     void operator=(const ResourceManagerStringCreator&) = delete;
-    ~ResourceManagerStringCreator() override = default;
 
     void parseFile() override;
     int getKeySize() const;

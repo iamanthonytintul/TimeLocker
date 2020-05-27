@@ -2,7 +2,9 @@
 #include <sstream>
 #include "resourceManagerStringCreator.h"
 
-ResourceManagerStringCreator::ResourceManagerStringCreator(std::string path): _pathToFile(std::move(path)) {
+const int SYMBOL = 0;
+
+ResourceManagerStringCreator::ResourceManagerStringCreator(std::string_view path): _pathToFile(path) {
 }
 
 void ResourceManagerStringCreator::parseFile() {
@@ -21,16 +23,16 @@ void ResourceManagerStringCreator::parseFile() {
                 _passwordSize = std::stoi(value);
             }
             if (key == "KEY_START_SYMBOL") {
-                _keyStartSymbol = value[FIRST_SYMBOL];
+                _keyStartSymbol = value[SYMBOL];
             }
             if (key == "KEY_END_SYMBOL") {
-                _keyEndSymbol = value[FIRST_SYMBOL];
+                _keyEndSymbol = value[SYMBOL];
             }
             if (key == "PASSWORD_START_SYMBOL") {
-                _passwordStartSymbol = value[FIRST_SYMBOL];
+                _passwordStartSymbol = value[SYMBOL];
             }
             if (key == "PASSWORD_END_SYMBOL") {
-                _passwordEndSymbol = value[FIRST_SYMBOL];
+                _passwordEndSymbol = value[SYMBOL];
             }
         }
     }

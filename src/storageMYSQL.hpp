@@ -1,33 +1,39 @@
 #ifndef TIMELOCKER_STORAGE_H
 #define TIMELOCKER_STORAGEMYSQL_H
 
-#include <mysql_connection.h>
+#if __cplusplus >= 201703L
+    #include <stdexcept>
+    #include <string>
+    #include <memory>
+
+    #define throw(...)
+    #include <cppconn/exception.h>
+    #undef throw
+#endif
+
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
 #include <cppconn/resultset.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
-#include <iostream>
 #include <string>
-#include <map>
+#include <mysql_connection.h>
+#include "loggerDatabase.h"
 #include "storage.h"
 
-using std::cout;
-using std::endl;
-using std::map;
 using std::string;
 
-template <typename DBRow>
-class StorageMySQL: public AbstractDBManager<DBRow> {
+template <typename QuerySet, typename Logger>
+class StorageMySQL: public AbstractDBManager<QuerySet, Logger> {
 public:
     StorageMySQL();
     StorageMySQL(const StorageMySQL&) = delete;
     void operator=(StorageMySQL&) = delete;
-    ~StorageMySQL() override;
+    ~StorageMySQL();
 
-    int connect(string host, string user, string password, string database) override;
-    int saveData(string key, string password, string deletionDate) override;
-    DBRow getData(string key) override;
+    int connect(string host, string user, string password, string database, Logger*& loggerDB) override;
+    int saveData(string key, string password, string deletionDate, Logger*& loggerDB) override;
+    int getData(string key, QuerySet*& querySet, Logger*& loggerDB) override;
     bool isConnected() override { return _isConnectionStated; }
 private:
     sql::Driver* _driver;
@@ -38,61 +44,45 @@ private:
     bool _isConnectionStated;
 };
 
-template <typename DBRow>
-StorageMySQL<DBRow>::StorageMySQL(): _driver(nullptr), _connection(nullptr),
+template <typename QuerySet, typename Logger>
+StorageMySQL<QuerySet, Logger>::StorageMySQL(): _driver(nullptr), _connection(nullptr),
                                      _statement(nullptr), _preparedStatement(nullptr),
                                      _resultSet(nullptr), _isConnectionStated(false) {
-
 }
 
-template <typename DBRow>
-int StorageMySQL<DBRow>::connect(string host, string user, string password, string database) {
-    cout << endl;
-    cout << "Connecting to database " << database << "..." << endl;
+template <typename QuerySet, typename Logger>
+int StorageMySQL<QuerySet, Logger>::connect(string host, string user,
+                                            string password, string database,
+                                            Logger*& loggerDB) {
     try {
         _driver = get_driver_instance();
         _connection = _driver->connect(host, user, password);
         _connection->setSchema(database);
         _isConnectionStated = true;
-        cout << "Connection to database \"" << database <<"\" is stated." << endl;
-    } catch (sql::SQLException &e) {
-        cout << "# ERR: SQLException in " << __FILE__;
-        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
-        cout << "# ERR: " << e.what();
-        cout << " (MySQL error code: " << e.getErrorCode();
-        cout << ", SQLState: " << e.getSQLState() << " )" << endl;
+    } catch (sql::SQLException &exception) {
         _isConnectionStated = false;
-        cout << "Connection to database \""<< database << "\" is not stated." << endl;
+        loggerDB->LogOperationConnect(database, _isConnectionStated, exception);
         return EXIT_FAILURE;
     }
-    cout << endl;
+    loggerDB->LogOperationConnect(database, _isConnectionStated);
     return EXIT_SUCCESS;
 }
 
-template <typename DBRow>
-StorageMySQL<DBRow>::~StorageMySQL() {
+template <typename QuerySet, typename Logger>
+StorageMySQL<QuerySet, Logger>::~StorageMySQL() {
     if (isConnected()) {
-        cout << "Closing connection to database..." << endl;
         _connection->close();
-        delete _connection;
-        cout << "Connection to database is closed." << endl;
-    } else {
-        cout << "No connection to close." << endl;
     }
-    cout << endl;
+    delete _connection;
 }
 
-template <typename DBRow>
-int StorageMySQL<DBRow>::saveData(string key, string password, string deletionDate) {
-
-     if (!isConnected()) {
-        cout << "Error: connection to database is not stated." << endl;
-        cout << "Insertion failed." << endl;
+template <typename QuerySet, typename Logger>
+int StorageMySQL<QuerySet, Logger>::saveData(string key, string password, string deletionDate, Logger*& loggerDB) {
+    if (!isConnected()) {
+        loggerDB->LogOperationSaveData(key, _isConnectionStated);
         return EXIT_FAILURE;
     }
-
     try {
-        cout << endl << "Inserting data..." << endl;
         _preparedStatement = _connection->prepareStatement("INSERT INTO "
                                                            "TimelockerStorage.Storage"
                                                            "(Storage.Key, Storage.Password, Storage.DeletionDate) "
@@ -101,60 +91,41 @@ int StorageMySQL<DBRow>::saveData(string key, string password, string deletionDa
         _preparedStatement->setString(2, password);
         _preparedStatement->setString(3, deletionDate);
         _preparedStatement->execute();
+        loggerDB->LogOperationSaveData(key, _isConnectionStated);
         delete _preparedStatement;
-    } catch (sql::SQLException &e) {
-        cout << "# ERR: SQLException in " << __FILE__;
-        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
-        cout << "# ERR: " << e.what();
-        cout << " (MySQL error code: " << e.getErrorCode();
-        cout << ", SQLState: " << e.getSQLState() << " )" << endl;
-        cout << "Insertion failed." << endl;
+    } catch (sql::SQLException &exception) {
+        loggerDB->LogOperationSaveData(key, _isConnectionStated, exception);
         delete _preparedStatement;
         return EXIT_FAILURE;
     }
-    cout << "Insertion done." << endl;
     return EXIT_SUCCESS;
 }
 
-template <typename DBRow>
-DBRow StorageMySQL<DBRow>::getData(string key) {
-    map<string, string> result;
-
+template <typename QuerySet, typename Logger>
+int StorageMySQL<QuerySet, Logger>::getData(string key, QuerySet*& querySet, Logger*& loggerDB) {
     if (!isConnected()) {
-        cout << "Error: "
-                "connection to database is not stated." << endl;
-        cout << "Extraction failed." << endl;
-        return result;
+        loggerDB->LogOperationGetData(key, _isConnectionStated);
+        return EXIT_FAILURE;
     }
-
     try {
-        cout << endl << "Getting data using key \"" << key << "\"..." << endl;
         _statement = _connection->createStatement();
         _resultSet = _statement->executeQuery("SELECT Storage.Key, Password, DeletionDate "
                                               "FROM TimelockerStorage.Storage;");
         while (_resultSet->next()) {
             if (key == _resultSet->getString("Key")) {
-                result.insert({"Key", key});
-                result.insert({"Password", _resultSet->getString("Password")});
-                result.insert({"DeletionDate", _resultSet->getString("DeletionDate")});
-                break;
+                querySet->Insert("Key", key, true);
+                querySet->Insert("Password", _resultSet->getString("Password"));
+                querySet->Insert("DeletionDate", _resultSet->getString("DeletionDate"));
             }
         }
         delete _resultSet;
         delete _statement;
-        if (result.empty()) {
-            throw sql::SQLException("No data found.");
-        }
-        cout << "Extraction done." << endl;
-    } catch (sql::SQLException &e) {
-        cout << "# ERR: SQLException in " << __FILE__;
-        cout << "(" << __FUNCTION__ << ") on line " << __LINE__ << endl;
-        cout << "# ERR: " << e.what();
-        cout << " (MySQL error code: " << e.getErrorCode();
-        cout << ", SQLState: " << e.getSQLState() << " )" << endl;
-        cout << "Extraction failed." << endl;
+    } catch (sql::SQLException &exception) {
+        loggerDB->LogOperationGetData(key, _isConnectionStated, exception);
+        return EXIT_FAILURE;
     }
-    return result;
+    loggerDB->LogOperationGetData(key, _isConnectionStated);
+    return EXIT_SUCCESS;
 }
 
 #endif //TIMELOCKER_STORAGE_H

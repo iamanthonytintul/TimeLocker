@@ -2,7 +2,7 @@
 #include <sstream>
 #include "resourceManagerDatabase.h"
 
-ResourceManagerDatabase::ResourceManagerDatabase(string path): _pathToFile(std::move(path)) {
+ResourceManagerDatabase::ResourceManagerDatabase(std::string_view path): _pathToFile(path) {
 }
 
 void ResourceManagerDatabase::parseFile() {
